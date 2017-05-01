@@ -9,12 +9,12 @@
   
   
   
-  <title>Hunting Optima</title>
-  <meta name="description" content="Write-ups on optimization">
+  <title>Stochastic Processes for Expensive Black-Box Optimization</title>
+  <meta name="description" content="In this post, we’ll go through one of the techniques of Black-Box Deterministic Optimization: Response Surface Methdology. In general, this approach models the objective and constraint functions with stochastic processes based on a few evaluations at points in the search space; with the goal of predicting the functions’ behavior as we move away from the evaluated points by different amounts in each coordinate direction. The stochastic process approach has been used in several fields under such names as ‘kriging’, ‘Bayesian optimization’, and ‘random function approach’. It comes with two main advantages: Suitability for Expensive Optimization - as it quickly captures the trends over the search space. Ease of establishing reasonable stopping rules - as it provide statistical confidence intervals. Modelling Alternatives Let’s say we have evaluated a deterministic function, $~y:\mathbb{R}^k\to \mathbb{R}$, at $n$ points. In other words, we have a sample $\mathcal{D}={(x^{(i)},y^{(i)})}_{1\leq i \leq n}$ from the $k$-dimensional space, and we would like to use these observation in guiding our search for the optimal point. Let’s explore possible models that may help us in that. 1. Linear Regression One can use linear regression as a simple way to fit a response surface to $\mathcal{D}$. In linear regression, the observations are assumed to be generated from the following model. \begin{equation} y(\mathbf{x}^{(i)}) = \sum_{h} \beta_{h}f_h(\mathbf{x}^{(i)}) + \epsilon^{(i)}\;,\; i = 1,\ldots,n\;. \label{eq:lin-reg} \end{equation} In the above equation, the $f_h(\mathbf{x})$’s are a set of linear or non-linear functions of $\mathbf{x}$; the $\beta_h$’s are unknown parameters of the model to be estimated; and the $\epsilon^{(i)}$’s are independent error terms with a normal distribution of zero mean and $\sigma^2$ variance. Employing Eq. \ref{eq:lin-reg} has two main concerns: A Conceptual Concern: Our function $f$ is deterministic. Therefore, any improper fit of Eq. \ref{eq:lin-reg} will be a modelling error—i.e., incomplete regression term $\sum_{h} \beta_{h}f_h(\mathbf{x}^{(i)})$—rather than measurement noise or error—i.e., the $\epsilon^{(i)}$ term. In essence $\epsilon^{(i)}=\epsilon(\mathbf{x}^{(i)}$ captures the value of the left-out regression terms at $\mathbf{x}^{(i)}$. And if $y(\mathbf{x})$ is continuous, then $\epsilon(\mathbf{x})$ is continuous as well. Thus, if two points $\mathbf{x}^{(i)}$ and $\mathbf{x}^{(j)}$ are close, then the errors $\epsilon(\mathbf{x}^{(i)})$ and $\epsilon(\mathbf{x}^{(j)})$ should be close as well. A Practical Concern: How to define the $f_h$’s functions. Indeed, if we knew the perfect form of Eq. \ref{eq:lin-reg}, our function $f$ would not have been a black box in the first place. One can certainly employ a meta-model (some referred to it as flexible functional form) approach to decide the most suitable form of Eq. \ref{eq:lin-reg}. However, this approach comes with an additional set of parameters (hyperparameters) and requires many more function evaluations. In light of the above concerns, it makes no sense to assume that the error terms $\epsilon^{(i)}$’s are independent. Alternatively, we can assume that these terms are associated / related and that the level of such association (correlation) is low when the corresponding points $\mathbf{x}^{(i)}$’s are far away and high when they are close. The following equation captures this assumption of correlation. \begin{equation} Corr[x^{(i)},x^{(j)}] = \exp\big(- \sum_{h=1}^{k} \theta_h |x^{(j)}_h-x^{(j)}_h|^{p_h}\big)\;, \theta_h \geq 0\;, p_h \in [0,1]\;. \label{eq:corr-fct} \end{equation} The parameters $\theta_h$’s and $p_h$’s controls how fast the degree of correlation changes between two errors terms as the (weighted) distance between the corresponding points changes as shown in the figure below. In general, $\theta_h$ measures the importance / activity of the $h^{th}$ variable $x_h$ (the higher $\theta_h$ is, the faster the correlation drops as the corresponding points move away in the coordinate direction $h$), while $p_h$ captures the function smoothness in the coordinate direction $h$ ($p_h$ = 2 is for smooth functions). Figure 1. Correlation Function (Eq. \ref{eq:corr-fct}) with different parameters. Having modelled the correlation between our observations, fitting the regression term to our observations is less of a concern now. In fact, this forms the basis of the stochastic process model presented next. 2. DACE (Design and Analysis of Computer Experiments) We can estimate DACE’s $2k+2$ parameters by maximizing the likelihood of our sample $\mathcal{D}$. With the correlation between two error terms defined as above, the vector $\mathbf{y}=[y^{(1)},\ldots, y^{(n)}]$ of observed function values is a normal random $n$-vector. That is, $\mathbf{y}\sim\mathcal{N}(\mu, \sigma^2\mathbf{R})$. Thus, the likelihood function of our samples can be written as follows.1 \begin{equation} f(\mathbf{y};\theta,p, \mu, \sigma) = \frac{1} {(2\pi)^{n/2}(\sigma^2)^{n/2}|\mathbf{R}|^{(1/2)}} \exp\big(-\frac{(\mathbf{y}-\mathbf{1}\mu)^{T} \mathbf{R}^{-1} (\mathbf{y}-\mathbf{1}\mu)}{2\sigma^2}\big) \label{eq:likelihood} \end{equation} Eq. $\ref{eq:likelihood}$ can be optimized with respect to $\mu$ and $\sigma^2$ in closed form by taking the partial derivative of its log: 1: Make use of: $det(cA)= c^n det(A)$, where A is an $n\times n$-matrix; $Cov[x^{(i)},x^{(j)}] = \sigma^2 \cdot Corr[x^{(i)},x^{(j)}]$; and the multivariate normal probability density function. TO BE COMPLETED… References This post is based on the following papers: Sacks, Jerome, et al. Design and analysis of computer experiments. Statistical science (1989): 409-423. Jones, Donald R.; Schonlau, Matthias; Welch, William J. Efficient global optimization of expensive black-box functions. J. Global Optim. 13 (1998), no. 4, 455–492.">
   
 
   <link rel="stylesheet" href="/blog/assets/main.css">
-  <link rel="canonical" href="http://ash-aldujaili.github.io//blog/">
+  <link rel="canonical" href="http://ash-aldujaili.github.io//blog/2017/03/01/exp-opt/">
   
   
   <link rel="alternate" type="application/rss+xml" title="Hunting Optima" href="http://ash-aldujaili.github.io//blog/feed.xml">
@@ -24,8 +24,8 @@
   
   <meta name="twitter:card" content="summary">
   
-  <meta name="twitter:title" content="Hunting Optima">
-  <meta name="twitter:description" content="Write-ups on optimization">
+  <meta name="twitter:title" content="Stochastic Processes for Expensive Black-Box Optimization">
+  <meta name="twitter:description" content="In this post, we’ll go through one of the techniques of Black-Box Deterministic Optimization: Response Surface Methdology. In general, this approach models the objective and constraint functions wi...">
   
   
 
@@ -47,6 +47,25 @@
   
 
 </head>
+
+  
+    <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    TeX: {
+      equationNumbers: {
+        autoNumber: "AMS"
+      }
+    },
+    tex2jax: {
+      inlineMath: [ ['$','$'], ['\(', '\)'] ],
+      displayMath: [ ['$$','$$'] ],
+      processEscapes: true,
+    }
+  });
+</script>
+<script type="text/javascript"
+        src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
 
   
   <body>
@@ -80,28 +99,17 @@
 
     <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        <div class="home">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
 
-  
-
-  
-
-  <ul class="post-list">
+  <header class="post-header">
     
-      
-      
+      <h1 class="post-title" itemprop="name headline">Stochastic Processes for Expensive Black-Box Optimization</h1>
+    
+    <p class="post-meta"><time datetime="2017-03-01T00:00:00-08:00" itemprop="datePublished">Mar 1, 2017</time></p>
+  </header>
 
-      <li>
-        <header class="post-header">
-          <h1 class="post-title">
-            <a class="post-link" href="/blog/2017/03/01/exp-opt/">Stochastic Processes for Expensive Black-Box Optimization</a>
-          </h1>
-
-          <p class="post-meta">Mar 1, 2017</p>
-        </header>
-
-        <div class="post-content">
-          <p>In this post, we’ll go through one of the techniques of Black-Box Deterministic Optimization: <strong>Response Surface Methdology</strong>. In general, this approach models the objective and constraint functions with stochastic processes based on a few evaluations at points in the search space; with the goal of predicting the functions’ behavior as we move away from the evaluated points by different amounts in each coordinate direction.</p>
+  <div class="post-content" itemprop="articleBody">
+    <p>In this post, we’ll go through one of the techniques of Black-Box Deterministic Optimization: <strong>Response Surface Methdology</strong>. In general, this approach models the objective and constraint functions with stochastic processes based on a few evaluations at points in the search space; with the goal of predicting the functions’ behavior as we move away from the evaluated points by different amounts in each coordinate direction.</p>
 
 <p>The stochastic process approach has been used in several fields under such names as ‘kriging’, ‘Bayesian optimization’, and ‘random function approach’. It comes with two main advantages:</p>
 <ol>
@@ -189,16 +197,9 @@ f(\mathbf{y};\theta,p, \mu, \sigma) =
   </li>
 </ol>
 
-        </div>
-        
-      </li>
-    
-  </ul>
+  </div>
 
-  
-
-
-</div>
+</article>
 
       </div>
     </main>
