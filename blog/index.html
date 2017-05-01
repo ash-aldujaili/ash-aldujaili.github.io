@@ -149,7 +149,7 @@ y(\mathbf{x}^{(i)}) = \sum_{h} \beta_{h}f_h(\mathbf{x}^{(i)}) + \epsilon^{(i)}\;
 
 <ol>
   <li>A Conceptual Concern: Our function $f$ is deterministic. Therefore, any improper fit of Eq. \ref{eq:lin-reg} will be a modelling error—i.e., incomplete regression term $\sum_{h} \beta_{h}f_h(\mathbf{x}^{(i)})$—rather than measurement noise or error—i.e., the $\epsilon^{(i)}$ term. In essence $\epsilon^{(i)}=\epsilon(\mathbf{x}^{(i)}$ captures the value of the left-out regression terms at $\mathbf{x}^{(i)}$. And if $y(\mathbf{x})$ is continuous, then $\epsilon(\mathbf{x})$ is continuous as well. Thus, if two points $\mathbf{x}^{(i)}$ and $\mathbf{x}^{(j)}$ are close, then the errors $\epsilon(\mathbf{x}^{(i)})$ and $\epsilon(\mathbf{x}^{(j)})$ should be close as well.</li>
-  <li>A Practical Concern: How to define the $f_h$’s functions. Indeed, if we knew the perfect form of Eq. \ref{eq:lin-reg}, our function $f$ would not have been a black box in the first place. One can certainly employ a meta-model (some referred to it as flexible functional form) approach to decide the most suitable form of Eq. \ref{eq:lin-reg}. However, this approach comes with an additional set of parameters $($hyperparameters$)$ and requires many more function evaluations.</li>
+  <li>A Practical Concern: How to define the $f_h$’s functions. Indeed, if we knew the perfect form of Eq. \ref{eq:lin-reg}, our function $f$ would not have been a black box in the first place. One can certainly employ a meta-model $($some referred to it as flexible functional form$)$ approach to decide the most suitable form of Eq. \ref{eq:lin-reg}. However, this approach comes with an additional set of parameters $($hyperparameters$)$ and requires many more function evaluations.</li>
 </ol>
 
 <p>In light of the above concerns, it makes no sense to assume that the error terms $\epsilon^{(i)}$’s are independent. Alternatively, we can assume that these terms are associated / related and that the level of such association $($correlation$)$ is low when the corresponding points $\mathbf{x}^{(i)}$’s are far away and high when they are close. The following equation captures this assumption of correlation.</p>
@@ -159,12 +159,12 @@ Corr[x^{(i)},x^{(j)}] = \exp\big(- \sum_{h=1}^{k} \theta_h |x^{(j)}_h-x^{(j)}_h|
 \label{eq:corr-fct}
 \end{equation}</p>
 
-<p>The parameters $\theta_h$’s and $p_h$’s controls how fast the degree of correlation changes between two errors terms as the (weighted) distance between the corresponding points changes as shown in the figure below. In general, $\theta_h$ measures the importance / activity of the $h^{th}$ variable $x_h$ $($the higher $\theta_h$ is, the faster the correlation drops as the corresponding points move away in the coordinate direction $h<script type="math/tex">)$, while $p_h$ captures the function smoothness in the coordinate direction $h$ $(</script>p_h$ = 2 is for smooth functions$)$.</p>
+<p>The parameters $\theta_h$’s and $p_h$’s controls how fast the degree of correlation changes between two errors terms as the (weighted) distance between the corresponding points changes as shown in the figure below. In general, $\theta_h$ measures the importance / activity of the $h^{th}$ variable $x_h$ $($the higher $\theta_h$ is, the faster the correlation drops as the corresponding points move away in the coordinate direction $h)$, while $p_h$ captures the function smoothness in the coordinate direction $h$ $(p_h$ = 2 is for smooth functions$)$.</p>
 
 <p align="center">
   <img src="http://ash-aldujaili.github.io/blog/assets/err_corr.jpg" width="400" />
 <br /><br />
-  Figure 1. Correlation Function \(Eq. \ref{eq:corr-fct}\) with different parameters.
+  Figure 1. Correlation Function $($Eq. \ref{eq:corr-fct}$)$ with different parameters.
 </p>
 
 <p>Having modelled the correlation between our observations, fitting the regression term to our observations is less of a concern now. In fact, this forms the basis of the stochastic process model presented next.</p>
