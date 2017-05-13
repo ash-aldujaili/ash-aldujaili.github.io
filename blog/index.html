@@ -135,7 +135,7 @@
 <h4>Notation</h4>
 
 <p align="center">
-  <img src="http://ash-aldujaili.github.io/blog/assets/notation_rand_lipschitz.png" width="400" />
+  <img src="http://ash-aldujaili.github.io/blog/assets/notation_rand_lipschitz.png" width="600" />
 <br /><br />
 
 </p>
@@ -155,26 +155,28 @@ problems is <strong>bounded</strong>.</p>
 <h4>Proof</h4>
 
 <p align="center">
-  <img src="http://ash-aldujaili.github.io/blog/assets/proof_rand_lipschitz.png" width="400" />
+  <img src="http://ash-aldujaili.github.io/blog/assets/proof_rand_lipschitz.png" width="600" />
 <br /><br />
 
 </p>
 <h4>Numerical Validation</h4>
 
-<p>Figure 1 shows a numerical validation of [1]’s Theorem I. First, we sampled 100 points $\mathbf{y}\in\mathcal{Y}\subset \mathbb{R}^d$ whose norms span the range $[0,1]$. E.g., with $d=1$, $\mathbf{y}\in[-1,1]$.</p>
+<p>Here, we carry out a numerical validation of [1]’s Theorem I over four popular Lipschitz-like benchmark functions $($namely, Cigar, Sphere, Rastrigin, and Bohachevsky$)$.</p>
+
+<p>First, we sampled 100 points $\mathbf{y}\in\mathcal{Y}\subset \mathbb{R}^d$ whose norms span the range $[0,1]$. E.g., with $d=1$, $\mathbf{y}\in[-1,1]$.</p>
 
 <p>Second, each of these 100 points are projected to the function space $\mathcal{X}\subset\mathbb{R}^n$ using 20 random matrices ${A_p}_{1\leq p\leq 20}$.</p>
 
-<p>Third, four functions (namely, Cigar, Sphere, Rastrigin, and Bohachevsky) are evaluated at these random projections. Note that for each of these functions, $100*20$ function evaluations are performed.</p>
+<p>Third, the four considered functions are evaluated at these random projections. Note that for each of these functions, $100*20$ function evaluations are performed.</p>
 
 <p>Fourth, we average over the absolute difference between function values at projections of the same point $\mathbf{y}$. That is, for each of the 100 points, we compute the mean of $\frac{20*20- 20}{2}=190$ values, each of which representing the absolute difference of the function value at two random projections of the corresponding point $\mathbf{y}$.</p>
 
-<p>Fifth, the computed average values are plotted as a function of the  corresponding point $\mathbf{y}$. One can see how the trend of the plot follows the curve of $||\mathbf{y}||$ in accordance with [1]’s Theorem I.</p>
+<p>Fifth, the computed average values are plotted as a function of the  corresponding point $\mathbf{y}$ in Figure 1. One can see how the trend of the plot follows the curve of $||\mathbf{y}||$ in accordance with [1]’s Theorem I.</p>
 
 <p align="center">
-  <img src="http://ash-aldujaili.github.io/blog/assets/rand_lipschitz.jpg" width="600" />
+  <img src="http://ash-aldujaili.github.io/blog/assets/rand_lipschitz.jpg" width="1000" />
 <br /><br />
-  Figure 1. Empirical mean of the absolute value difference of four functions evaluated at 20 random projections in $\mathbb{R}^n$ of a point in $\mathbb{R}^d$, where $d&lt;n$.
+  Figure 1. Empirical mean of the absolute value difference of four functions evaluated at 20 random projections in $\mathbb{R}^n$ of a point in $\mathbb{R}^d$, where $d=2$ and $n=10^3$.
 </p>
 <hr />
 
