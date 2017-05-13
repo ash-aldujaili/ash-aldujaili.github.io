@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  
+  
+  <title>Random Projections for Lipschitz Functions</title>
+  <meta name="description" content="In this post, we’ll shed some light on the behavior of Lipschitz-continuous functions at random projections of the same point in another space. Consider the figure below. We have a point in the $\mathbf{y}$ in the lower dimensional space $\mathcal{Y}$ that is projected randomly to the higher dimensional space $\mathcal{X}$ twice using two randomly sampled matrices $A_p$ and $A_q$. With this setting at hand, we are interested in the following question: is there a relation between the function values at $A_p\mathbf{y}$ and $A_q\mathbf{y}$. This has been addressed in [1, Theorem I]. Here, we provide a numerical validation of [1]’s result besides reiterating the formal proof. Before we delve into this further, let’s introduce some notation in accordance with [1]. Notation Theorem I [1] It has been shown in [1] that the mean variation in the objective value for a point $\mathbf{y}$ in the low-dimensional space $\mathcal{Y} \subset \mathbb{R}^d$ projected randomly into the decision space $\mathcal{X}\subset\mathbb{R}^n$ of Lipschitz-continuous problems is bounded. Mathematically, for all $\mathbf{y} \in \mathcal{Y}$, we have Here, we reproduce [1]’s proof for completeness, then we validate the theorem numerically. Proof Numerical Validation Figure 1 shows a numerical validation of [1]’s Theorem I. First, we sampled 100 points $\mathbf{y}\in\mathcal{Y}\subset \mathbb{R}^d$ whose norms span the range $[0,1]$. E.g., with $d=1$, $\mathbf{y}\in[-1,1]$. Second, each of these 100 points are projected to the function space $\mathcal{X}\subset\mathbb{R}^n$ using 20 random matrices ${A_p}_{1\leq p\leq 20}$. Third, four functions (namely, Cigar, Sphere, Rastrigin, and Bohachevsky) are evaluated at these random projections. Note that for each of these functions, $100*20$ function evaluations are performed. Fourth, we average over the absolute difference between function values at projections of the same point $\mathbf{y}$. That is, for each of the 100 points, we compute the mean of $\frac{20*20- 20}{2}=190$ values, each of which representing the absolute difference of the function value at two random projections of the corresponding point $\mathbf{y}$. Fifth, the computed average values are plotted as a function of the corresponding point $\mathbf{y}$. One can see how the trend of the plot follows the curve of $||\mathbf{y}||$ in accordance with [1]’s Theorem I. Figure 1. Empirical mean of the absolute value difference of four functions evaluated at 20 random projections in $\mathbb{R}^n$ of a point in $\mathbb{R}^d$, where $d&amp;lt;n$. References This post is based on the following papers: Al-Dujaili, Abdullah, and S. Suresh. “Embedded Bandits for Large-Scale Black-Box Optimization.” Thirty-First AAAI Conference on Artificial Intelligence. 2017.">
+  
+
+  <link rel="stylesheet" href="/blog/assets/main.css">
+  <link rel="canonical" href="http://ash-aldujaili.github.io//blog/2017/05/08/rand-proj-lipschitz/">
+  
+  
+  <link rel="alternate" type="application/rss+xml" title="Hunting Optima" href="http://ash-aldujaili.github.io//blog/feed.xml">
+
+  
+
+  
+  <meta name="twitter:card" content="summary">
+  
+  <meta name="twitter:title" content="Random Projections for Lipschitz Functions">
+  <meta name="twitter:description" content="In this post, we’ll shed some light on the behavior of Lipschitz-continuous functions at random projections of the same point in another space. Consider the figure below. We have a point in the $\m...">
+  
+  
+
+  <script type="text/javascript">
+  WebFontConfig = {
+    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
+  };
+  (function() {
+    var wf = document.createElement('script');
+    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+    wf.type = 'text/javascript';
+    wf.async = 'true';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(wf, s);
+  })();
+</script>
+
+  
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-68645681-6', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+
+
+</head>
+
+  <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    TeX: {
+      equationNumbers: {
+        autoNumber: "AMS"
+      }
+    },
+    tex2jax: {
+      inlineMath: [ ['$','$'], ['\(', '\)'] ],
+      displayMath: [ ['$$','$$'] ],
+      processEscapes: true,
+    }
+  });
+</script>
+<script type="text/javascript"
+        src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/blog/">Hunting Optima</a>
+
+    <nav class="site-nav">
+      
+        
+        <a class="page-link" href="http://ash-aldujaili.github.io/">Home</a>
+      
+        
+        <a class="page-link" href="/blog/about/">About my blog</a>
+      
+        
+        <a class="page-link" href="/blog/archives/">Archives</a>
+      
+        
+        <a class="page-link" href="https://github.com/ash-aldujaili">GitHub</a>
+      
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    
+      <h1 class="post-title" itemprop="name headline">Random Projections for Lipschitz Functions</h1>
+    
+    <p class="post-meta"><time datetime="2017-05-08T00:00:00-08:00" itemprop="datePublished">May 8, 2017</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>In this post, we’ll shed some light on the behavior of Lipschitz-continuous functions at random projections of the same point in another space. Consider the figure below. We have a point in the $\mathbf{y}$ in the lower dimensional space $\mathcal{Y}$ that is projected randomly to the higher dimensional space $\mathcal{X}$ twice using two randomly sampled matrices $A_p$ and $A_q$. With this setting at hand, we are interested in the following question: is there a relation between the function values at $A_p\mathbf{y}$ and $A_q\mathbf{y}$. This has been addressed in [1, Theorem I]. Here, we provide a numerical validation of [1]’s result besides reiterating the formal proof. Before we delve into this further, let’s introduce some notation in accordance with [1].</p>
+
+<h4>Notation</h4>
+
+<p align="center">
+  <img src="http://ash-aldujaili.github.io/blog/assets/notation_rand_lipschitz.jpg" width="400" />
+<br /><br />
+
+</p>
+
+<h4>Theorem I [1]</h4>
+
+<p>It has been shown in [1] that the mean variation in the objective value for a point $\mathbf{y}$ in the low-dimensional
+space $\mathcal{Y} \subset \mathbb{R}^d$ projected randomly into the decision space $\mathcal{X}\subset\mathbb{R}^n$ of Lipschitz-continuous
+problems is <strong>bounded</strong>.</p>
+
+<p>Mathematically, for all $\mathbf{y} \in \mathcal{Y}$, we have
+<script type="math/tex">\mathbb{E}[|g_p(\mathbf{y}) − g_q(\mathbf{y})|] \leq \sqrt{8} \cdot L 
+\cdot ||\mathbf{y}||\;.</script></p>
+
+<p>Here, we reproduce [1]’s proof for completeness, then we validate the theorem numerically.</p>
+
+<h4>Proof</h4>
+
+<p align="center">
+  <img src="http://ash-aldujaili.github.io/blog/assets/proof_rand_lipschitz.jpg" width="400" />
+<br /><br />
+
+</p>
+<h4>Numerical Validation</h4>
+
+<p>Figure 1 shows a numerical validation of [1]’s Theorem I. First, we sampled 100 points $\mathbf{y}\in\mathcal{Y}\subset \mathbb{R}^d$ whose norms span the range $[0,1]$. E.g., with $d=1$, $\mathbf{y}\in[-1,1]$.</p>
+
+<p>Second, each of these 100 points are projected to the function space $\mathcal{X}\subset\mathbb{R}^n$ using 20 random matrices ${A_p}_{1\leq p\leq 20}$.</p>
+
+<p>Third, four functions (namely, Cigar, Sphere, Rastrigin, and Bohachevsky) are evaluated at these random projections. Note that for each of these functions, $100*20$ function evaluations are performed.</p>
+
+<p>Fourth, we average over the absolute difference between function values at projections of the same point $\mathbf{y}$. That is, for each of the 100 points, we compute the mean of $\frac{20*20- 20}{2}=190$ values, each of which representing the absolute difference of the function value at two random projections of the corresponding point $\mathbf{y}$.</p>
+
+<p>Fifth, the computed average values are plotted as a function of the  corresponding point $\mathbf{y}$. One can see how the trend of the plot follows the curve of $||\mathbf{y}||$ in accordance with [1]’s Theorem I.</p>
+
+<p align="center">
+  <img src="http://ash-aldujaili.github.io/blog/assets/rand_lipschitz.jpg" width="400" />
+<br /><br />
+  Figure 1. Empirical mean of the absolute value difference of four functions evaluated at 20 random projections in $\mathbb{R}^n$ of a point in $\mathbb{R}^d$, where $d&lt;n$.
+</p>
+<hr />
+
+<h4>References</h4>
+
+<p>This post is based on the following papers:</p>
+
+<ol>
+  <li><strong>Al-Dujaili, Abdullah, and S. Suresh.</strong> <em>“Embedded Bandits for Large-Scale Black-Box Optimization.”</em> Thirty-First AAAI Conference on Artificial Intelligence. 2017.</li>
+</ol>
+
+
+  </div>
+
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <p>
+      
+
+&copy; Abdullah Al-Dujaili - Powered by <a href="https://jekyllrb.com">Jekyll</a> &amp; <a href="https://github.com/yous/whiteglass">whiteglass</a> - Subscribe via <a href="http://ash-aldujaili.github.io//blog/feed.xml">RSS</a>
+
+    </p>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
