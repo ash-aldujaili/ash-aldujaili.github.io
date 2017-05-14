@@ -130,7 +130,13 @@
         </header>
 
         <div class="post-content">
-          <p>In this post, we’ll shed some light on the behavior of Lipschitz-continuous functions at random projections of the same point in another space. Consider the figure below. We have a point in the $\mathbf{y}$ in the lower dimensional space $\mathcal{Y}$ that is projected randomly to the higher dimensional space $\mathcal{X}$ twice using two randomly sampled matrices $A_p$ and $A_q$. With this setting at hand, we are interested in the following question: is there a relation between the function values at $A_p\mathbf{y}$ and $A_q\mathbf{y}$. This has been addressed in [1, Theorem I]. Here, we provide a numerical validation of [1]’s result besides reiterating the formal proof. Before we delve into this further, let’s introduce some notation in accordance with [1].</p>
+          <p>In this post, we’ll shed some light on the behavior of Lipschitz-continuous functions at random projections of the same point in another space. Consider Figure 1; we have a point in the $\mathbf{y}$ in the lower dimensional space $\mathcal{Y}$ that is projected randomly to the higher dimensional space $\mathcal{X}$ twice using two randomly sampled matrices $A_p$ and $A_q$. With this setting at hand, we are interested in the following question: is there a relation between the function values at $A_p\mathbf{y}$ and $A_q\mathbf{y}$. This has been addressed in [1, Theorem I]. Here, we provide a numerical validation of [1]’s result besides reiterating the formal proof. Before we delve into this further, let’s introduce some notation in accordance with [1].</p>
+
+<p align="center">
+  <img src="http://ash-aldujaili.github.io/blog/assets/illust_rand_lipschitz.jpg" width="1000" />
+<br /><br />
+  Figure 1. Two random projections of $\mathbf{y}$ to $\mathcal{X}$.
+</p>
 
 <h4>Notation</h4>
 
@@ -176,7 +182,7 @@ problems is <strong>bounded</strong>.</p>
 <p align="center">
   <img src="http://ash-aldujaili.github.io/blog/assets/rand_lipschitz.jpg" width="1000" />
 <br /><br />
-  Figure 1. Empirical mean of the absolute value difference of four functions evaluated at 20 random projections in $\mathbb{R}^n$ of a point in $\mathbb{R}^d$, where $d=2$ and $n=10^3$.
+  Figure 2. Empirical mean of the absolute value difference of four functions evaluated at 20 random projections in $\mathbb{R}^n$ of a point in $\mathbb{R}^d$, where $d=2$ and $n=10^3$.
 </p>
 <hr />
 
