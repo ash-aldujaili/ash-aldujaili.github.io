@@ -302,7 +302,7 @@ f(\mathbf{y};\theta,p, \mu, \sigma) =
     \mathbf{r}^{T}     & 1 
 \end{bmatrix} %]]></script>, where $\mathbf{r} = \mathbf{r}(\mathbf{x}^{(n+1)}) = [Corr[\epsilon(\mathbf{x}^{(1)}),\epsilon(\mathbf{x}^{(n+1)})],\ldots,Corr[\epsilon(\mathbf{x}^{(n)}),\epsilon(\mathbf{x}^{(n+1)})]]$.</p>
 
-<p>Applying the [blockwise inversion formula] (https://en.wikipedia.org/wiki/Invertible_matrix#Blockwise_inversion) on $(\tilde{\mathbf{y}}- \mathbf{1}\hat{\mu})^{T}{\tilde{\mathbf{R}}}^{-1}(\tilde{\mathbf{y}}- \mathbf{1}\hat{\mu})$, we have:</p>
+<p>Applying the <a href="https://en.wikipedia.org/wiki/Invertible_matrix#Blockwise_inversion">blockwise inversion formula</a> on $(\tilde{\mathbf{y}}- \mathbf{1}\hat{\mu})^{T}{\tilde{\mathbf{R}}}^{-1}(\tilde{\mathbf{y}}- \mathbf{1}\hat{\mu})$, we have:</p>
 
 <script type="math/tex; mode=display">\bigg(y^{*}-\text{independent terms}\bigg) + \frac{1}{1-\mathbf{r}^{T}R^{-1}\mathbf{r}}(y^{*}-\hat{\mu})^2 - \frac{2\mathbf{r}^{T}\mathbf{R}^{-1}(\mathbf{y}-\mathbf{1}\hat{\mu})}{1-\mathbf{r}^{T}\mathbf{R}^{-1}\mathbf{r}}(y^{*}-\hat{\mu})</script>
 
