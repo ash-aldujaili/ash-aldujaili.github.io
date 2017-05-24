@@ -293,6 +293,34 @@ f(\mathbf{y};\theta,p, \mu, \sigma) =
 
 <script type="math/tex; mode=display">\hat{\sigma}^2 = \frac{(\mathbf{y}-\mathbf{1}\hat{\mu})^{T} \mathbf{R}^{-1} (\mathbf{y}-\mathbf{1}\hat{\mu})}{n}</script>
 
+<p>The above equations can in turn be plugged into the likelihood function to form a <em>concentrated likelihood function</em>, which can be optimized with resepct to the parameters $\theta_h$’s and $p_h$’s. Subsequently, the corresponding values of $\hat{\mu}$ and $\hat{\sigma}^2$ are computed.</p>
+
+<p>Having estimated the parameters of our stochastic process model, we can now use it to predict the function value at new points in the $k$-dimensional space. The stochastic process model encodes the left-out terms of the regression model using the correlated errors. In other words, these correlated errors must be employed to adjust the prediction above or below the constant regression term $\hat{\mu}$. To see how this can be done, assume that we are interested in predicting the function value at $x^{(n+1)}$ and let $y^{*}$ be some prediction candidate for $f(x^{(n+1)})$. To measure how well $(x^{(n+1)},y^{*})$ fits the sample $\mathcal{D}$, one can compute the joint $($augmented$)$ likelihood function of $\tilde{\mathbf{y}} = (\mathbf{y}\; y^{*})$ - $f(\tilde{\mathbf{y}};\theta,p, \hat{\mu}, \hat{\sigma})$ from Eq. \ref{eq:likelihood}’s $f(\mathbf{y};\theta,p, \mu, \sigma)$. Taking the log of Eq. \ref{eq:likelihood}, it is easy to see that the only term that depends on $y^{*}$ is $(\tilde{\mathbf{y}}- \mathbf{1}\hat{\mu})^{T}{\tilde{\mathbf{R}}}^{-1}(\tilde{\mathbf{y}}- \mathbf{1}\hat{\mu})$ with 
+<script type="math/tex">% <![CDATA[
+\tilde{\mathbf{R}} = \begin{bmatrix}
+    \mathbf{R}       & \mathbf{r} \\
+    \mathbf{r}^{T}     & 1 
+\end{bmatrix} %]]></script>, where $\mathbf{r} = \mathbf{r}(\mathbf{x}^{(n+1)}) = [Corr[\epsilon(\mathbf{x}^{(1)}),\epsilon(\mathbf{x}^{(n+1)})],\ldots,Corr[\epsilon(\mathbf{x}^{(n)}),\epsilon(\mathbf{x}^{(n+1)})]]$.</p>
+
+<p>Applying the [blockwise inversion formula] (https://en.wikipedia.org/wiki/Invertible_matrix#Blockwise_inversion) on $(\tilde{\mathbf{y}}- \mathbf{1}\hat{\mu})^{T}{\tilde{\mathbf{R}}}^{-1}(\tilde{\mathbf{y}}- \mathbf{1}\hat{\mu})$, we have:</p>
+
+<script type="math/tex; mode=display">\bigg(y^{*}-\text{independent terms}\bigg) + \frac{1}{1-\mathbf{r}^{T}R^{-1}\mathbf{r}}(y^{*}-\hat{\mu})^2 - \frac{2\mathbf{r}^{T}\mathbf{R}^{-1}(\mathbf{y}-\mathbf{1}\hat{\mu})}{1-\mathbf{r}^{T}\mathbf{R}^{-1}\mathbf{r}}(y^{*}-\hat{\mu})</script>
+
+<p>Thus, setting the derivative of the above term with respect to $y^{*}$ to zero gives the best prediction’s formula at $\mathbf{x}^{(n+1)}$ that fits the sample $\mathcal{D}$ as follows.</p>
+
+<p>\begin{equation}
+\hat{y}(\mathbf{x}) = \hat{\mu} + {\mathbf{r}(\mathbf{x})}^{T}\mathbf{R}^{-1}(\mathbf{y}-\mathbf{1}\hat{\mu})
+\label{eq:prediction}
+\end{equation}</p>
+
+<p>Figure 2 shows predicted values of $f$ according to Eq. \ref{eq:prediction}.</p>
+
+<p align="center">
+  <img src="http://ash-aldujaili.github.io/blog/assets/stoch_proc_pred.png" width="400" />
+<br /><br />
+  Figure 2. Application of Eq. \ref{eq:prediction}
+</p>
+
 <p><a name="myfootnote1">1</a>: Make use of: $det(cA)= c^n det(A)$, where A is an $n\times n$-matrix; $Cov[x^{(i)},x^{(j)}] = \sigma^2 \cdot Corr[x^{(i)},x^{(j)}]$; and the multivariate normal probability density function.</p>
 
 <p><strong>TO BE COMPLETED…</strong></p>
