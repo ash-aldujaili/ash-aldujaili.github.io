@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  
+  
+  <title>DACE/BLUP MSE for EGO</title>
+  <meta name="description" content="$\newcommand{\hy}{\hat{y}} \newcommand{\hmu}{\hat{\mu}} \newcommand{\R}{\mathbf{R}} \newcommand{\hmu}{\hat{\mu}} \newcommand{\rR}{\mathbf{r}^TR^{-1}} \newcommand{\rRr}{\mathbf{r}^TR^{-1}\mathbf{r}} \newcommand{\oRr}{\mathbf{1}^TR^{-1}\mathbf{r}} \newcommand{\ymu}{(\mathbf{y}-\mathbf{1}\hmu)} \newcommand{\hyexp}{\hmu+\rR\ymu} \newcommand{\oRy}{\mathbf{1}^T\mathbf{R} ^{-1}\mathbf{y}} \newcommand{\yRo}{\mathbf{y}^T\mathbf{R} ^{-1}\mathbf{1}} \newcommand{\oRo}{\mathbf{1}^T\mathbf{R}^{-1}\mathbf{1}} \newcommand{\hmuexp}{\frac{\oRy}{\oRo}} \newcommand{\st}{\sigma^2} \newcommand{\mt}{\mu^2}$ This post shows a derivation of the DACE predictor’s MSE discussed in Stochastic Processes for Expensive Black-Box Optimization. The mean squared error of a predictor at $\mathbf{x}$ based on the stochastic Gaussian process is \begin{equation}MSE(\mathbf{x})=E[(\hat{y}(\mathbf{x})-y(\mathbf{x}))^2] =\sigma \big[1 - {\mathbf{r}(\mathbf{x})}^{T}\mathbf{R}^{-1}\mathbf{r}(\mathbf{x})-\frac{(1-\mathbf{1}^T\mathbf{R}^{-1}\mathbf{r}(\mathbf{x}))^2}{(\mathbf{1}^T\mathbf{R}\mathbf{1})}\big]\;, \label{eq:final-mse} \end{equation} where $\mu$ is process’s mean and $\sigma^2\mathbf{R}$ is its covariance matrix over a sample $\mathcal{D}={(x^{(i)},y^{(i)})}_{1\leq i \leq n}$. For brevity, we will drop $\mathbf{x}$ henceforth. Before proceeding with the proof, let’s recall some terms and their definitions that will be useful in the proof. \begin{equation} \hy=\hyexp \end{equation} \begin{equation} \hmu=\hmuexp \end{equation} From the above, we have $E[y^2]=\sigma^2 + \mu^2$, $E[\mathbf{y}\mathbf{y}^{T}]=\sigma^2\R+\mu^2\mathbf{1}\mathbf{1}^T$. Thus, we can expand the MSE term as \begin{equation} MSE= \sigma^2 + \mu^2 + E[{\hy}^2] - 2 E[y\hy]\;. \label{eq:mse} \end{equation} Where \begin{equation} E[\hy^2]=\frac{\st}{\oRo}+\mt + \st (\rRr) - \st \frac{(\oRr)^2}{\oRo} \label{eq:h2} \end{equation} and \begin{equation} -2E[y\hy]=-2\st(\rRr)-2\mt-2\st\frac{\oRr}{\oRo}+2\st\frac{(\oRr)^2}{\oRo}\;. \label{eq:h3} \end{equation} Plugging Equations \ref{eq:h2} and \ref{eq:h3} into Eq. \ref{eq:mse} results in Eq. \ref{eq:final-mse}.">
+  
+
+  <link rel="stylesheet" href="/blog/assets/main.css">
+  <link rel="canonical" href="http://ash-aldujaili.github.io//blog/2017/06/06/mse-ego-dace/">
+  
+  
+  <link rel="alternate" type="application/rss+xml" title="Hunting Optima" href="http://ash-aldujaili.github.io//blog/feed.xml">
+
+  
+
+  
+  <meta name="twitter:card" content="summary">
+  
+  <meta name="twitter:title" content="DACE/BLUP MSE for EGO">
+  <meta name="twitter:description" content="$\newcommand{\hy}{\hat{y}} \newcommand{\hmu}{\hat{\mu}} \newcommand{\R}{\mathbf{R}} \newcommand{\hmu}{\hat{\mu}} \newcommand{\rR}{\mathbf{r}^TR^{-1}} \newcommand{\rRr}{\mathbf{r}^TR^{-1}\mathbf{r}}...">
+  
+  
+
+  <script type="text/javascript">
+  WebFontConfig = {
+    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
+  };
+  (function() {
+    var wf = document.createElement('script');
+    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+    wf.type = 'text/javascript';
+    wf.async = 'true';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(wf, s);
+  })();
+</script>
+
+  
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-68645681-6', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+
+
+</head>
+
+  <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    TeX: {
+      equationNumbers: {
+        autoNumber: "AMS"
+      }
+    },
+    tex2jax: {
+      inlineMath: [ ['$','$'], ['\(', '\)'] ],
+      displayMath: [ ['$$','$$'] ],
+      processEscapes: true,
+    }
+  });
+</script>
+<script type="text/javascript"
+        src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/blog/">Hunting Optima</a>
+
+    <nav class="site-nav">
+      
+        
+        <a class="page-link" href="http://ash-aldujaili.github.io/">Home</a>
+      
+        
+        <a class="page-link" href="/blog/about/">About my blog</a>
+      
+        
+        <a class="page-link" href="/blog/archives/">Archives</a>
+      
+        
+        <a class="page-link" href="https://github.com/ash-aldujaili">GitHub</a>
+      
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    
+      <h1 class="post-title" itemprop="name headline">DACE/BLUP MSE for EGO</h1>
+    
+    <p class="post-meta"><time datetime="2017-06-06T00:00:00-08:00" itemprop="datePublished">Jun 6, 2017</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>$\newcommand{\hy}{\hat{y}}
+\newcommand{\hmu}{\hat{\mu}}
+\newcommand{\R}{\mathbf{R}}
+\newcommand{\hmu}{\hat{\mu}}
+\newcommand{\rR}{\mathbf{r}^TR^{-1}}
+\newcommand{\rRr}{\mathbf{r}^TR^{-1}\mathbf{r}}
+\newcommand{\oRr}{\mathbf{1}^TR^{-1}\mathbf{r}}
+\newcommand{\ymu}{(\mathbf{y}-\mathbf{1}\hmu)}
+\newcommand{\hyexp}{\hmu+\rR\ymu}
+\newcommand{\oRy}{\mathbf{1}^T\mathbf{R}
+^{-1}\mathbf{y}}
+\newcommand{\yRo}{\mathbf{y}^T\mathbf{R}
+^{-1}\mathbf{1}}
+\newcommand{\oRo}{\mathbf{1}^T\mathbf{R}^{-1}\mathbf{1}}
+\newcommand{\hmuexp}{\frac{\oRy}{\oRo}}
+\newcommand{\st}{\sigma^2}
+\newcommand{\mt}{\mu^2}$
+This post shows a derivation of the DACE predictor’s MSE discussed in <a href="http://ash-aldujaili.github.io/blog/2017/03/01/exp-opt/">Stochastic Processes for Expensive Black-Box Optimization</a>.</p>
+
+<p>The mean squared error of a predictor at $\mathbf{x}$ based on the stochastic Gaussian process is</p>
+
+<p>\begin{equation}MSE(\mathbf{x})=E[(\hat{y}(\mathbf{x})-y(\mathbf{x}))^2] =\sigma \big[1 - {\mathbf{r}(\mathbf{x})}^{T}\mathbf{R}^{-1}\mathbf{r}(\mathbf{x})-\frac{(1-\mathbf{1}^T\mathbf{R}^{-1}\mathbf{r}(\mathbf{x}))^2}{(\mathbf{1}^T\mathbf{R}\mathbf{1})}\big]\;,
+\label{eq:final-mse}
+\end{equation}</p>
+
+<p>where $\mu$ is process’s mean and $\sigma^2\mathbf{R}$ is its covariance matrix over a sample $\mathcal{D}={(x^{(i)},y^{(i)})}_{1\leq i \leq n}$. For brevity, we will drop $\mathbf{x}$ henceforth. Before proceeding with the proof, let’s recall some terms and their definitions that will be useful in the proof.
+\begin{equation}
+\hy=\hyexp
+\end{equation}</p>
+
+<p>\begin{equation}
+\hmu=\hmuexp
+\end{equation}</p>
+
+<p>From the above, we have 
+$E[y^2]=\sigma^2 + \mu^2$, $E[\mathbf{y}\mathbf{y}^{T}]=\sigma^2\R+\mu^2\mathbf{1}\mathbf{1}^T$.</p>
+
+<script type="math/tex; mode=display">E[\hmu]=\frac{(\oRy)(\yRo)}{(\oRo)^2}=\sigma^2\cdot \frac{(\oRo)}{(\oRo)^2}+ \mu^2\cdot \frac{(\oRo)^2}{(\oRo)^2}=\frac{\st}{\oRo}+\mt</script>
+
+<p>Thus, we can expand the MSE term as</p>
+
+<p>\begin{equation}
+MSE= \sigma^2 + \mu^2 + E[{\hy}^2] - 2 E[y\hy]\;.
+\label{eq:mse}
+\end{equation}
+Where 
+\begin{equation}
+E[\hy^2]=\frac{\st}{\oRo}+\mt + \st (\rRr) - \st \frac{(\oRr)^2}{\oRo}
+\label{eq:h2}
+\end{equation}
+and</p>
+
+<p>\begin{equation}
+-2E[y\hy]=-2\st(\rRr)-2\mt-2\st\frac{\oRr}{\oRo}+2\st\frac{(\oRr)^2}{\oRo}\;.
+\label{eq:h3}
+\end{equation}</p>
+
+<p>Plugging Equations \ref{eq:h2} and \ref{eq:h3} into Eq. \ref{eq:mse} results in Eq. \ref{eq:final-mse}.</p>
+
+  </div>
+
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <p>
+      
+
+&copy; Abdullah Al-Dujaili - Powered by <a href="https://jekyllrb.com">Jekyll</a> &amp; <a href="https://github.com/yous/whiteglass">whiteglass</a> - Subscribe via <a href="http://ash-aldujaili.github.io//blog/feed.xml">RSS</a>
+
+    </p>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
