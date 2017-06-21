@@ -209,7 +209,7 @@ and</p>
           <p>In this post, we’ll shed some light on the behavior of Lipschitz-continuous functions at random projections of the same point in another space. Consider Figure 1; we have a point in the $\mathbf{y}$ in the lower dimensional space $\mathcal{Y}$ that is projected randomly to the higher dimensional space $\mathcal{X}$ twice using two randomly sampled matrices $A_p$ and $A_q$. With this setting at hand, we are interested in the following question: is there a relation between the function values at $A_p\mathbf{y}$ and $A_q\mathbf{y}$. This has been addressed in [1, Theorem I]. Here, we provide a numerical validation of [1]’s result besides reiterating the formal proof. Before we delve into this further, let’s introduce some notation in accordance with [1].</p>
 
 <p align="center">
-  <img src="http://ash-aldujaili.github.ioblog/assets/illust_rand_lipschitz.png" width="1000" />
+  <img src="http://ash-aldujaili.github.io/blog/assets/illust_rand_lipschitz.png" width="1000" />
 <br /><br />
   Figure 1. Two random projections of $\mathbf{y}$ to $\mathcal{X}$.
 </p>
@@ -217,7 +217,7 @@ and</p>
 <h4>Notation</h4>
 
 <p align="center">
-  <img src="http://ash-aldujaili.github.ioblog/assets/notation_rand_lipschitz.png" width="600" />
+  <img src="http://ash-aldujaili.github.io/blog/assets/notation_rand_lipschitz.png" width="600" />
 <br /><br />
 
 </p>
@@ -237,7 +237,7 @@ problems is <strong>bounded</strong>.</p>
 <h4>Proof</h4>
 
 <p align="center">
-  <img src="http://ash-aldujaili.github.ioblog/assets/proof_rand_lipschitz.png" width="600" />
+  <img src="http://ash-aldujaili.github.io/blog/assets/proof_rand_lipschitz.png" width="600" />
 <br /><br />
 
 </p>
@@ -256,7 +256,7 @@ problems is <strong>bounded</strong>.</p>
 <p>Fifth, the computed average values are plotted as a function of the  corresponding point $\mathbf{y}$ in Figure 1. One can see how the trend of the plot follows the curve of $||\mathbf{y}||$ in accordance with [1]’s Theorem I.</p>
 
 <p align="center">
-  <img src="http://ash-aldujaili.github.ioblog/assets/rand_lipschitz.jpg" width="1000" />
+  <img src="http://ash-aldujaili.github.io/blog/assets/rand_lipschitz.jpg" width="1000" />
 <br /><br />
   Figure 2. Empirical mean of the absolute value difference of four functions evaluated at 20 random projections in $\mathbb{R}^n$ of a point in $\mathbb{R}^d$, where $d=2$ and $n=10^3$.
 </p>
@@ -332,7 +332,7 @@ Corr[\epsilon(\mathbf{x}^{(i)}),\epsilon(\mathbf{x}^{(j)})] = \exp\big(- \sum_{h
 <p>The parameters $\theta_h$’s and $p_h$’s controls how fast the degree of correlation changes between two errors terms as the (weighted) distance between the corresponding points changes as shown in the figure below. In general, $\theta_h$ measures the importance / activity of the $h^{th}$ variable $x_h$ $($the higher $\theta_h$ is, the faster the correlation drops as the corresponding points move away in the coordinate direction $h)$, while $p_h$ captures the function smoothness in the coordinate direction $h$ $(p_h$ = 2 is for smooth functions$)$.</p>
 
 <p align="center">
-  <img src="http://ash-aldujaili.github.ioblog/assets/err_corr.jpg" width="400" />
+  <img src="http://ash-aldujaili.github.io/blog/assets/err_corr.jpg" width="400" />
 <br /><br />
   Figure 1. Correlation Function $($Eq. \ref{eq:corr-fct}$)$ with different parameters.
 </p>
@@ -391,7 +391,7 @@ f(\mathbf{y};\theta,p, \mu, \sigma) =
 <p>While this value maximizes the joint augmented likelihood of $(x^{(n+1)},y^{*})$ and $\mathcal{D}$, it is interesting to note that it also corresponds to the mean of the normal probablity density function of the function value at $x^{(n+1)}$ conditioned on $\mathcal{D}$.</p>
 
 <p align="center">
-  <img src="http://ash-aldujaili.github.ioblog/assets/stoch_proc_pred.png" width="400" />
+  <img src="http://ash-aldujaili.github.io/blog/assets/stoch_proc_pred.png" width="400" />
 <br /><br />
   Figure 2. Application of Eq. \ref{eq:prediction}
 </p>
