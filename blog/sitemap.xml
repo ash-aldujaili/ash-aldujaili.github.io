@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
-<loc>http://ash-aldujaili.github.io//blog/2017/03/01/exp-opt/</loc>
+<loc>http://ash-aldujaili.github.io/blog/2017/03/01/exp-opt/</loc>
 <lastmod>2017-03-01T00:00:00-08:00</lastmod>
 </url>
 <url>
-<loc>http://ash-aldujaili.github.io//blog/2017/05/08/rand-proj-lipschitz/</loc>
+<loc>http://ash-aldujaili.github.io/blog/2017/05/08/rand-proj-lipschitz/</loc>
 <lastmod>2017-05-08T00:00:00-08:00</lastmod>
 </url>
 <url>
-<loc>http://ash-aldujaili.github.io//blog/2017/06/06/mse-ego-dace/</loc>
+<loc>http://ash-aldujaili.github.io/blog/2017/06/06/mse-ego-dace/</loc>
 <lastmod>2017-06-06T00:00:00-08:00</lastmod>
 </url>
 <url>
-<loc>http://ash-aldujaili.github.io//blog/about/</loc>
+<loc>http://ash-aldujaili.github.io/blog/about/</loc>
 </url>
 <url>
-<loc>http://ash-aldujaili.github.io//blog/archives/</loc>
+<loc>http://ash-aldujaili.github.io/blog/archives/</loc>
 </url>
 <url>
-<loc>http://ash-aldujaili.github.io//blog/</loc>
+<loc>http://ash-aldujaili.github.io/blog/</loc>
 </url>
 </urlset>
