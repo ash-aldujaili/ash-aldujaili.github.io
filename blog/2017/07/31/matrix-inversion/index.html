@@ -10,7 +10,7 @@
   
   
   <title>A Practical Summary to Matrix Inversion</title>
-  <meta name="description" content="Matrix inversion is an essential procedure in solving a linear system of equations. I am writing this post to summarize possible scenarios one may face when inverting a matrix. Before delving into the details, I intend to present a geometric view of linear systems of equations. This will help us understand why we could have exactly one, infinitely many, or no solution at all. And subsequently, why some matrices are convertible, and others are not. $ \newcommand{\vx}{\mathbf{x}} \newcommand{\vq}{\mathbf{q}} \newcommand{\vb}{\mathbf{b}} \newcommand{\lm}{\lambda} \newcommand{\norm}[1]{||#1||_2} $ Problem Setup Let us define our linear system as $A\vx=b$, where $A\in\mathbb{R}^{m\times n}$ is a known matrix, $\vb\in\mathbb{R}^m$ is a known vector, and $\vx\in\mathbb{R}^n$ is a vector of unknown values. One can think of $b$ as a point in the $m$-dimensional space. Furthermore, consider $A\vx$ as a linear combination $A$’s column vectors where the $i^{th}$ column $A_{:,i}$ is scaled by the $i^{th}$ entry of $\vx$, $x_i$. In other words, when we say that $\vb=A\vx$, we mean that $\vb$ is reachable from the origin $(\mathbf{0}\in\mathbb{R}^m)$ by moving $x_1$ units along the vector $A_{:,1}$, $x_2$ units along the vector $A_{:,2}$, …, and $x_n$ units along the vector $A_{:,n}$ Matrix Inversion Summary">
+  <meta name="description" content="Matrix inversion is an essential procedure in solving a linear system of equations. I am writing this post to summarize possible scenarios one may face when inverting a matrix. Before delving into the details, I intend to present a geometric view of linear systems of equations. This will help us understand why we could have exactly one, infinitely many, or no solution at all. And subsequently, why some matrices are convertible, and others are not. $ \newcommand{\vx}{\mathbf{x}} \newcommand{\vq}{\mathbf{q}} \newcommand{\vb}{\mathbf{b}} \newcommand{\lm}{\lambda} \newcommand{\norm}[1]{||#1||_2} $ Problem Setup Let us define our linear system as $A\vx=b$, where $A\in\mathbb{R}^{m\times n}$ is a known matrix, $\vb\in\mathbb{R}^m$ is a known vector, and $\vx\in\mathbb{R}^n$ is a vector of unknown values. One can think of $b$ as a point in the $m$-dimensional space. Furthermore, consider $A\vx$ as a linear combination $A$’s column vectors where the $i^{th}$ column $A_{:,i}$ is scaled by the $i^{th}$ entry of $\vx$, $x_i$. In other words, when we say that $\vb=A\vx$, we mean that $\vb$ is reachable from the origin $(\mathbf{0}\in\mathbb{R}^m)$ by moving $x_1$ units along the vector $A_{:,1}$, $x_2$ units along the vector $A_{:,2}$, …, and $x_n$ units along the vector $A_{:,n}$ Matrix Inversion Summary Summary of Matrix Inverse Techniques.">
   
 
   <link rel="stylesheet" href="/blog/assets/main.css">
@@ -138,11 +138,11 @@ $</p>
 <p>One can think of $b$ as a point in the $m$-dimensional space. Furthermore, consider $A\vx$ as a linear combination $A$’s column vectors where the $i^{th}$ column $A_{:,i}$ is scaled by the $i^{th}$ entry of $\vx$, $x_i$. In other words, when we say that $\vb=A\vx$, we mean that $\vb$ is reachable from the origin $(\mathbf{0}\in\mathbb{R}^m)$ by moving $x_1$ units along the vector $A_{:,1}$, $x_2$ units along the vector $A_{:,2}$, …, and $x_n$ units along the vector $A_{:,n}$</p>
 
 <h3>Matrix Inversion Summary</h3>
-<!--<p align="center">
-  <img src="http://ash-aldujaili.github.io/blog/assets/matrix-inverse-summary.png" width="1000"/>
-<br><br/>
+<p align="center">
+  <img src="http://ash-aldujaili.github.io/blog/assets/matrix-inverse-summary.png" width="1000" />
+<br /><br />
   Summary of Matrix Inverse Techniques.
-</p>-->
+</p>
 
 
   </div>
