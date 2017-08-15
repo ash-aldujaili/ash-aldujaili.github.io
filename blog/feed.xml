@@ -1,4 +1,52 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="3.4.3">Jekyll</generator><link href="http://ash-aldujaili.github.io/blog/feed.xml" rel="self" type="application/atom+xml" /><link href="http://ash-aldujaili.github.io/blog/" rel="alternate" type="text/html" hreflang="en" /><updated>2017-06-21T09:31:23-08:00</updated><id>http://ash-aldujaili.github.io/blog/</id><title type="html">Hunting Optima</title><subtitle>Write-ups on optimization</subtitle><author><name>Abdullah Al-Dujaili</name></author><entry><title type="html">DACE/BLUP MSE for EGO</title><link href="http://ash-aldujaili.github.io/blog/2017/06/06/mse-ego-dace/" rel="alternate" type="text/html" title="DACE/BLUP MSE for EGO" /><published>2017-06-06T00:00:00-08:00</published><updated>2017-06-06T00:00:00-08:00</updated><id>http://ash-aldujaili.github.io/blog/2017/06/06/mse-ego-dace</id><content type="html" xml:base="http://ash-aldujaili.github.io/blog/2017/06/06/mse-ego-dace/">&lt;p&gt;$\newcommand{\hy}{\hat{y}}
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="3.4.3">Jekyll</generator><link href="http://ash-aldujaili.github.io/blog/feed.xml" rel="self" type="application/atom+xml" /><link href="http://ash-aldujaili.github.io/blog/" rel="alternate" type="text/html" hreflang="en" /><updated>2017-08-15T08:46:45-08:00</updated><id>http://ash-aldujaili.github.io/blog/</id><title type="html">Hunting Optima</title><subtitle>Write-ups on optimization</subtitle><author><name>Abdullah Al-Dujaili</name></author><entry><title type="html">Quadratic Function Optimization via Linear Algebra</title><link href="http://ash-aldujaili.github.io/blog/2017/08/01/quadratic-form-opt/" rel="alternate" type="text/html" title="Quadratic Function Optimization via Linear Algebra" /><published>2017-08-01T00:00:00-08:00</published><updated>2017-08-01T00:00:00-08:00</updated><id>http://ash-aldujaili.github.io/blog/2017/08/01/quadratic-form-opt</id><content type="html" xml:base="http://ash-aldujaili.github.io/blog/2017/08/01/quadratic-form-opt/">&lt;p&gt;In this post, we show how Linear Algebra can be used to solve one of the common optimization problems that arise in a variety of domains. In particular, we are interested in the quadratic optimization problem of the form
+$
+\newcommand{\vx}{\mathbf{x}}
+\newcommand{\vq}{\mathbf{q}}
+\newcommand{\lm}{\lambda}
+\newcommand{\norm}[1]{||#1||_2}
+$&lt;/p&gt;
+
+&lt;p&gt;\begin{align}
+\text{max}_{\vx}\hspace{1.15cm} \vx^TA\vx \newline
+\hspace{1em}\text{s.t.}\hspace{1em} \norm{\vx}=1
+\label{eq:opt-problem}
+\end{align}&lt;/p&gt;
+
+&lt;p&gt;where $A\in\mathbb{R}^{n^2}$ is a real symmetric $($square$)$ matrix, $\vx\in\mathbb{R}^n$. An optimal solution of this problem is $\vq_1\in\mathbb{R}^n$, the eigenvector that corresponds to $\lambda_1\in \mathbb{R}$, the largest eigenvalue of $A$.&lt;/p&gt;
+
+&lt;p&gt;Now that we have defined the problem, let’s try to solve it by making use of Linear Algebra, from which we know the following.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;If $Q\in\mathbb{R}^{n^2}$ is an orthogonal matrix, then $Q^{T}Q=QQ^T=I_n$ where $I_n\in\mathbb{R}^{n^2}$ is the $n\times n$ identity matrix.&lt;/li&gt;
+  &lt;li&gt;Columns (and rows) of an orthogonal matrix have unit norm.&lt;/li&gt;
+  &lt;li&gt;Any real symmetric matrix $A$ can be decomposed into $Q\Lambda Q^T$, where $Q\in\mathbb{R}^{n^2}$ is an orthogonal matrix whose columns are the eigenvectors of $A$, while $\Lambda = diag(\mathbf{\lambda})$ is a diagonal matrix whose diagonal entries are the eign values of $A$ such that $\lambda_1\geq \lambda_2 \geq \cdots\geq \lambda_n$ and  $\lambda_i$ is the eigenvalue of the $i^{th}$ column of $Q$.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;From (3.), one can write $\vx^TA\vx$ as $\vx^T Q\Lambda Q^T \vx \leq \lambda_1 \vx^T QI_n Q^T \vx$. Based on (1.) and the constraint of $\vx$’s unit norm, the last term can further be simplified to have $\vx^TA\vx \leq \lambda_1 \norm{\vx}\leq \lambda_1$.&lt;/p&gt;
+
+&lt;p&gt;On the one hand, we found that $\max_{\vx} \vx^T A \vx = \lambda_1$. On the other hand, $A\vq_1 = \lambda_1\vq_1$, and thus $\vq_1^TA\vq_1 = \lambda_1$. Therefore, $\vq_1 \in \arg\max_{\vx} \vx^T A \vx$.&lt;/p&gt;</content><author><name>Abdullah Al-Dujaili</name></author><summary type="html">In this post, we show how Linear Algebra can be used to solve one of the common optimization problems that arise in a variety of domains. In particular, we are interested in the quadratic optimization problem of the form $ \newcommand{\vx}{\mathbf{x}} \newcommand{\vq}{\mathbf{q}} \newcommand{\lm}{\lambda} \newcommand{\norm}[1]{||#1||_2} $ \begin{align} \text{max}_{\vx}\hspace{1.15cm} \vx^TA\vx \newline \hspace{1em}\text{s.t.}\hspace{1em} \norm{\vx}=1 \label{eq:opt-problem} \end{align} where $A\in\mathbb{R}^{n^2}$ is a real symmetric $($square$)$ matrix, $\vx\in\mathbb{R}^n$. An optimal solution of this problem is $\vq_1\in\mathbb{R}^n$, the eigenvector that corresponds to $\lambda_1\in \mathbb{R}$, the largest eigenvalue of $A$. Now that we have defined the problem, let’s try to solve it by making use of Linear Algebra, from which we know the following. If $Q\in\mathbb{R}^{n^2}$ is an orthogonal matrix, then $Q^{T}Q=QQ^T=I_n$ where $I_n\in\mathbb{R}^{n^2}$ is the $n\times n$ identity matrix. Columns (and rows) of an orthogonal matrix have unit norm. Any real symmetric matrix $A$ can be decomposed into $Q\Lambda Q^T$, where $Q\in\mathbb{R}^{n^2}$ is an orthogonal matrix whose columns are the eigenvectors of $A$, while $\Lambda = diag(\mathbf{\lambda})$ is a diagonal matrix whose diagonal entries are the eign values of $A$ such that $\lambda_1\geq \lambda_2 \geq \cdots\geq \lambda_n$ and $\lambda_i$ is the eigenvalue of the $i^{th}$ column of $Q$. From (3.), one can write $\vx^TA\vx$ as $\vx^T Q\Lambda Q^T \vx \leq \lambda_1 \vx^T QI_n Q^T \vx$. Based on (1.) and the constraint of $\vx$’s unit norm, the last term can further be simplified to have $\vx^TA\vx \leq \lambda_1 \norm{\vx}\leq \lambda_1$. On the one hand, we found that $\max_{\vx} \vx^T A \vx = \lambda_1$. On the other hand, $A\vq_1 = \lambda_1\vq_1$, and thus $\vq_1^TA\vq_1 = \lambda_1$. Therefore, $\vq_1 \in \arg\max_{\vx} \vx^T A \vx$.</summary></entry><entry><title type="html">A Practical Summary to Matrix Inversion</title><link href="http://ash-aldujaili.github.io/blog/2017/07/31/matrix-inversion/" rel="alternate" type="text/html" title="A Practical Summary to Matrix Inversion" /><published>2017-07-31T00:00:00-08:00</published><updated>2017-07-31T00:00:00-08:00</updated><id>http://ash-aldujaili.github.io/blog/2017/07/31/matrix-inversion</id><content type="html" xml:base="http://ash-aldujaili.github.io/blog/2017/07/31/matrix-inversion/">&lt;p&gt;Matrix inversion is an essential procedure in solving a linear system of equations. I am writing this post to summarize possible scenarios one may face when inverting a matrix.&lt;/p&gt;
+
+&lt;p&gt;Before delving into the details, I intend to present a geometric view of linear systems of equations. This will help us understand why we could have exactly one, infinitely many, or no solution at all. And subsequently, why some matrices are convertible, and others are not.&lt;/p&gt;
+
+&lt;p&gt;$
+\newcommand{\vx}{\mathbf{x}}
+\newcommand{\vq}{\mathbf{q}}
+\newcommand{\vb}{\mathbf{b}}
+\newcommand{\lm}{\lambda}
+\newcommand{\norm}[1]{||#1||_2}
+$&lt;/p&gt;
+
+&lt;h3&gt;Problem Setup&lt;/h3&gt;
+&lt;p&gt;Let us define our linear system as $A\vx=b$, where $A\in\mathbb{R}^{m\times n}$ is a known matrix, $\vb\in\mathbb{R}^m$ is a known vector, and $\vx\in\mathbb{R}^n$ is a vector of unknown values.&lt;/p&gt;
+
+&lt;p&gt;One can think of $b$ as a point in the $m$-dimensional space. Furthermore, consider $A\vx$ as a linear combination $A$’s column vectors where the $i^{th}$ column $A_{:,i}$ is scaled by the $i^{th}$ entry of $\vx$, $x_i$. In other words, when we say that $\vb=A\vx$, we mean that $\vb$ is reachable from the origin $(\mathbf{0}\in\mathbb{R}^m)$ by moving $x_1$ units along the vector $A_{:,1}$, $x_2$ units along the vector $A_{:,2}$, …, and $x_n$ units along the vector $A_{:,n}$&lt;/p&gt;
+
+&lt;h3&gt;Matrix Inversion Summary&lt;/h3&gt;
+&lt;!--&lt;p align=&quot;center&quot;&gt;
+  &lt;img src=&quot;http://ash-aldujaili.github.io/blog/assets/matrix-inverse-summary.png&quot; width=&quot;1000&quot;/&gt;
+&lt;br&gt;&lt;br/&gt;
+  Summary of Matrix Inverse Techniques.
+&lt;/p&gt;--&gt;</content><author><name>Abdullah Al-Dujaili</name></author><summary type="html">Matrix inversion is an essential procedure in solving a linear system of equations. I am writing this post to summarize possible scenarios one may face when inverting a matrix. Before delving into the details, I intend to present a geometric view of linear systems of equations. This will help us understand why we could have exactly one, infinitely many, or no solution at all. And subsequently, why some matrices are convertible, and others are not. $ \newcommand{\vx}{\mathbf{x}} \newcommand{\vq}{\mathbf{q}} \newcommand{\vb}{\mathbf{b}} \newcommand{\lm}{\lambda} \newcommand{\norm}[1]{||#1||_2} $ Problem Setup Let us define our linear system as $A\vx=b$, where $A\in\mathbb{R}^{m\times n}$ is a known matrix, $\vb\in\mathbb{R}^m$ is a known vector, and $\vx\in\mathbb{R}^n$ is a vector of unknown values. One can think of $b$ as a point in the $m$-dimensional space. Furthermore, consider $A\vx$ as a linear combination $A$’s column vectors where the $i^{th}$ column $A_{:,i}$ is scaled by the $i^{th}$ entry of $\vx$, $x_i$. In other words, when we say that $\vb=A\vx$, we mean that $\vb$ is reachable from the origin $(\mathbf{0}\in\mathbb{R}^m)$ by moving $x_1$ units along the vector $A_{:,1}$, $x_2$ units along the vector $A_{:,2}$, …, and $x_n$ units along the vector $A_{:,n}$ Matrix Inversion Summary</summary></entry><entry><title type="html">DACE/BLUP MSE for EGO</title><link href="http://ash-aldujaili.github.io/blog/2017/06/06/mse-ego-dace/" rel="alternate" type="text/html" title="DACE/BLUP MSE for EGO" /><published>2017-06-06T00:00:00-08:00</published><updated>2017-06-06T00:00:00-08:00</updated><id>http://ash-aldujaili.github.io/blog/2017/06/06/mse-ego-dace</id><content type="html" xml:base="http://ash-aldujaili.github.io/blog/2017/06/06/mse-ego-dace/">&lt;p&gt;$\newcommand{\hy}{\hat{y}}
 \newcommand{\hmu}{\hat{\mu}}
 \newcommand{\R}{\mathbf{R}}
 \newcommand{\hmu}{\hat{\mu}}

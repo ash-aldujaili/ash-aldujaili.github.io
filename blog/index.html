@@ -123,6 +123,94 @@
       <li>
         <header class="post-header">
           <h1 class="post-title">
+            <a class="post-link" href="/blog/2017/08/01/quadratic-form-opt/">Quadratic Function Optimization via Linear Algebra</a>
+          </h1>
+
+          <p class="post-meta">Aug 1, 2017</p>
+        </header>
+
+        <div class="post-content">
+          <p>In this post, we show how Linear Algebra can be used to solve one of the common optimization problems that arise in a variety of domains. In particular, we are interested in the quadratic optimization problem of the form
+$
+\newcommand{\vx}{\mathbf{x}}
+\newcommand{\vq}{\mathbf{q}}
+\newcommand{\lm}{\lambda}
+\newcommand{\norm}[1]{||#1||_2}
+$</p>
+
+<p>\begin{align}
+\text{max}_{\vx}\hspace{1.15cm} \vx^TA\vx \newline
+\hspace{1em}\text{s.t.}\hspace{1em} \norm{\vx}=1
+\label{eq:opt-problem}
+\end{align}</p>
+
+<p>where $A\in\mathbb{R}^{n^2}$ is a real symmetric $($square$)$ matrix, $\vx\in\mathbb{R}^n$. An optimal solution of this problem is $\vq_1\in\mathbb{R}^n$, the eigenvector that corresponds to $\lambda_1\in \mathbb{R}$, the largest eigenvalue of $A$.</p>
+
+<p>Now that we have defined the problem, let’s try to solve it by making use of Linear Algebra, from which we know the following.</p>
+
+<ol>
+  <li>If $Q\in\mathbb{R}^{n^2}$ is an orthogonal matrix, then $Q^{T}Q=QQ^T=I_n$ where $I_n\in\mathbb{R}^{n^2}$ is the $n\times n$ identity matrix.</li>
+  <li>Columns (and rows) of an orthogonal matrix have unit norm.</li>
+  <li>Any real symmetric matrix $A$ can be decomposed into $Q\Lambda Q^T$, where $Q\in\mathbb{R}^{n^2}$ is an orthogonal matrix whose columns are the eigenvectors of $A$, while $\Lambda = diag(\mathbf{\lambda})$ is a diagonal matrix whose diagonal entries are the eign values of $A$ such that $\lambda_1\geq \lambda_2 \geq \cdots\geq \lambda_n$ and  $\lambda_i$ is the eigenvalue of the $i^{th}$ column of $Q$.</li>
+</ol>
+
+<p>From (3.), one can write $\vx^TA\vx$ as $\vx^T Q\Lambda Q^T \vx \leq \lambda_1 \vx^T QI_n Q^T \vx$. Based on (1.) and the constraint of $\vx$’s unit norm, the last term can further be simplified to have $\vx^TA\vx \leq \lambda_1 \norm{\vx}\leq \lambda_1$.</p>
+
+<p>On the one hand, we found that $\max_{\vx} \vx^T A \vx = \lambda_1$. On the other hand, $A\vq_1 = \lambda_1\vq_1$, and thus $\vq_1^TA\vq_1 = \lambda_1$. Therefore, $\vq_1 \in \arg\max_{\vx} \vx^T A \vx$.</p>
+
+
+        </div>
+        
+      </li>
+    
+      
+      
+
+      <li>
+        <header class="post-header">
+          <h1 class="post-title">
+            <a class="post-link" href="/blog/2017/07/31/matrix-inversion/">A Practical Summary to Matrix Inversion</a>
+          </h1>
+
+          <p class="post-meta">Jul 31, 2017</p>
+        </header>
+
+        <div class="post-content">
+          <p>Matrix inversion is an essential procedure in solving a linear system of equations. I am writing this post to summarize possible scenarios one may face when inverting a matrix.</p>
+
+<p>Before delving into the details, I intend to present a geometric view of linear systems of equations. This will help us understand why we could have exactly one, infinitely many, or no solution at all. And subsequently, why some matrices are convertible, and others are not.</p>
+
+<p>$
+\newcommand{\vx}{\mathbf{x}}
+\newcommand{\vq}{\mathbf{q}}
+\newcommand{\vb}{\mathbf{b}}
+\newcommand{\lm}{\lambda}
+\newcommand{\norm}[1]{||#1||_2}
+$</p>
+
+<h3>Problem Setup</h3>
+<p>Let us define our linear system as $A\vx=b$, where $A\in\mathbb{R}^{m\times n}$ is a known matrix, $\vb\in\mathbb{R}^m$ is a known vector, and $\vx\in\mathbb{R}^n$ is a vector of unknown values.</p>
+
+<p>One can think of $b$ as a point in the $m$-dimensional space. Furthermore, consider $A\vx$ as a linear combination $A$’s column vectors where the $i^{th}$ column $A_{:,i}$ is scaled by the $i^{th}$ entry of $\vx$, $x_i$. In other words, when we say that $\vb=A\vx$, we mean that $\vb$ is reachable from the origin $(\mathbf{0}\in\mathbb{R}^m)$ by moving $x_1$ units along the vector $A_{:,1}$, $x_2$ units along the vector $A_{:,2}$, …, and $x_n$ units along the vector $A_{:,n}$</p>
+
+<h3>Matrix Inversion Summary</h3>
+<!--<p align="center">
+  <img src="http://ash-aldujaili.github.io/blog/assets/matrix-inverse-summary.png" width="1000"/>
+<br><br/>
+  Summary of Matrix Inverse Techniques.
+</p>-->
+
+
+        </div>
+        
+      </li>
+    
+      
+      
+
+      <li>
+        <header class="post-header">
+          <h1 class="post-title">
             <a class="post-link" href="/blog/2017/06/06/mse-ego-dace/">DACE/BLUP MSE for EGO</a>
           </h1>
 
