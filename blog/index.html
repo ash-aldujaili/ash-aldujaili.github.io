@@ -189,10 +189,13 @@ $</p>
 
 <p>For a linear system $A\vx=\vb$ where $A\in\mathbb{R}^{m\times n}$ is a known matrix, $\vb\in\mathbb{R}^m$ is a known vector, and $\vx\in\mathbb{R}^n$ is a vector of unknown values, one can find a solution if a matrix $B\in\mathbb{R}^{n\times m}$ can be found such that $BA=I_n$ since for all $\vx \in \mathbb{R}^n$, $I_n \vx=\vx$. We refer to $B$ as the inverse of $A$ $($commonly denoted as $A^{-1})$. Mathematically,</p>
 
-<p><script type="math/tex">A\vx=\vb</script>
-<script type="math/tex">A^{-1}A\vx=A^{-1}\vb</script>
-<script type="math/tex">I_n\vx=A^{-1}\vb</script>
-<script type="math/tex">\vx=A^{-1}\vb</script></p>
+<script type="math/tex; mode=display">A\vx=\vb</script>
+
+<script type="math/tex; mode=display">A^{-1}A\vx=A^{-1}\vb</script>
+
+<script type="math/tex; mode=display">I_n\vx=A^{-1}\vb</script>
+
+<script type="math/tex; mode=display">\vx=A^{-1}\vb</script>
 
 <p>Of course, such solution can be found if $A$ is invertible. That is it is possible to find $A^{-1}$. I am writing this post to summarize possible scenarios one may face when inverting a matrix.</p>
 
@@ -204,9 +207,9 @@ $</p>
 <p>Therefore, a solution exists for $A\vx=\vb$ if $\vb\in span(A\text{‘s columns})$. A necessary and sufficient condition for a solution to exist for all possible values of $\vb$ $(\mathbb{R}^m)$ is that $A$’s columns constitute at least one set of $m$ linearly independent vectors. Let’s note that there is no set of $m$-dimensional vectors has more than $m$ linearly indepdent vectors. The following examples provide an illustration.</p>
 
 <ol>
-  <li>$A=\mat{\begin{array}{cc} 1 &amp; 2 \ 0 &amp; 0\end{array}}$,  $\vb =\mat{\begin{array}{c} 1 \ 1\end{array}}$. In this example, $A$’s span is $\mathbb{R}^1$ along the vector $\mat{\begin{array}{c}1 \ 0\end{array}}$ and no matter how $\vx$ is set, we can not reach $\vb$, because it does not lie at the intersection of its plane $\mathbb{R}^2$ and $A$’s space. With regard to the remark made above, we notice that $m=2$, but we do not have $2$ linearly independent vectors in $A$’s columns.</li>
-  <li>$A=\mat{\begin{array}{cc} 1 &amp; 2 \ 0 &amp; 0\end{array}}$,  $\vb =\mat{\begin{array}\begin{array}{c} 1 \ 0\end{array}}$. In this example, $A$ is the same as $(1.)$’s but we moved $\vb$ to make it reachable. One may note that the effective dimension of the problem at hand is one (the second entry of all the columns is zero). In other words, we have matrix of $1\times 2$ with $m=1$ and we have $2$ linearly dependent vectors of length 1 that can reach $\vb$ through any solution that satisfies $x_1+ 2x_2=1$, for which there are infinitely many. Such example fulfills the sufficient and necessary condition aforementioned, but here we have more than $m$ columns. Thus, there are infinitely many solutions rather than exactly one.</li>
-  <li>$A=\mat{\begin{array}{cc} 1 &amp; 0 \ 0 &amp; 1\end{array}}$,  $\vb =\mat{\begin{array}{c} 1 \ 1\end{array}}$. In this example, we made $A$ spans $\mathbb{R}^2$ with exactly $m=2$ linearly indepdendent vectors, and so we can reach $\vb$ with exactly one particular $\vx$. This example fulfils the sufficient and necessary condition with exactly $n=m$ columns.</li>
+  <li>$A=\mat{\begin{array}{cc} 1 &amp; 2 , 0 &amp; 0\end{array}}$,  $\vb =\mat{\begin{array}{c} 1 , 1\end{array}}$. In this example, $A$’s span is $\mathbb{R}^1$ along the vector $\mat{\begin{array}{c}1 , 0\end{array}}$ and no matter how $\vx$ is set, we can not reach $\vb$, because it does not lie at the intersection of its plane $\mathbb{R}^2$ and $A$’s space. With regard to the remark made above, we notice that $m=2$, but we do not have $2$ linearly independent vectors in $A$’s columns.</li>
+  <li>$A=\mat{\begin{array}{cc} 1 &amp; 2 , 0 &amp; 0\end{array}}$,  $\vb =\mat{\begin{array}{c} 1 , 0\end{array}}$. In this example, $A$ is the same as $(1.)$’s but we moved $\vb$ to make it reachable. One may note that the effective dimension of the problem at hand is one (the second entry of all the columns is zero). In other words, we have matrix of $1\times 2$ with $m=1$ and we have $2$ linearly dependent vectors of length 1 that can reach $\vb$ through any solution that satisfies $x_1+ 2x_2=1$, for which there are infinitely many. Such example fulfills the sufficient and necessary condition aforementioned, but here we have more than $m$ columns. Thus, there are infinitely many solutions rather than exactly one.</li>
+  <li>$A=\mat{\begin{array}{cc} 1 &amp; 0 , 0 &amp; 1\end{array}}$,  $\vb =\mat{\begin{array}{c} 1 , 1\end{array}}$. In this example, we made $A$ spans $\mathbb{R}^2$ with exactly $m=2$ linearly indepdendent vectors, and so we can reach $\vb$ with exactly one particular $\vx$. This example fulfils the sufficient and necessary condition with exactly $n=m$ columns.</li>
 </ol>
 
 <p>Based on the above, one can conclude the following:</p>
@@ -220,12 +223,12 @@ $</p>
     <p>When $A$ is a rectangular matrix $(m&gt;n)$, there exists some $\vb$ for which no solution exists. Thus, $A$ is non-invertible, and we say that the system is <strong>overdetermined</strong>.</p>
   </li>
   <li>
-    <p>When $A$ is a rectangular matrix $(m&lt;n)$ with $m$ linearly indendent column vectors, there exist infinitely many solutions for any $\vb \in \mathbb{R}^m$. Thus, $A$ is non-invertible, and we say that the system is <strong>underdetermined</strong>.</p>
+    <p>When $A$ is a rectangular matrix $(m&lt; n)$ with $m$ linearly indendent column vectors, there exist infinitely many solutions for any $\vb \in \mathbb{R}^m$. Thus, $A$ is non-invertible, and we say that the system is <strong>underdetermined</strong>.</p>
   </li>
-  <li>When $A$ is a rectangular matrix $(m&lt;n)$ with $&lt;m$ linearly indendent column vectors, it is possible that there exists some $\vb$ for which no solution exists. Thus, $A$ is non-invertible. We still say the system is <strong>underdetermined</strong>.</li>
+  <li>When $A$ is a rectangular matrix $(m&lt; n)$ with $&lt; m$ linearly indendent column vectors, it is possible that there exists some $\vb$ for which no solution exists. Thus, $A$ is non-invertible. We still say the system is <strong>underdetermined</strong>.</li>
 </ol>
 
-<p>There are several procedures to compute $A^{-1}$ for invertible matrices such as the Gauss elimination method (some others are listed in the figure at the bottom of this page).</p>
+<p>There are several procedures to compute $A^{-1}$ for invertible matrices such as the Gauss elimination method $($some others are listed in the figure at the bottom of this page$)$.</p>
 
 <h3>Non-Invertible Matrices</h3>
 
@@ -255,21 +258,21 @@ yields $\vx=(A^{T}A)^{-1}A^T\vb$. Therefore, the pseudo-inverse matrix is $(A^{T
 
 <script type="math/tex; mode=display">0=\nabla_{\vx}{(\vx^{T}\vx - \mathbf{\lambda}^{T}(A\vx-b))}= 2\vx - A^{T}\mathbf{\lambda}</script>
 
-<p>$A^{T}$ is not invertible, but $AA^{T}$ is [^ATA]. Therefore, we can solve for $\mathbf{\lambda}$ as follows.</p>
+<p>$A^{T}$ is not invertible, but $AA^{T}$ is.<sup id="fnref:1"><a href="#fn:1" class="footnote">1</a></sup> Therefore, we can solve for $\mathbf{\lambda}$ as follows.</p>
 
 <script type="math/tex; mode=display">\mathbf{\lambda}= 2(AA^T)^{-1}A\vx=2(AA^T)^{-1}\vb</script>
 
 <p>Thus, $\vx=A^T(AA^T)^{-1}\vb$</p>
 
-<p>Interestingly, both of the above pseudo-inverses are equivalent to the <strong>Moore-Penrose</strong> pseudo-inverse which can be computed from the singular value decomposition (SVD).</p>
+<p>Interestingly, both of the above pseudo-inverses are equivalent to the <strong>Moore-Penrose</strong> pseudo-inverse which can be computed from the singular value decomposition $($SVD$)$.</p>
 
 <h3>Ill-Conditioned Matrices</h3>
 
-<p>Let’s motivate this issue with an example. Assume you are reading a measurement, which you have to scale by dividing by a very small number. If your reading deviates a little, the absolute error will extremely large. Such large oscillations might be undesirable and we’d like to dampen them. In the matrix world, dividing by a small number corresponds to to multiplying by the inverse of an ill-conditioned matrix. An ill-conditioned matrix is still <strong>invertible</strong>, but it is numerically unstable. In addition to the measurement error $($here the measurement is captured by $\vb$$)$, inverting an ill-conditioned matrix also suffers from loss of precision in floating point arithmetic.To cope with this unstability, we compromise the quality of the solution and use regularization techniques to have a stable numerical outcome. The bulk of these techniques aim to increase (or replace) the value of the smallest eigenvalue with respect to the greatest eigenvalue. Common techniques are:</p>
+<p>Let’s motivate this issue with an example. Assume you are reading a measurement, which you have to scale by dividing by a very small number. If your reading deviates a little, the absolute error will extremely large. Such large oscillations might be undesirable and we’d like to dampen them. In the matrix world, dividing by a small number corresponds to to multiplying by the inverse of an ill-conditioned matrix. An ill-conditioned matrix is still <strong>invertible</strong>, but it is numerically unstable. In addition to the measurement error $($here the measurement is captured by $\vb$$)$, inverting an ill-conditioned matrix also suffers from loss of precision in floating point arithmetic.To cope with this unstability, we compromise the quality of the solution and use regularization techniques to have a stable numerical outcome. The bulk of these techniques aim to increase $($or replace$)$ the value of the smallest eigenvalue with respect to the greatest eigenvalue. Common techniques are:</p>
 
 <ol>
   <li>Truncated SVD</li>
-  <li>Tikhonov Regularization (which can also be used for non-invertible matrices).</li>
+  <li>Tikhonov Regularization $($which can also be used for non-invertible matrices$)$.</li>
 </ol>
 
 <p>It is important to consider the regularization effect on the final solution and whether it makes sense to our system or not.</p>
@@ -284,17 +287,13 @@ yields $\vx=(A^{T}A)^{-1}A^T\vb$. Therefore, the pseudo-inverse matrix is $(A^{T
   Summary of Matrix Inverse Techniques.
 </p>
 
-<table>
-  <tbody>
-    <tr>
-      <td>[^ATA]: QuickProof. $AA^T$ is a square matrix. What is left to show is that columns of $AA^T$ are linearly independent, and thus $AA^T$ is invertible. We know that the columns of $A^T$ are linearly independent,  which means its null space is ${\mathbf{0}}$. By contradiction, let’s assume that $\mathbf{v}$ is a non-zero vector that belongs to  $AA^T$’s null space, which means $AA^T\mathbf{v}=\mathbf{0}$. Mutiplying both sides by $\mathbf{v}$ yields $</td>
-      <td> </td>
-      <td>A^T\mathbf{v}</td>
-      <td> </td>
-      <td>^2_2=0$, i.e., $A^T\mathbf{v}=\mathbf{0}$. This contradicts the fact that $A^T$’s null space is the zero vector. Therefore, $\mathbf{v}$ can not be zero and $AA^T$’s null space has no non-zero vector, and all of its columns are linearly independent.</td>
-    </tr>
-  </tbody>
-</table>
+<div class="footnotes">
+  <ol>
+    <li id="fn:1">
+      <p>$AA^T$ is a square matrix. What is left to show is that columns of $AA^T$ are linearly independent, and thus $AA^T$ is invertible. We know that the columns of $A^T$ are linearly independent,  which means its null space is ${\mathbf{0}}$. By contradiction, let’s assume that $\mathbf{v}$ is a non-zero vector that belongs to  $AA^T$’s null space, which means $AA^T \mathbf{v}= \mathbf{0}$. Mutiplying both sides by $\mathbf{v}$ yields $(A^T \mathbf{v})^{T}(A^T \mathbf{v})=0$, i.e., $A^T \mathbf{v}= \mathbf{0}$. This contradicts the fact that $A^T$’s null space is the zero vector. Therefore, $\mathbf{v}$ can not be zero and $AA^T$’s null space has no non-zero vector, and all of its columns are linearly independent.&nbsp;<a href="#fnref:1" class="reversefootnote">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
 
         </div>
         
