@@ -10,7 +10,7 @@
   
   
   <title>On the Positive Definitness of Multivariate Gaussian&#39;s  Covariance Matrix</title>
-  <meta name="description" content="$ \newcommand{\vx}{\mathbf{x}} \newcommand{\vy}{\mathbf{y}} \newcommand{\vz}{\mathbf{z}} \newcommand{\covmat}{\Sigma} $ In this short post, we show why the covariance matrix $\Sigma \in \mathbb{R}^{n\times n}$ of a multivariate Gaussian $\vx\in\mathbb{R}^n$ is always symmetric positive definite. That is, for all non-zero vector $\vy \in \mathbb{R}^n$, $\vy^T\Sigma \vy&amp;gt;0$ $\Sigma_{ij} = \Sigma_{ji}$. The latter condition $(2)$ follows from the definition of the covariance matrix and the commutative property of multiplication. For condition $(1)$, we can prove it in two steps: For all non-zero vector $\vy \in \mathbb{R}^n$, $\vy^T\Sigma \vy \geq 0$. This follows from with $z_i =x_i - \bar{x}_i$, we have since $(\vy^T\vz)^2\geq 0$. For $\Sigma$ to hold as a covariance matrix for a multivariate Gaussian, it must be invertible. That is to say, its rank is $n$, i.e., $n$ non-zero eigenvalues ${\lambda_i}{1\leq i \leq n}$ which are also positive $($from step 1$)$. This means that all non-zero vectors $\vx \in \mathbb{R}^n$ can be written as linear combinations of $\Sigma$’s eigen vectors ${\mathbf{v}_i}{1\leq i \leq n}$. Therefore, $\vx^T\Sigma \vx= \sum_{ij} w_i \mathbf{v}^T_i \lambda_j w_j \mathbf{v}j= \sum{i} \lambda_i w^2_i &amp;gt; 0$.">
+  <meta name="description" content="$ \newcommand{\vx}{\mathbf{x}} \newcommand{\vy}{\mathbf{y}} \newcommand{\vz}{\mathbf{z}} \newcommand{\covmat}{\Sigma} $ In this short post, we show why the covariance matrix $\Sigma \in \mathbb{R}^{n\times n}$ of a multivariate Gaussian $\vx\in\mathbb{R}^n$ is always symmetric positive definite. That is, for all non-zero vector $\vy \in \mathbb{R}^n$, $\vy^T\Sigma \vy&amp;gt;0$ $\Sigma_{ij} = \Sigma_{ji}$. The latter condition $(2)$ follows from the definition of the covariance matrix and the commutative property of multiplication. For condition $(1)$, we can prove it in two steps: First, for all non-zero vector $\vy \in \mathbb{R}^n$, $\vy^T\Sigma \vy \geq 0$. This follows from with $z_i =x_i - \bar{x}_i$, we have since $(\vy^T\vz)^2\geq 0$. Second, for $\Sigma$ to hold as a covariance matrix for a multivariate Gaussian, it must be invertible. That is to say, its rank is $n$, i.e., $n$ non-zero eigenvalues ${\lambda_i }_{1\leq i \leq n}$ which are also positive $($from step 1$)$. This means that all non-zero vectors $\vx \in \mathbb{R}^n$ can be written as linear combinations of $\Sigma$’s eigen vectors Therefore,">
   
 
   <link rel="stylesheet" href="/blog/assets/main.css">
@@ -136,17 +136,15 @@ $</p>
 
 <p>The latter condition $(2)$ follows from the definition of the covariance matrix and the commutative property of multiplication. For condition $(1)$, we can prove it in two steps:</p>
 
-<ol>
-  <li>
-    <p>For all non-zero vector $\vy \in \mathbb{R}^n$, $\vy^T\Sigma \vy \geq 0$. This follows from
-<script type="math/tex">\vx^T\Sigma \vx=\sum_{ij} y_i y_j \Sigma_{ij}=\sum_{ij}y_i y_j E[(x_i - \bar{x}_i)(x_j - \bar{x}_j)]=E\big[\sum_{ij}y_i y_j (x_i - \bar{x}_i)(x_j - \bar{x}_j)\big]\;,</script>
+<p>First, for all non-zero vector $\vy \in \mathbb{R}^n$, $\vy^T\Sigma \vy \geq 0$. This follows from
+<script type="math/tex">{\vx}^T\Sigma \vx=\sum_{ij} y_i y_j \Sigma_{ij}=\sum_{ij}y_i y_j E[(x_i - \bar{x}_i)(x_j - \bar{x}_j)]=E\big[\sum_{ij}y_i y_j (x_i - \bar{x}_i)(x_j - \bar{x}_j)\big]\;,</script>
 with $z_i =x_i - \bar{x}_i$, we have <script type="math/tex">% <![CDATA[
 \vx^T\Sigma \vx=E[\sum_{ij} y_i z_iy_jz_j]=E[\sum_{i} y^2_iz^2_i + 2 \sum_{i<j} y_iz_i y_j z_j]=E[(\vy^T\vz)^2]\geq 0\;, %]]></script> since $(\vy^T\vz)^2\geq 0$.</p>
-  </li>
-  <li>
-    <p>For $\Sigma$ to hold as a covariance matrix for a multivariate Gaussian, it must be invertible. That is to say, its rank is $n$, i.e., $n$ non-zero eigenvalues ${\lambda_i}<em>{1\leq i \leq n}$ which are also positive $($from step 1$)$. This means that all non-zero vectors $\vx \in \mathbb{R}^n$ can be written as linear combinations of $\Sigma$’s eigen vectors ${\mathbf{v}_i}</em>{1\leq i \leq n}$. Therefore, $\vx^T\Sigma \vx= \sum_{ij} w_i \mathbf{v}^T_i \lambda_j w_j \mathbf{v}<em>j= \sum</em>{i} \lambda_i w^2_i &gt; 0$.</p>
-  </li>
-</ol>
+
+<p>Second, for $\Sigma$ to hold as a covariance matrix for a multivariate Gaussian, it must be invertible. That is to say, its rank is $n$, i.e., $n$ non-zero eigenvalues ${\lambda_i }_{1\leq i \leq n}$ which are also positive $($from step 1$)$. This means that all non-zero vectors $\vx \in \mathbb{R}^n$ can be written as linear combinations of $\Sigma$’s eigen vectors 
+<script type="math/tex">\{\mathbf{v}_i\}_{1\leq i \leq n}\;.</script></p>
+
+<p>Therefore, <script type="math/tex">{\vx}^T \Sigma \vx= \sum_{ij} w_i \mathbf{v}^T_i \lambda_j w_j \mathbf{v}_j= \sum_{i} \lambda_i w^2_i > 0\;.</script></p>
 
 
   </div>
