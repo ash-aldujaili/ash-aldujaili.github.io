@@ -123,6 +123,52 @@
       <li>
         <header class="post-header">
           <h1 class="post-title">
+            <a class="post-link" href="/blog/2017/09/20/covariance-matrix/">On the Positive Definitness of Multivariate Gaussian&#39;s  Covariance Matrix</a>
+          </h1>
+
+          <p class="post-meta">Sep 20, 2017</p>
+        </header>
+
+        <div class="post-content">
+          <p>$
+\newcommand{\vx}{\mathbf{x}}
+\newcommand{\vy}{\mathbf{y}}
+\newcommand{\vz}{\mathbf{z}}
+\newcommand{\covmat}{\Sigma}
+$</p>
+
+<p>In this short post, we show why the covariance matrix $\Sigma \in \mathbb{R}^{n\times n}$ of a multivariate Gaussian $\vx\in\mathbb{R}^n$ is always symmetric positive definite. That is,</p>
+
+<ol>
+  <li>for all non-zero vector $\vy \in \mathbb{R}^n$, $\vy^T\Sigma \vy&gt;0$</li>
+  <li>$\Sigma_{ij} = \Sigma_{ji}$.</li>
+</ol>
+
+<p>The latter condition $(2)$ follows from the definition of the covariance matrix and the commutative property of multiplication. For condition $(1)$, we can prove it in two steps:</p>
+
+<ol>
+  <li>
+    <p>For all non-zero vector $\vy \in \mathbb{R}^n$, $\vy^T\Sigma \vy \geq 0$. This follows from
+<script type="math/tex">\vx^T\Sigma \vx=\sum_{ij} y_i y_j \Sigma_{ij}=\sum_{ij}y_i y_j E[(x_i - \bar{x}_i)(x_j - \bar{x}_j)]=E\big[\sum_{ij}y_i y_j (x_i - \bar{x}_i)(x_j - \bar{x}_j)\big]\;,</script>
+with $z_i =x_i - \bar{x}_i$, we have <script type="math/tex">% <![CDATA[
+\vx^T\Sigma \vx=E[\sum_{ij} y_i z_iy_jz_j]=E[\sum_{i} y^2_iz^2_i + 2 \sum_{i<j} y_iz_i y_j z_j]=E[(\vy^T\vz)^2]\geq 0\;, %]]></script> since $(\vy^T\vz)^2\geq 0$.</p>
+  </li>
+  <li>
+    <p>For $\Sigma$ to hold as a covariance matrix for a multivariate Gaussian, it must be invertible. That is to say, its rank is $n$, i.e., $n$ non-zero eigenvalues ${\lambda_i}<em>{1\leq i \leq n}$ which are also positive $($from step 1$)$. This means that all non-zero vectors $\vx \in \mathbb{R}^n$ can be written as linear combinations of $\Sigma$’s eigen vectors ${\mathbf{v}_i}</em>{1\leq i \leq n}$. Therefore, $\vx^T\Sigma \vx= \sum_{ij} w_i \mathbf{v}^T_i \lambda_j w_j \mathbf{v}<em>j= \sum</em>{i} \lambda_i w^2_i &gt; 0$.</p>
+  </li>
+</ol>
+
+
+        </div>
+        
+      </li>
+    
+      
+      
+
+      <li>
+        <header class="post-header">
+          <h1 class="post-title">
             <a class="post-link" href="/blog/2017/08/01/quadratic-form-opt/">Quadratic Function Optimization via Linear Algebra</a>
           </h1>
 
@@ -457,164 +503,17 @@ problems is <strong>bounded</strong>.</p>
         
       </li>
     
-      
-      
-
-      <li>
-        <header class="post-header">
-          <h1 class="post-title">
-            <a class="post-link" href="/blog/2017/03/01/exp-opt/">Stochastic Processes for Expensive Black-Box Optimization</a>
-          </h1>
-
-          <p class="post-meta">Mar 1, 2017</p>
-        </header>
-
-        <div class="post-content">
-          <p>In this post, we’ll go through one of the techniques of Black-Box Deterministic Optimization: <strong>Response Surface Methdology</strong>. In general, this approach models the objective and constraint functions with stochastic processes based on a few evaluations at points in the search space; with the goal of predicting the functions’ behavior as we move away from the evaluated points by different amounts in each coordinate direction.</p>
-
-<p>The stochastic process approach has been used in several fields under such names as ‘kriging’, ‘Bayesian optimization’, and ‘random function approach’. It comes with two main advantages:</p>
-<ol>
-  <li>Suitability for Expensive Optimization - as it quickly captures the trends over the search space.</li>
-  <li>Ease of establishing reasonable stopping rules - as it provide statistical confidence intervals.</li>
-</ol>
-
-<hr />
-
-<h4>Modelling Alternatives</h4>
-
-<p>Let’s say we have evaluated a deterministic function,  $~y:\mathbb{R}^k\to \mathbb{R}$, at $n$ points. In other words, we have a sample $\mathcal{D}={(x^{(i)},y^{(i)})}_{1\leq i \leq n}$ 
-from the $k$-dimensional space, and we would like to use these observation in guiding our search for the optimal point. Let’s explore possible models that may help us in that.</p>
-
-<hr />
-<h4>1. <strong>Linear Regression</strong></h4>
-
-<p>One can use linear regression as a simple way to fit a response surface to $\mathcal{D}$. In linear regression, the observations are assumed to be generated from the following model.</p>
-
-<p>\begin{equation}
-y(\mathbf{x}^{(i)}) = \sum_{h} \beta_{h}f_h(\mathbf{x}^{(i)}) + \epsilon^{(i)}\; (i = 1,\ldots,n).
-\label{eq:lin-reg}
-\end{equation}</p>
-
-<p>In the above equation, the $f_h(\mathbf{x})$’s are a set of linear or non-linear functions of $\mathbf{x}$; the $\beta_h$’s are unknown parameters of the model to be estimated; and the $\epsilon^{(i)}$’s are independent error terms with a normal distribution of zero mean and $\sigma^2$ variance.</p>
-
-<p>Employing Eq. \ref{eq:lin-reg} has two main concerns:</p>
-
-<ol>
-  <li>A Conceptual Concern: Our function $f$ is deterministic. Therefore, any improper fit of Eq. \ref{eq:lin-reg} will be a modelling error—i.e., incomplete regression term $\sum_{h} \beta_{h}f_h(\mathbf{x}^{(i)})$—rather than measurement noise or error—i.e., the $\epsilon^{(i)}$ term. In essence $\epsilon^{(i)}=\epsilon(\mathbf{x}^{(i)})$ captures the value of the left-out regression terms at $\mathbf{x}^{(i)}$. And if $y(\mathbf{x})$ is continuous, then $\epsilon(\mathbf{x})$ is continuous as well. Thus, if two points $\mathbf{x}^{(i)}$ and $\mathbf{x}^{(j)}$ are close, then the errors $\epsilon(\mathbf{x}^{(i)})$ and $\epsilon(\mathbf{x}^{(j)})$ should be close as well.</li>
-  <li>A Practical Concern: How to define the $f_h$’s functions. Indeed, if we knew the perfect form of Eq. \ref{eq:lin-reg}, our function $f$ would not have been a black box in the first place. One can certainly employ a meta-model $($some referred to it as flexible functional form$)$ approach to decide the most suitable form of Eq. \ref{eq:lin-reg}. However, this approach comes with an additional set of parameters $($hyperparameters$)$ and requires many more function evaluations.</li>
-</ol>
-
-<p>In light of the above concerns, it makes no sense to assume that the error terms $\epsilon^{(i)}$’s are independent. Alternatively, we can assume that these terms are associated / related and that the level of such association $($correlation$)$ is low when the corresponding points $\mathbf{x}^{(i)}$’s are far away and high when they are close. The following equation captures this assumption of correlation.</p>
-
-<p>\begin{equation}
-Corr[\epsilon(\mathbf{x}^{(i)}),\epsilon(\mathbf{x}^{(j)})] = \exp\big(- \sum_{h=1}^{k} \theta_h |x^{(j)}_h-x^{(j)}_h|^{p_h}\big)\;, \theta_h \geq 0\;, p_h \in [0,1]\;.
-\label{eq:corr-fct}
-\end{equation}</p>
-
-<p>The parameters $\theta_h$’s and $p_h$’s controls how fast the degree of correlation changes between two errors terms as the (weighted) distance between the corresponding points changes as shown in the figure below. In general, $\theta_h$ measures the importance / activity of the $h^{th}$ variable $x_h$ $($the higher $\theta_h$ is, the faster the correlation drops as the corresponding points move away in the coordinate direction $h)$, while $p_h$ captures the function smoothness in the coordinate direction $h$ $(p_h$ = 2 is for smooth functions$)$.</p>
-
-<p align="center">
-  <img src="http://ash-aldujaili.github.io/blog/assets/err_corr.jpg" width="400" />
-<br /><br />
-  Figure 1. Correlation Function $($Eq. \ref{eq:corr-fct}$)$ with different parameters.
-</p>
-
-<p>Having modelled the correlation between our observations, fitting the regression term to our observations is less of a concern now. In fact, this forms the basis of the stochastic process model presented next.</p>
-
-<hr />
-
-<h4>2. <strong>DACE</strong> $($Design and Analysis of Computer Experiments [1]$)$</h4>
-
-<p>Based on the correlation model $($Eq. \ref{eq:corr-fct}$)$, one can view the
-error term $\epsilon(\mathbf{x})$ as a stochastic process - a set of correlated random variables indexed by the $k$-dimensional space of $\mathbf{x}$. Therefore, the observations can be modeled with the following stochastic process:</p>
-
-<p>\begin{equation}
-y^{(i)} = \mu + \epsilon(\mathbf{x}^{(i)})\; (i=1, \ldots, n).
-\label{eq:dace}
-\end{equation}</p>
-
-<p>In comparison to Eq. \ref{eq:lin-reg}, $\mu$ $($the mean of the stochastic process$)$ is the simplest regression term $($ a constant $)$; $\epsilon(\mathbf{x}^{(i)})\sim \mathcal{N}(0, \sigma^2)$ with a correlation given by Eq. \ref{eq:corr-fct}. This model is commonly referred to as <strong>DACE</strong> - an acronym to the paper that popularized it [1].</p>
-
-<p>We can estimate DACE’s $2k+2$ parameters by maximizing the likelihood of our sample $\mathcal{D}$. With the correlation between two error terms defined as above, the vector $\mathbf{y}=[y^{(1)},\ldots, y^{(n)}]$ of observed function values is a normal random $n$-vector. That is, $\mathbf{y}\sim\mathcal{N}(\mu, \sigma^2\mathbf{R})$. Thus, the likelihood function of our samples can be written as follows.<sup id="fnref:1"><a href="#fn:1" class="footnote">1</a></sup> 
-\begin{equation}
-f(\mathbf{y};\theta,p, \mu, \sigma) = 
-\frac{1}
-{(2\pi)^{n/2}(\sigma^2)^{n/2}|\mathbf{R}|^{(1/2)}}
-\exp\big(-\frac{(\mathbf{y}-\mathbf{1}\mu)^{T} \mathbf{R}^{-1} (\mathbf{y}-\mathbf{1}\mu)}{2\sigma^2}\big)
-\label{eq:likelihood}
-\end{equation}</p>
-
-<p>Eq. $\ref{eq:likelihood}$ can be optimized with respect to $\mu$ and $\sigma^2$ in closed form by taking the partial derivative of its log:</p>
-
-<script type="math/tex; mode=display">\hat{\mu}=\frac{\mathbf{1}^{T}\mathbf{R}^{-1}\mathbf{y}}{\mathbf{1}^{T}\mathbf{R}^{-1}\mathbf{1}}</script>
-
-<script type="math/tex; mode=display">\hat{\sigma}^2 = \frac{(\mathbf{y}-\mathbf{1}\hat{\mu})^{T} \mathbf{R}^{-1} (\mathbf{y}-\mathbf{1}\hat{\mu})}{n}</script>
-
-<p>The above equations can in turn be plugged into the likelihood function to form a <em>concentrated likelihood function</em>, which can be optimized with resepct to the parameters $\theta_h$’s and $p_h$’s. Subsequently, the corresponding values of $\hat{\mu}$ and $\hat{\sigma}^2$ are computed.</p>
-
-<p>Having estimated the parameters of our stochastic process model, we can now use it to predict the function value at new points in the $k$-dimensional space. The stochastic process model encodes the left-out terms of the regression model using the correlated errors. In other words, these correlated errors must be employed to adjust the prediction above or below the constant regression term $\hat{\mu}$. To see how this can be done, assume that we are interested in predicting the function value at $x^{(n+1)}$ and let $y^{*}$ be some prediction candidate for $f(x^{(n+1)})$. To measure how well $(x^{(n+1)},y^{*})$ fits the sample $\mathcal{D}$, one can compute the joint $($augmented$)$ likelihood function of $\tilde{\mathbf{y}} = (\mathbf{y}\; y^{*})$ - $f(\tilde{\mathbf{y}};\theta,p, \hat{\mu}, \hat{\sigma})$ from Eq. \ref{eq:likelihood}’s $f(\mathbf{y};\theta,p, \mu, \sigma)$. Taking the log of Eq. \ref{eq:likelihood}, it is easy to see that the only term that depends on $y^{*}$ is $(\tilde{\mathbf{y}}- \mathbf{1}\hat{\mu})^{T}{\tilde{\mathbf{R}}}^{-1}(\tilde{\mathbf{y}}- \mathbf{1}\hat{\mu})$ with 
-<script type="math/tex">% <![CDATA[
-\tilde{\mathbf{R}} = \begin{bmatrix}
-    \mathbf{R}       & \mathbf{r} \\
-    \mathbf{r}^{T}     & 1 
-\end{bmatrix} %]]></script>, where $\mathbf{r} = \mathbf{r}(\mathbf{x}^{(n+1)}) = [Corr[\epsilon(\mathbf{x}^{(1)}),\epsilon(\mathbf{x}^{(n+1)})],\ldots,Corr[\epsilon(\mathbf{x}^{(n)}),\epsilon(\mathbf{x}^{(n+1)})]]$.</p>
-
-<p>Applying the <a href="https://en.wikipedia.org/wiki/Invertible_matrix#Blockwise_inversion">blockwise inversion formula</a> on $(\tilde{\mathbf{y}}- \mathbf{1}\hat{\mu})^{T}{\tilde{\mathbf{R}}}^{-1}(\tilde{\mathbf{y}}- \mathbf{1}\hat{\mu})$, we have:</p>
-
-<script type="math/tex; mode=display">\bigg(y^{*}-\text{independent terms}\bigg) + \frac{1}{1-\mathbf{r}^{T}R^{-1}\mathbf{r}}(y^{*}-\hat{\mu})^2 - \frac{2\mathbf{r}^{T}\mathbf{R}^{-1}(\mathbf{y}-\mathbf{1}\hat{\mu})}{1-\mathbf{r}^{T}\mathbf{R}^{-1}\mathbf{r}}(y^{*}-\hat{\mu})</script>
-
-<p>Thus, setting the derivative of the above term with respect to $y^{*}$ to zero gives the best prediction’s formula at $\mathbf{x}^{(n+1)}$ that fits the sample $\mathcal{D}$ as follows.</p>
-
-<p>\begin{equation}
-\hat{y}(\mathbf{x}) = \hat{\mu} + {\mathbf{r}(\mathbf{x})}^{T}\mathbf{R}^{-1}(\mathbf{y}-\mathbf{1}\hat{\mu})
-\label{eq:prediction}
-\end{equation}</p>
-
-<p>While this value maximizes the joint augmented likelihood of $(x^{(n+1)},y^{*})$ and $\mathcal{D}$, it is interesting to note that it also corresponds to the mean of the normal probablity density function of the function value at $x^{(n+1)}$ conditioned on $\mathcal{D}$.</p>
-
-<p align="center">
-  <img src="http://ash-aldujaili.github.io/blog/assets/stoch_proc_pred.png" width="400" />
-<br /><br />
-  Figure 2. Application of Eq. \ref{eq:prediction}
-</p>
-
-<p>Figure 2 shows predicted values of $f$ at different points according to Eq. \ref{eq:prediction}. DACE’s predictor $($Eq. \ref{eq:prediction}$)$ is also an interpolator of $\mathcal{D}$. That is
-$\hat{y}(\mathbf{x}^{(i)}) = \hat{\mu} + {\mathbf{r}(\mathbf{x}^{(i)})}^{T}\mathbf{R}^{-1}(\mathbf{y}-\mathbf{1}\hat{\mu}) = y^{(i)}$, since ${\mathbf{r}(\mathbf{x}^{(i)})}^{T}\mathbf{R}^{-1}={(\mathbf{R}^{-1}\mathbf{R}_i)}^{T}=\mathbf{e}^T_i$. Furthermore, the prediction accuracy can be characterized by the mean squared error, which can be proved to be as follows.<sup id="fnref:2"><a href="#fn:2" class="footnote">2</a></sup></p>
-
-<script type="math/tex; mode=display">E[(\hat{y}(\mathbf{x})-y(\mathbf{x}))^2] =\sigma \big[1 - \mathbf{r}^{T}\mathbf{R}^{-1}\mathbf{r}-\frac{(1-\mathbf{1}^T\mathbf{R}^{-1}\mathbf{r})^2}{(\mathbf{1}^T\mathbf{R}\mathbf{1})}\big]</script>
-
-<p><strong>TO BE COMPLETED…</strong></p>
-
-<h4>References</h4>
-
-<p>This post is based on the following papers:</p>
-
-<ol>
-  <li>
-    <p><strong>Sacks, Jerome, et al.</strong> <em>Design and analysis of computer experiments.</em> Statistical science $($1989$)$: 409-423.</p>
-  </li>
-  <li>
-    <p><strong>Jones, Donald R.; Schonlau, Matthias; Welch, William J.</strong> <em>Efficient global optimization of expensive black-box functions</em>. J. Global Optim. 13 $($1998$)$, no. 4, 455–492.</p>
-  </li>
-</ol>
-<div class="footnotes">
-  <ol>
-    <li id="fn:1">
-      <p>Make use of: $det(cA)= c^n det(A)$, where A is an $n\times n$-matrix; $Cov[x^{(i)},x^{(j)}] = \sigma^2 \cdot Corr[x^{(i)},x^{(j)}]$; and the multivariate normal probability density function.&nbsp;<a href="#fnref:1" class="reversefootnote">&#8617;</a></p>
-    </li>
-    <li id="fn:2">
-      <p>This is proved <a href="">here</a>.&nbsp;<a href="#fnref:2" class="reversefootnote">&#8617;</a></p>
-    </li>
-  </ol>
-</div>
-
-        </div>
-        
-      </li>
-    
   </ul>
 
   
+  <div class="pagination">
+    
+      <a class="previous" href="/blog/posts/2/">&laquo; Older</a>
+    
+
+    
+  </div>
+
 
 
 </div>
