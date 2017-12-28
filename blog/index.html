@@ -302,41 +302,19 @@ _ = sns.jointplot(x=df.x_1, y=df.x_2, kind='kde')
 
 <ol>
   <li>
-    <p>We would like to sample from our system’s distribution $q(x)$.</p>
+    <p>We would like to sample from our system’s distribution <script type="math/tex">q( x )</script>.</p>
   </li>
-  <li>We are using Markov Chain $($ process $)$ to simulate our system of random variables. That is the Markov chain asymptotically converges to a stationary distribution $\pi(x)$ and which is $q(x)$.</li>
-  <li>
-    <table>
-      <tbody>
-        <tr>
-          <td>To converge to $q(x)$, we need to construct the corresponding chain’s transition probability $T(\bar{x}</td>
-          <td>x)$ because it uniquely defines the process and hence its stationary distribution.</td>
-        </tr>
-      </tbody>
-    </table>
-  </li>
-  <li>One way of achieving that is through the detailed balance—sufficient but not necessary—condition:</li>
+  <li>We are using Markov Chain $($process$)$ to simulate our system of random variables. That is the Markov chain asymptotically converges to a stationary distribution <script type="math/tex">\pi(x)</script> and which is <script type="math/tex">q(x)</script>.</li>
+  <li>To converge to $ q(x) $, we need to construct the corresponding chain’s transition probability $ T(\bar{x}|x) $
+ because it uniquely defines the process and hence its stationary distribution.</li>
+  <li>One way of achieving that is through the detailed balance, sufficient but not a necessary condition:
+$ q(x) T(\bar{x}|x) = q(\bar{x}) T(x|\bar{x}) $</li>
 </ol>
 
-<table>
-  <tbody>
-    <tr>
-      <td>$q(x) T(\bar{x}</td>
-      <td>x) = q(\bar{x}) T(x</td>
-      <td>\bar{x})$</td>
-    </tr>
-  </tbody>
-</table>
-
-<table>
-  <tbody>
-    <tr>
-      <td>We can make use of the above formula to construct a transition probability  that is a product of an arbitrary distribution $g(\bar{x}</td>
-      <td>x)$—which is referred to as the proposal distribution as mentioned above—and the acceptance distribution $A(\bar{x}</td>
-      <td>x)$:</td>
-    </tr>
-  </tbody>
-</table>
+<p>We can make use of the above formula to construct a transition probability  that is a product of an arbitrary distribution 
+$g(\bar{x}|x)$ 
+, which is referred to as the proposal distribution as mentioned above, and the acceptance distribution 
+$A(\bar{x}|x)$</p>
 
 <script type="math/tex; mode=display">T(\bar{x}|x)= g(\bar{x}|x)A(\bar{x}|x)</script>
 
@@ -344,14 +322,9 @@ _ = sns.jointplot(x=df.x_1, y=df.x_2, kind='kde')
 
 <script type="math/tex; mode=display">A(\bar{x}|x)=\min\{1, \frac{q(\bar{x})g(x|\bar{x})}{q(x)g(\bar{x}|x)}\}</script>
 
-<table>
-  <tbody>
-    <tr>
-      <td>Let’s see how we can realize this in code: Let’s define our $$g(\bar{x}</td>
-      <td>x)\sim \mathcal{N}(x,0.25I)$$,</td>
-    </tr>
-  </tbody>
-</table>
+<p>Let’s see how we can realize this in code: Let’s define our</p>
+
+<script type="math/tex; mode=display">g(\bar{x}|x)\sim \mathcal{N}(x,0.25I)</script>
 
 <p>and here we are assuming that we can sample efficiently from this 2-D Gaussian distribution $($ otherwise, we may use one of the techniques above as rejection sampling $)$. Notice here, there is nothing preventing us from sampling outside the support of $q(x)$, so we need to explicitly state that. I.e., $q(x)=0$ outside $q$’s support. Also, our choice of proposal distribution might affect the convergence progress.</p>
 
