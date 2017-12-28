@@ -302,23 +302,11 @@ _ = sns.jointplot(x=df.x_1, y=df.x_2, kind='kde')
 
 <p>Let’s step back and summarise the above:</p>
 
-<ul>
-  <li>
-    <p>We would like to sample from our system’s distribution $q(x)$.</p>
-  </li>
-  <li>We are using Markov Chain $($process$)$ to simulate our system of random variables. That is the Markov chain asymptotically converges to a stationary distribution $\pi(x)$ and which is $q(x)$.</li>
-  <li>
-    <table>
-      <tbody>
-        <tr>
-          <td>To converge to $q(x)$, we need to construct the corresponding chain’s transition probability $T(\bar{x}</td>
-          <td>x)$ because it uniquely defines the process and hence its stationary distribution.</td>
-        </tr>
-      </tbody>
-    </table>
-  </li>
-  <li>One way of achieving that is through the detailed balance $($ sufficient but not necessary $)$ condition:</li>
-</ul>
+<p>. We would like to sample from our system’s distribution $q(x)$.</p>
+
+<p>. We are using Markov Chain $($ process $)$ to simulate our system of random variables. That is the Markov chain asymptotically converges to a stationary distribution $\pi(x)$ and which is $q(x)$.
+. To converge to $q(x)$, we need to construct the corresponding chain’s transition probability $T(\bar{x}|x)$ because it uniquely defines the process and hence its stationary distribution.
+. One way of achieving that is through the detailed balance $($ sufficient but not necessary $)$ condition:</p>
 
 <table>
   <tbody>
