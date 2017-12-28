@@ -130,9 +130,7 @@
         </header>
 
         <div class="post-content">
-          <h3>A Gentle Tour through Sampling Techniques</h3>
-
-<p>In this post, we’ll take a quick tour into the sampling world and how it might be handy in some applications. Let’s start with some setup code.</p>
+          <p>In this post, we’ll take a quick tour into the sampling world and how it might be handy in some applications. Let’s start with some setup code.</p>
 
 <div class="highlighter-rouge"><pre class="highlight"><code>import numpy as np
 import pandas as pd
@@ -302,17 +300,29 @@ _ = sns.jointplot(x=df.x_1, y=df.x_2, kind='kde')
 
 <p>Let’s step back and summarise the above:</p>
 
-<p>. We would like to sample from our system’s distribution $q(x)$.</p>
-
-<p>. We are using Markov Chain $($ process $)$ to simulate our system of random variables. That is the Markov chain asymptotically converges to a stationary distribution $\pi(x)$ and which is $q(x)$.
-. To converge to $q(x)$, we need to construct the corresponding chain’s transition probability $T(\bar{x}|x)$ because it uniquely defines the process and hence its stationary distribution.
-. One way of achieving that is through the detailed balance $($ sufficient but not necessary $)$ condition:</p>
+<ol>
+  <li>
+    <p>We would like to sample from our system’s distribution $q(x)$.</p>
+  </li>
+  <li>We are using Markov Chain $($ process $)$ to simulate our system of random variables. That is the Markov chain asymptotically converges to a stationary distribution $\pi(x)$ and which is $q(x)$.</li>
+  <li>
+    <table>
+      <tbody>
+        <tr>
+          <td>To converge to $q(x)$, we need to construct the corresponding chain’s transition probability $T(\bar{x}</td>
+          <td>x)$ because it uniquely defines the process and hence its stationary distribution.</td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+  <li>One way of achieving that is through the detailed balance—sufficient but not necessary—condition:</li>
+</ol>
 
 <table>
   <tbody>
     <tr>
-      <td>$q(x)T(\bar{x}</td>
-      <td>x)= q(\bar{x})T(x</td>
+      <td>$q(x) T(\bar{x}</td>
+      <td>x) = q(\bar{x}) T(x</td>
       <td>\bar{x})$</td>
     </tr>
   </tbody>
@@ -321,8 +331,8 @@ _ = sns.jointplot(x=df.x_1, y=df.x_2, kind='kde')
 <table>
   <tbody>
     <tr>
-      <td>We can make use of the above formula to construct a transition probability  that is a product of an arbitrary distribution $$g(\bar{x}</td>
-      <td>x)$$ $($which is referred to as the proposal distribution as mentioned above$)$ and the acceptance distribution $A(\bar{x}</td>
+      <td>We can make use of the above formula to construct a transition probability  that is a product of an arbitrary distribution $g(\bar{x}</td>
+      <td>x)$—which is referred to as the proposal distribution as mentioned above—and the acceptance distribution $A(\bar{x}</td>
       <td>x)$:</td>
     </tr>
   </tbody>
