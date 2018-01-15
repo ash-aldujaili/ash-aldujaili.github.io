@@ -123,6 +123,82 @@
       <li>
         <header class="post-header">
           <h1 class="post-title">
+            <a class="post-link" href="/blog/2017/06/06/mse-ego-dace/">DACE/BLUP MSE for EGO</a>
+          </h1>
+
+          <p class="post-meta">Jun 6, 2017</p>
+        </header>
+
+        <div class="post-content">
+          <p>$\newcommand{\hy}{\hat{y}}
+\newcommand{\hmu}{\hat{\mu}}
+\newcommand{\R}{\mathbf{R}}
+\newcommand{\hmu}{\hat{\mu}}
+\newcommand{\rR}{\mathbf{r}^TR^{-1}}
+\newcommand{\rRr}{\mathbf{r}^TR^{-1}\mathbf{r}}
+\newcommand{\oRr}{\mathbf{1}^TR^{-1}\mathbf{r}}
+\newcommand{\ymu}{(\mathbf{y}-\mathbf{1}\hmu)}
+\newcommand{\hyexp}{\hmu+\rR\ymu}
+\newcommand{\oRy}{\mathbf{1}^T\mathbf{R}
+^{-1}\mathbf{y}}
+\newcommand{\yRo}{\mathbf{y}^T\mathbf{R}
+^{-1}\mathbf{1}}
+\newcommand{\oRo}{\mathbf{1}^T\mathbf{R}^{-1}\mathbf{1}}
+\newcommand{\hmuexp}{\frac{\oRy}{\oRo}}
+\newcommand{\st}{\sigma^2}
+\newcommand{\mt}{\mu^2}$
+This post shows a derivation of the DACE predictor’s MSE discussed in <a href="http://ash-aldujaili.github.io/blog/2017/03/01/exp-opt/">Stochastic Processes for Expensive Black-Box Optimization</a>.</p>
+
+<p>The mean squared error of a predictor at $\mathbf{x}$ based on the stochastic Gaussian process is</p>
+
+<p>\begin{equation}MSE(\mathbf{x})=E[(\hat{y}(\mathbf{x})-y(\mathbf{x}))^2] =\sigma \big[1 - {\mathbf{r}(\mathbf{x})}^{T}\mathbf{R}^{-1}\mathbf{r}(\mathbf{x})-\frac{(1-\mathbf{1}^T\mathbf{R}^{-1}\mathbf{r}(\mathbf{x}))^2}{(\mathbf{1}^T\mathbf{R}\mathbf{1})}\big]\;,
+\label{eq:final-mse}
+\end{equation}</p>
+
+<p>where $\mu$ is process’s mean and $\sigma^2\mathbf{R}$ is its covariance matrix over a sample $\mathcal{D}={(x^{(i)},y^{(i)})}_{1\leq i \leq n}$. For brevity, we will drop $\mathbf{x}$ henceforth. Before proceeding with the proof, let’s recall some terms and their definitions that will be useful in the proof.
+\begin{equation}
+\hy=\hyexp
+\end{equation}</p>
+
+<p>\begin{equation}
+\hmu=\hmuexp
+\end{equation}</p>
+
+<p>From the above, we have 
+$E[y^2]=\sigma^2 + \mu^2$, $E[\mathbf{y}\mathbf{y}^{T}]=\sigma^2\R+\mu^2\mathbf{1}\mathbf{1}^T$.</p>
+
+<script type="math/tex; mode=display">E[\hmu]=\frac{(\oRy)(\yRo)}{(\oRo)^2}=\sigma^2\cdot \frac{(\oRo)}{(\oRo)^2}+ \mu^2\cdot \frac{(\oRo)^2}{(\oRo)^2}=\frac{\st}{\oRo}+\mt</script>
+
+<p>Thus, we can expand the MSE term as</p>
+
+<p>\begin{equation}
+MSE= \sigma^2 + \mu^2 + E[{\hy}^2] - 2 E[y\hy]\;.
+\label{eq:mse}
+\end{equation}
+Where 
+\begin{equation}
+E[\hy^2]=\frac{\st}{\oRo}+\mt + \st (\rRr) - \st \frac{(\oRr)^2}{\oRo}
+\label{eq:h2}
+\end{equation}
+and</p>
+
+<p>\begin{equation}
+-2E[y\hy]=-2\st(\rRr)-2\mt-2\st\frac{\oRr}{\oRo}+2\st\frac{(\oRr)^2}{\oRo}\;.
+\label{eq:h3}
+\end{equation}</p>
+
+<p>Plugging Equations \ref{eq:h2} and \ref{eq:h3} into Eq. \ref{eq:mse} results in Eq. \ref{eq:final-mse}.</p>
+
+        </div>
+        
+      </li>
+    
+      
+      
+
+      <li>
+        <header class="post-header">
+          <h1 class="post-title">
             <a class="post-link" href="/blog/2017/05/08/rand-proj-lipschitz/">Random Projections for Lipschitz Functions</a>
           </h1>
 

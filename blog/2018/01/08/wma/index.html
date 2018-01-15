@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  
+  
+  <title>Weighted Majority Algorithm: A beautiful algorithm for Learning from Experts</title>
+  <meta name="description" content="In this post, we demonstrate the theoretical gurantee on the performance of the Weighted Majority Alogorithm (WMA) with empirical validation. WMA is one of the beautiful algorithms in the framework of online learning and sequential decision making under uncertainity. First, let’s describe a setup where WMA can be used. Assume that a friend of yours challenges to a True or False quiz where you’re allowed to seek help / advice from $n$ advisors throughout the game. With this challenge at hand, WMA helps you play the game such that the number of your mistakes is upper bounded by roughly twice the number of mistakes made by your best advisor, i.e., the least number of mistakes made among your $n$ advisors. In the next paragraph, we’ll see how you can use WMA in the game. For each advisor $i$ and question (round) $t$, WMA associates a weight $w^t_i$. With $w^1_i=1\;, \forall i=1,\ldots, n.$ Assume the game has $T$ rounds. If advisor $i$ makes a mistake at round $t$, its weight is adjusted by a multiplicative factor $1-\eta$ where $\eta\in(0,1/2)$. That is, $w^{t+1}_i= (1-\eta) w^t_i$ if $i$ makes a mistake. Otherwise, $w^{t+1}_i=w^t_i$. At each round $t$, your decision is governed by the sum of weights of advisors who think the answer is True versus that of those who think the answer should be False. Mathematically, denote your answer at round $t$ by $y^t$, and the advisors’ answers by $x^t_i$. These variables take the values $0$ and $1$ to represent True and False respectively: we have Let’s put WMA in action. Below, I have created $n$ advisors whose decisions at each round are based on tossing coins whose bias is sampled uniformly, $p_i\sim \mathcal{U}(0,1)$. Likewise, the game generates questions whose answers follows a Bernoulli distribution with $p_g\sim\mathcal{U}(0,1)$. We denote the correct answer at round $t$ by $z^t$. Also, let’s try to validate the theoretical bound on its performance. From this, after $\hat{t}$ rounds, That is, Let’s verify the above with the following 100 games with 1000 rounds each. import numpy as np # let&#39;s try 100 games each with 1000 rounds, num_runs = 100 T = 1000 diff = np.zeros((num_runs, T)) for run in range(num_runs): n = np.random.randint(1,10) ps = np.random.random(n) ws = np.ones(n) p_g = np.random.random() eta = 0.25 # your mistakes m = 0 # advisors mistakes ms = np.zeros(n, dtype=np.int32) for t in range(T): # game correct answer z = np.random.random() &amp;gt;= p_g # advisors answers xs = np.random.random(n) &amp;gt;= ps # your answer y = np.sum(xs * ws) &amp;gt;= np.sum((1-xs) * ws) # your mistakes m += (y != z) # advistors mistakes ms[xs != z] += 1 # theoretical bound th_ub = 2 * (1+eta) * min(ms) + 2. * np.log(n) / eta diff[run, t] = th_ub - m # update weights ws[xs != z] = (1-eta) * ws[xs != z] assert np.min(diff) &amp;gt;= 0, &quot;Theoretical gap should be non-negative&quot; Our mistakes never exceeded the theoretical upper limit, as can be seen from the non-negative theoretical gap across all the runs and rounds of the game. import matplotlib.pyplot as plt _ = plt.plot(diff.T) plt.xlabel(&#39;round&#39;) plt.ylabel(&#39;Theoretical Gap&#39;) plt.show()">
+  
+
+  <link rel="stylesheet" href="/blog/assets/main.css">
+  <link rel="canonical" href="http://ash-aldujaili.github.io/blog/2018/01/08/wma/">
+  
+  
+  <link rel="alternate" type="application/rss+xml" title="Hunting Optima" href="http://ash-aldujaili.github.io/blog/feed.xml">
+
+  
+
+  
+  <meta name="twitter:card" content="summary">
+  
+  <meta name="twitter:title" content="Weighted Majority Algorithm: A beautiful algorithm for Learning fro...">
+  <meta name="twitter:description" content="In this post, we demonstrate the theoretical gurantee on the performance of the Weighted Majority Alogorithm (WMA) with empirical validation. WMA is one of the beautiful algorithms in the framework...">
+  
+  
+
+  <script type="text/javascript">
+  WebFontConfig = {
+    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
+  };
+  (function() {
+    var wf = document.createElement('script');
+    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+    wf.type = 'text/javascript';
+    wf.async = 'true';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(wf, s);
+  })();
+</script>
+
+  
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-68645681-6', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+
+
+</head>
+
+  <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    TeX: {
+      equationNumbers: {
+        autoNumber: "AMS"
+      }
+    },
+    tex2jax: {
+      inlineMath: [ ['$','$'], ['\(', '\)'] ],
+      displayMath: [ ['$$','$$'] ],
+      processEscapes: true,
+    }
+  });
+</script>
+<script type="text/javascript"
+        src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/blog/">Hunting Optima</a>
+
+    <nav class="site-nav">
+      
+        
+        <a class="page-link" href="http://ash-aldujaili.github.io/">Home</a>
+      
+        
+        <a class="page-link" href="/blog/about/">About my blog</a>
+      
+        
+        <a class="page-link" href="/blog/archives/">Archives</a>
+      
+        
+        <a class="page-link" href="https://github.com/ash-aldujaili">GitHub</a>
+      
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    
+      <h1 class="post-title" itemprop="name headline">Weighted Majority Algorithm: A beautiful algorithm for Learning from Experts</h1>
+                                       
+
+    <p class="post-meta"><time datetime="2018-01-08T00:00:00-08:00" itemprop="datePublished">Jan 8, 2018</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>In this post, we demonstrate the theoretical gurantee on the performance of the <strong>Weighted Majority Alogorithm</strong> (<em>WMA</em>) with empirical validation. WMA is one of the beautiful algorithms in the framework of online learning and sequential decision making under uncertainity.</p>
+
+<p>First, let’s describe a setup where WMA can be used. Assume that a friend of yours challenges to a <strong>True or False</strong> quiz where you’re allowed to seek help / advice from $n$ advisors throughout the game.</p>
+
+<p>With this challenge at hand, WMA helps you play the game such that the number of your mistakes is upper bounded by roughly twice the number of mistakes made by your best advisor, i.e., the least number of mistakes made among your $n$ advisors. In the next paragraph, we’ll see how you can use WMA in the game.</p>
+
+<p>For each advisor $i$ and question (round) $t$, WMA associates a weight $w^t_i$. With $w^1_i=1\;, \forall i=1,\ldots, n.$ Assume the game has $T$ rounds. If advisor $i$ makes a mistake at round $t$, its weight is adjusted by a multiplicative factor $1-\eta$ where $\eta\in(0,1/2)$. That is, $w^{t+1}_i= (1-\eta) w^t_i$ if $i$ makes a mistake. Otherwise, $w^{t+1}_i=w^t_i$. At each round $t$, your decision is governed by the sum of weights of advisors who think the answer is <strong>True</strong> versus that of those who think the answer should be <strong>False</strong>. Mathematically, denote your answer at round $t$ by $y^t$, and the advisors’ answers by $x^t_i$. These variables take the values $0$ and $1$ to represent <em>True</em> and <em>False</em> respectively: we have</p>
+
+<script type="math/tex; mode=display">y^t = \mathbf{1}\big\{\sum_{i}x^t_i * w^t_i \geq \sum_{i} (1-x^t_i) * w^t_i \big\}</script>
+
+<p>Let’s put WMA in action. Below, I have created $n$ advisors whose decisions at each round are based on tossing coins whose bias is sampled uniformly, $p_i\sim \mathcal{U}(0,1)$. Likewise, the game generates questions whose answers follows a Bernoulli distribution with $p_g\sim\mathcal{U}(0,1)$. We denote the correct answer at round $t$ by $z^t$. Also, let’s try to validate the theoretical bound on its performance. From <a href="https://www.cs.princeton.edu/courses/archive/fall13/cos521/lecnotes/lec8.pdf">this</a>, after $\hat{t}$ rounds,</p>
+
+<script type="math/tex; mode=display">|\text{your mistakes}| \leq 2 (1+ \eta)\;|\text{best_advisors_mistakes}|\; + \frac{2 \ln n}{\eta}</script>
+
+<p>That is,</p>
+
+<script type="math/tex; mode=display">2(1+\eta) \min(\sum_{t=0}^{\hat{t}}\mathbf{1}\{x^t_1 \neq z^t\}, \ldots, \sum_{t=0}^{\hat{t}}\mathbf{1}\{x^t_n \neq z^t\}) + \frac{2\ln n}{\eta}-  \sum_{t=0}^{\hat{t}} \mathbf{1}\{y^t\neq z^t\} \geq 0\;, \hat{t}= 1,\ldots, T</script>
+
+<p>Let’s verify the above with the following 100 games with 1000 rounds each.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>import numpy as np
+
+# let's try 100 games each with 1000 rounds,  
+num_runs = 100
+T = 1000
+
+diff = np.zeros((num_runs, T))
+for run in range(num_runs):
+    n = np.random.randint(1,10)
+    ps = np.random.random(n)
+    ws = np.ones(n)
+    p_g = np.random.random()
+    eta = 0.25
+
+    # your mistakes
+    m = 0
+    # advisors mistakes
+    ms = np.zeros(n, dtype=np.int32)
+
+    for t in range(T):
+        # game correct answer
+        z = np.random.random() &gt;= p_g
+        # advisors answers
+        xs = np.random.random(n) &gt;= ps
+        # your answer
+        y = np.sum(xs * ws) &gt;= np.sum((1-xs) * ws)
+
+        # your mistakes
+        m += (y != z)
+        # advistors mistakes
+        ms[xs != z] += 1
+
+        # theoretical bound
+        th_ub = 2 * (1+eta) * min(ms) + 2. * np.log(n) / eta
+        diff[run, t] = th_ub - m
+        
+        # update weights
+        ws[xs != z] = (1-eta) * ws[xs != z]
+
+
+assert np.min(diff) &gt;= 0, "Theoretical gap should be non-negative"
+</code></pre>
+</div>
+
+<p>Our mistakes never exceeded the theoretical upper limit, as can be seen from the non-negative theoretical gap across all the runs and rounds of the game.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>import matplotlib.pyplot as plt
+
+_ = plt.plot(diff.T)
+plt.xlabel('round')
+plt.ylabel('Theoretical Gap')
+plt.show()
+</code></pre>
+</div>
+
+<p align="center">
+  <img src="http://ash-aldujaili.github.io/blog/assets/wma/wma.png" width="500" />
+<br /><br />
+</p>
+
+  </div>
+
+  
+    <div id="disqus_thread"></div>
+    <script>
+    /**
+    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+  
+    var disqus_config = function () {
+    this.page.url = "http://ash-aldujaili.github.io/blog/2018/01/08/wma/"; //'http://ash-aldujaili.github.io/blog/2017/06/06/mse-ego-dace/';  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = "/2018/01/08/wma"; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://ash-aldujaili.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+   
+
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <p>
+      
+
+&copy; Abdullah Al-Dujaili - Powered by <a href="https://jekyllrb.com">Jekyll</a> &amp; <a href="https://github.com/yous/whiteglass">whiteglass</a> - Subscribe via <a href="http://ash-aldujaili.github.io/blog/feed.xml">RSS</a>
+
+    </p>
+
+  </div>
+
+</footer>
+
+
+    
+  </body>
+
+</html>

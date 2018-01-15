@@ -123,6 +123,103 @@
       <li>
         <header class="post-header">
           <h1 class="post-title">
+            <a class="post-link" href="/blog/2018/01/08/wma/">Weighted Majority Algorithm: A beautiful algorithm for Learning from Experts</a>
+          </h1>
+
+          <p class="post-meta">Jan 8, 2018</p>
+        </header>
+
+        <div class="post-content">
+          <p>In this post, we demonstrate the theoretical gurantee on the performance of the <strong>Weighted Majority Alogorithm</strong> (<em>WMA</em>) with empirical validation. WMA is one of the beautiful algorithms in the framework of online learning and sequential decision making under uncertainity.</p>
+
+<p>First, let’s describe a setup where WMA can be used. Assume that a friend of yours challenges to a <strong>True or False</strong> quiz where you’re allowed to seek help / advice from $n$ advisors throughout the game.</p>
+
+<p>With this challenge at hand, WMA helps you play the game such that the number of your mistakes is upper bounded by roughly twice the number of mistakes made by your best advisor, i.e., the least number of mistakes made among your $n$ advisors. In the next paragraph, we’ll see how you can use WMA in the game.</p>
+
+<p>For each advisor $i$ and question (round) $t$, WMA associates a weight $w^t_i$. With $w^1_i=1\;, \forall i=1,\ldots, n.$ Assume the game has $T$ rounds. If advisor $i$ makes a mistake at round $t$, its weight is adjusted by a multiplicative factor $1-\eta$ where $\eta\in(0,1/2)$. That is, $w^{t+1}_i= (1-\eta) w^t_i$ if $i$ makes a mistake. Otherwise, $w^{t+1}_i=w^t_i$. At each round $t$, your decision is governed by the sum of weights of advisors who think the answer is <strong>True</strong> versus that of those who think the answer should be <strong>False</strong>. Mathematically, denote your answer at round $t$ by $y^t$, and the advisors’ answers by $x^t_i$. These variables take the values $0$ and $1$ to represent <em>True</em> and <em>False</em> respectively: we have</p>
+
+<script type="math/tex; mode=display">y^t = \mathbf{1}\big\{\sum_{i}x^t_i * w^t_i \geq \sum_{i} (1-x^t_i) * w^t_i \big\}</script>
+
+<p>Let’s put WMA in action. Below, I have created $n$ advisors whose decisions at each round are based on tossing coins whose bias is sampled uniformly, $p_i\sim \mathcal{U}(0,1)$. Likewise, the game generates questions whose answers follows a Bernoulli distribution with $p_g\sim\mathcal{U}(0,1)$. We denote the correct answer at round $t$ by $z^t$. Also, let’s try to validate the theoretical bound on its performance. From <a href="https://www.cs.princeton.edu/courses/archive/fall13/cos521/lecnotes/lec8.pdf">this</a>, after $\hat{t}$ rounds,</p>
+
+<script type="math/tex; mode=display">|\text{your mistakes}| \leq 2 (1+ \eta)\;|\text{best_advisors_mistakes}|\; + \frac{2 \ln n}{\eta}</script>
+
+<p>That is,</p>
+
+<script type="math/tex; mode=display">2(1+\eta) \min(\sum_{t=0}^{\hat{t}}\mathbf{1}\{x^t_1 \neq z^t\}, \ldots, \sum_{t=0}^{\hat{t}}\mathbf{1}\{x^t_n \neq z^t\}) + \frac{2\ln n}{\eta}-  \sum_{t=0}^{\hat{t}} \mathbf{1}\{y^t\neq z^t\} \geq 0\;, \hat{t}= 1,\ldots, T</script>
+
+<p>Let’s verify the above with the following 100 games with 1000 rounds each.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>import numpy as np
+
+# let's try 100 games each with 1000 rounds,  
+num_runs = 100
+T = 1000
+
+diff = np.zeros((num_runs, T))
+for run in range(num_runs):
+    n = np.random.randint(1,10)
+    ps = np.random.random(n)
+    ws = np.ones(n)
+    p_g = np.random.random()
+    eta = 0.25
+
+    # your mistakes
+    m = 0
+    # advisors mistakes
+    ms = np.zeros(n, dtype=np.int32)
+
+    for t in range(T):
+        # game correct answer
+        z = np.random.random() &gt;= p_g
+        # advisors answers
+        xs = np.random.random(n) &gt;= ps
+        # your answer
+        y = np.sum(xs * ws) &gt;= np.sum((1-xs) * ws)
+
+        # your mistakes
+        m += (y != z)
+        # advistors mistakes
+        ms[xs != z] += 1
+
+        # theoretical bound
+        th_ub = 2 * (1+eta) * min(ms) + 2. * np.log(n) / eta
+        diff[run, t] = th_ub - m
+        
+        # update weights
+        ws[xs != z] = (1-eta) * ws[xs != z]
+
+
+assert np.min(diff) &gt;= 0, "Theoretical gap should be non-negative"
+</code></pre>
+</div>
+
+<p>Our mistakes never exceeded the theoretical upper limit, as can be seen from the non-negative theoretical gap across all the runs and rounds of the game.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>import matplotlib.pyplot as plt
+
+_ = plt.plot(diff.T)
+plt.xlabel('round')
+plt.ylabel('Theoretical Gap')
+plt.show()
+</code></pre>
+</div>
+
+<p align="center">
+  <img src="http://ash-aldujaili.github.io/blog/assets/wma/wma.png" width="500" />
+<br /><br />
+</p>
+
+        </div>
+        
+      </li>
+    
+      
+      
+
+      <li>
+        <header class="post-header">
+          <h1 class="post-title">
             <a class="post-link" href="/blog/2017/12/26/sampling/">A Gentle Tour through Sampling Techniques</a>
           </h1>
 
@@ -596,82 +693,6 @@ yields $\vx=(A^{T}A)^{-1}A^T\vb$. Therefore, the pseudo-inverse matrix is $(A^{T
     </li>
   </ol>
 </div>
-
-        </div>
-        
-      </li>
-    
-      
-      
-
-      <li>
-        <header class="post-header">
-          <h1 class="post-title">
-            <a class="post-link" href="/blog/2017/06/06/mse-ego-dace/">DACE/BLUP MSE for EGO</a>
-          </h1>
-
-          <p class="post-meta">Jun 6, 2017</p>
-        </header>
-
-        <div class="post-content">
-          <p>$\newcommand{\hy}{\hat{y}}
-\newcommand{\hmu}{\hat{\mu}}
-\newcommand{\R}{\mathbf{R}}
-\newcommand{\hmu}{\hat{\mu}}
-\newcommand{\rR}{\mathbf{r}^TR^{-1}}
-\newcommand{\rRr}{\mathbf{r}^TR^{-1}\mathbf{r}}
-\newcommand{\oRr}{\mathbf{1}^TR^{-1}\mathbf{r}}
-\newcommand{\ymu}{(\mathbf{y}-\mathbf{1}\hmu)}
-\newcommand{\hyexp}{\hmu+\rR\ymu}
-\newcommand{\oRy}{\mathbf{1}^T\mathbf{R}
-^{-1}\mathbf{y}}
-\newcommand{\yRo}{\mathbf{y}^T\mathbf{R}
-^{-1}\mathbf{1}}
-\newcommand{\oRo}{\mathbf{1}^T\mathbf{R}^{-1}\mathbf{1}}
-\newcommand{\hmuexp}{\frac{\oRy}{\oRo}}
-\newcommand{\st}{\sigma^2}
-\newcommand{\mt}{\mu^2}$
-This post shows a derivation of the DACE predictor’s MSE discussed in <a href="http://ash-aldujaili.github.io/blog/2017/03/01/exp-opt/">Stochastic Processes for Expensive Black-Box Optimization</a>.</p>
-
-<p>The mean squared error of a predictor at $\mathbf{x}$ based on the stochastic Gaussian process is</p>
-
-<p>\begin{equation}MSE(\mathbf{x})=E[(\hat{y}(\mathbf{x})-y(\mathbf{x}))^2] =\sigma \big[1 - {\mathbf{r}(\mathbf{x})}^{T}\mathbf{R}^{-1}\mathbf{r}(\mathbf{x})-\frac{(1-\mathbf{1}^T\mathbf{R}^{-1}\mathbf{r}(\mathbf{x}))^2}{(\mathbf{1}^T\mathbf{R}\mathbf{1})}\big]\;,
-\label{eq:final-mse}
-\end{equation}</p>
-
-<p>where $\mu$ is process’s mean and $\sigma^2\mathbf{R}$ is its covariance matrix over a sample $\mathcal{D}={(x^{(i)},y^{(i)})}_{1\leq i \leq n}$. For brevity, we will drop $\mathbf{x}$ henceforth. Before proceeding with the proof, let’s recall some terms and their definitions that will be useful in the proof.
-\begin{equation}
-\hy=\hyexp
-\end{equation}</p>
-
-<p>\begin{equation}
-\hmu=\hmuexp
-\end{equation}</p>
-
-<p>From the above, we have 
-$E[y^2]=\sigma^2 + \mu^2$, $E[\mathbf{y}\mathbf{y}^{T}]=\sigma^2\R+\mu^2\mathbf{1}\mathbf{1}^T$.</p>
-
-<script type="math/tex; mode=display">E[\hmu]=\frac{(\oRy)(\yRo)}{(\oRo)^2}=\sigma^2\cdot \frac{(\oRo)}{(\oRo)^2}+ \mu^2\cdot \frac{(\oRo)^2}{(\oRo)^2}=\frac{\st}{\oRo}+\mt</script>
-
-<p>Thus, we can expand the MSE term as</p>
-
-<p>\begin{equation}
-MSE= \sigma^2 + \mu^2 + E[{\hy}^2] - 2 E[y\hy]\;.
-\label{eq:mse}
-\end{equation}
-Where 
-\begin{equation}
-E[\hy^2]=\frac{\st}{\oRo}+\mt + \st (\rRr) - \st \frac{(\oRr)^2}{\oRo}
-\label{eq:h2}
-\end{equation}
-and</p>
-
-<p>\begin{equation}
--2E[y\hy]=-2\st(\rRr)-2\mt-2\st\frac{\oRr}{\oRo}+2\st\frac{(\oRr)^2}{\oRo}\;.
-\label{eq:h3}
-\end{equation}</p>
-
-<p>Plugging Equations \ref{eq:h2} and \ref{eq:h3} into Eq. \ref{eq:mse} results in Eq. \ref{eq:final-mse}.</p>
 
         </div>
         
