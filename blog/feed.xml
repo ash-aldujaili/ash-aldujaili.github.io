@@ -1,4 +1,48 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="3.4.3">Jekyll</generator><link href="http://ash-aldujaili.github.io/blog/feed.xml" rel="self" type="application/atom+xml" /><link href="http://ash-aldujaili.github.io/blog/" rel="alternate" type="text/html" hreflang="en" /><updated>2018-01-14T18:19:08-08:00</updated><id>http://ash-aldujaili.github.io/blog/</id><title type="html">Hunting Optima</title><subtitle>Write-ups on optimization</subtitle><author><name>Abdullah Al-Dujaili</name></author><entry><title type="html">Weighted Majority Algorithm: A beautiful algorithm for Learning from Experts</title><link href="http://ash-aldujaili.github.io/blog/2018/01/08/wma/" rel="alternate" type="text/html" title="Weighted Majority Algorithm: A beautiful algorithm for Learning from Experts" /><published>2018-01-08T00:00:00-08:00</published><updated>2018-01-08T00:00:00-08:00</updated><id>http://ash-aldujaili.github.io/blog/2018/01/08/wma</id><content type="html" xml:base="http://ash-aldujaili.github.io/blog/2018/01/08/wma/">&lt;p&gt;In this post, we demonstrate the theoretical gurantee on the performance of the &lt;strong&gt;Weighted Majority Alogorithm&lt;/strong&gt; (&lt;em&gt;WMA&lt;/em&gt;) with empirical validation. WMA is one of the beautiful algorithms in the framework of online learning and sequential decision making under uncertainity.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="3.4.3">Jekyll</generator><link href="http://ash-aldujaili.github.io/blog/feed.xml" rel="self" type="application/atom+xml" /><link href="http://ash-aldujaili.github.io/blog/" rel="alternate" type="text/html" hreflang="en" /><updated>2018-02-20T19:42:24-08:00</updated><id>http://ash-aldujaili.github.io/blog/</id><title type="html">Hunting Optima</title><subtitle>Write-ups on optimization</subtitle><author><name>Abdullah Al-Dujaili</name></author><entry><title type="html">Expected Improvement for Bayesian Optimization: A Derivation</title><link href="http://ash-aldujaili.github.io/blog/2018/02/01/ei/" rel="alternate" type="text/html" title="Expected Improvement for Bayesian Optimization: A Derivation" /><published>2018-02-01T00:00:00-08:00</published><updated>2018-02-01T00:00:00-08:00</updated><id>http://ash-aldujaili.github.io/blog/2018/02/01/ei</id><content type="html" xml:base="http://ash-aldujaili.github.io/blog/2018/02/01/ei/">&lt;p&gt;In this post, we derive the closed-form expression of the Expected Improvement $($EI$)$ criterion commonly used in Bayesian Optimization.&lt;/p&gt;
+
+&lt;p&gt;Modelled with a Gaussian Process, the function value at a given point $x$ can be considered as a normal random variable with mean $\mu$ and variance $\sigma^2$. Given the best $($minimum in a minimization setup$)$ function value obtained so far-let’s denote it by 
+$f^*$:&lt;/p&gt;
+
+&lt;p&gt;we are interested in quantifying the improvement over 
+$f^*$ 
+we will have 
+if we sample a point 
+$x$ 
+. Mathematically, the improvement at 
+$x$ 
+can be expressed as follows&lt;/p&gt;
+
+&lt;p&gt;$I(x) = \max(f^* - Y,0)$&lt;/p&gt;
+
+&lt;p&gt;where $Y$ is the random variable $\sim \mathcal{N}(\mu, \sigma^2)$ that corresponds to the function value at $x$. Since $I$ is a random variable, one can consider the average $($expected$)$ improvement $($EI$)$ to assess $x$:&lt;/p&gt;
+
+&lt;p&gt;$EI(x) =  E_{Y\sim \mathcal{N}(\mu, \sigma^2)}[I(x)]$&lt;/p&gt;
+
+&lt;p&gt;With the reparameterization trick, $Y=\mu + \sigma \epsilon$ where 
+$\epsilon\sim\mathcal{N}(0,1)$, we have:&lt;/p&gt;
+
+&lt;p&gt;$EI(x) =  E_{\epsilon\sim \mathcal{N}(0,1)}[I(x)]$&lt;/p&gt;
+
+&lt;p&gt;which can be written as $($from linearity of integral, and the definition of  $\frac{d}{d\epsilon}e^{-\epsilon^2 / 2}$ derivative $)$&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;EI(x) = \int_{-\infty}^{\infty} I(x) \phi(\epsilon) d\epsilon&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;EI(x) =  \int_{-\infty}^{(f^*-\mu)/\sigma} (f^* - \mu - \sigma \epsilon) \phi(\epsilon) d\epsilon&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;EI(x)= (f^* - \mu)\Phi(\frac{f^*-\mu}{\sigma}) - \sigma \int_{-\infty}^{(f^*-\mu)/\sigma} \epsilon \phi(\epsilon) d\epsilon&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;EI(x)=(f^* - \mu)\Phi(\frac{f^*-\mu}{\sigma}) + \frac{\sigma}{
+\sqrt{2\pi}} \int_{-\infty}^{(f^*-\mu)/\sigma} (-\epsilon) e^{-\epsilon^2/2} d\epsilon&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;EI(x)=(f^* - \mu)\Phi(\frac{f^*-\mu}{\sigma}) + \frac{\sigma}{
+\sqrt{2\pi}}  e^{-\epsilon^2/2}|_{-\infty}^{(f^*-\mu)/\sigma}&lt;/script&gt;
+
+&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;EI(x)=(f^* - \mu)\Phi(\frac{f^*-\mu}{\sigma}) + \sigma
+  \big(\phi(\frac{f^*-\mu}{\sigma}) - 0\big)&lt;/script&gt;
+&lt;script type=&quot;math/tex&quot;&gt;EI(x)=(f^* - \mu)\Phi(\frac{f^*-\mu}{\sigma}) + \sigma
+  \phi(\frac{f^*-\mu}{\sigma})&lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;where $\phi, \Phi$ are the PDF, CDF of standard normal distribution, respectively.&lt;/p&gt;</content><author><name>Abdullah Al-Dujaili</name></author><summary type="html">In this post, we derive the closed-form expression of the Expected Improvement $($EI$)$ criterion commonly used in Bayesian Optimization. Modelled with a Gaussian Process, the function value at a given point $x$ can be considered as a normal random variable with mean $\mu$ and variance $\sigma^2$. Given the best $($minimum in a minimization setup$)$ function value obtained so far-let’s denote it by $f^*$: we are interested in quantifying the improvement over $f^*$ we will have if we sample a point $x$ . Mathematically, the improvement at $x$ can be expressed as follows $I(x) = \max(f^* - Y,0)$ where $Y$ is the random variable $\sim \mathcal{N}(\mu, \sigma^2)$ that corresponds to the function value at $x$. Since $I$ is a random variable, one can consider the average $($expected$)$ improvement $($EI$)$ to assess $x$: $EI(x) = E_{Y\sim \mathcal{N}(\mu, \sigma^2)}[I(x)]$ With the reparameterization trick, $Y=\mu + \sigma \epsilon$ where $\epsilon\sim\mathcal{N}(0,1)$, we have: $EI(x) = E_{\epsilon\sim \mathcal{N}(0,1)}[I(x)]$ which can be written as $($from linearity of integral, and the definition of $\frac{d}{d\epsilon}e^{-\epsilon^2 / 2}$ derivative $)$ where $\phi, \Phi$ are the PDF, CDF of standard normal distribution, respectively.</summary></entry><entry><title type="html">Weighted Majority Algorithm: A beautiful algorithm for Learning from Experts</title><link href="http://ash-aldujaili.github.io/blog/2018/01/08/wma/" rel="alternate" type="text/html" title="Weighted Majority Algorithm: A beautiful algorithm for Learning from Experts" /><published>2018-01-08T00:00:00-08:00</published><updated>2018-01-08T00:00:00-08:00</updated><id>http://ash-aldujaili.github.io/blog/2018/01/08/wma</id><content type="html" xml:base="http://ash-aldujaili.github.io/blog/2018/01/08/wma/">&lt;p&gt;In this post, we demonstrate the theoretical gurantee on the performance of the &lt;strong&gt;Weighted Majority Alogorithm&lt;/strong&gt; (&lt;em&gt;WMA&lt;/em&gt;) with empirical validation. WMA is one of the beautiful algorithms in the framework of online learning and sequential decision making under uncertainity.&lt;/p&gt;
 
 &lt;p&gt;First, let’s describe a setup where WMA can be used. Assume that a friend of yours challenges to a &lt;strong&gt;True or False&lt;/strong&gt; quiz where you’re allowed to seek help / advice from $n$ advisors throughout the game.&lt;/p&gt;
 

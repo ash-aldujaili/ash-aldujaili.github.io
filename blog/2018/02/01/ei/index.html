@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  
+  
+  <title>Expected Improvement for Bayesian Optimization: A Derivation</title>
+  <meta name="description" content="In this post, we derive the closed-form expression of the Expected Improvement $($EI$)$ criterion commonly used in Bayesian Optimization. Modelled with a Gaussian Process, the function value at a given point $x$ can be considered as a normal random variable with mean $\mu$ and variance $\sigma^2$. Given the best $($minimum in a minimization setup$)$ function value obtained so far-let’s denote it by $f^*$: we are interested in quantifying the improvement over $f^*$ we will have if we sample a point $x$ . Mathematically, the improvement at $x$ can be expressed as follows $I(x) = \max(f^* - Y,0)$ where $Y$ is the random variable $\sim \mathcal{N}(\mu, \sigma^2)$ that corresponds to the function value at $x$. Since $I$ is a random variable, one can consider the average $($expected$)$ improvement $($EI$)$ to assess $x$: $EI(x) = E_{Y\sim \mathcal{N}(\mu, \sigma^2)}[I(x)]$ With the reparameterization trick, $Y=\mu + \sigma \epsilon$ where $\epsilon\sim\mathcal{N}(0,1)$, we have: $EI(x) = E_{\epsilon\sim \mathcal{N}(0,1)}[I(x)]$ which can be written as $($from linearity of integral, and the definition of $\frac{d}{d\epsilon}e^{-\epsilon^2 / 2}$ derivative $)$ where $\phi, \Phi$ are the PDF, CDF of standard normal distribution, respectively.">
+  
+
+  <link rel="stylesheet" href="/blog/assets/main.css">
+  <link rel="canonical" href="http://ash-aldujaili.github.io/blog/2018/02/01/ei/">
+  
+  
+  <link rel="alternate" type="application/rss+xml" title="Hunting Optima" href="http://ash-aldujaili.github.io/blog/feed.xml">
+
+  
+
+  
+  <meta name="twitter:card" content="summary">
+  
+  <meta name="twitter:title" content="Expected Improvement for Bayesian Optimization: A Derivation">
+  <meta name="twitter:description" content="In this post, we derive the closed-form expression of the Expected Improvement $($EI$)$ criterion commonly used in Bayesian Optimization. Modelled with a Gaussian Process, the function value at a g...">
+  
+  
+
+  <script type="text/javascript">
+  WebFontConfig = {
+    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
+  };
+  (function() {
+    var wf = document.createElement('script');
+    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+    wf.type = 'text/javascript';
+    wf.async = 'true';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(wf, s);
+  })();
+</script>
+
+  
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-68645681-6', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+
+
+</head>
+
+  <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    TeX: {
+      equationNumbers: {
+        autoNumber: "AMS"
+      }
+    },
+    tex2jax: {
+      inlineMath: [ ['$','$'], ['\(', '\)'] ],
+      displayMath: [ ['$$','$$'] ],
+      processEscapes: true,
+    }
+  });
+</script>
+<script type="text/javascript"
+        src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/blog/">Hunting Optima</a>
+
+    <nav class="site-nav">
+      
+        
+        <a class="page-link" href="http://ash-aldujaili.github.io/">Home</a>
+      
+        
+        <a class="page-link" href="/blog/about/">About my blog</a>
+      
+        
+        <a class="page-link" href="/blog/archives/">Archives</a>
+      
+        
+        <a class="page-link" href="https://github.com/ash-aldujaili">GitHub</a>
+      
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    
+      <h1 class="post-title" itemprop="name headline">Expected Improvement for Bayesian Optimization: A Derivation</h1>
+                                       
+
+    <p class="post-meta"><time datetime="2018-02-01T00:00:00-08:00" itemprop="datePublished">Feb 1, 2018</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>In this post, we derive the closed-form expression of the Expected Improvement $($EI$)$ criterion commonly used in Bayesian Optimization.</p>
+
+<p>Modelled with a Gaussian Process, the function value at a given point $x$ can be considered as a normal random variable with mean $\mu$ and variance $\sigma^2$. Given the best $($minimum in a minimization setup$)$ function value obtained so far-let’s denote it by 
+$f^*$:</p>
+
+<p>we are interested in quantifying the improvement over 
+$f^*$ 
+we will have 
+if we sample a point 
+$x$ 
+. Mathematically, the improvement at 
+$x$ 
+can be expressed as follows</p>
+
+<p>$I(x) = \max(f^* - Y,0)$</p>
+
+<p>where $Y$ is the random variable $\sim \mathcal{N}(\mu, \sigma^2)$ that corresponds to the function value at $x$. Since $I$ is a random variable, one can consider the average $($expected$)$ improvement $($EI$)$ to assess $x$:</p>
+
+<p>$EI(x) =  E_{Y\sim \mathcal{N}(\mu, \sigma^2)}[I(x)]$</p>
+
+<p>With the reparameterization trick, $Y=\mu + \sigma \epsilon$ where 
+$\epsilon\sim\mathcal{N}(0,1)$, we have:</p>
+
+<p>$EI(x) =  E_{\epsilon\sim \mathcal{N}(0,1)}[I(x)]$</p>
+
+<p>which can be written as $($from linearity of integral, and the definition of  $\frac{d}{d\epsilon}e^{-\epsilon^2 / 2}$ derivative $)$</p>
+
+<script type="math/tex; mode=display">EI(x) = \int_{-\infty}^{\infty} I(x) \phi(\epsilon) d\epsilon</script>
+
+<script type="math/tex; mode=display">EI(x) =  \int_{-\infty}^{(f^*-\mu)/\sigma} (f^* - \mu - \sigma \epsilon) \phi(\epsilon) d\epsilon</script>
+
+<script type="math/tex; mode=display">EI(x)= (f^* - \mu)\Phi(\frac{f^*-\mu}{\sigma}) - \sigma \int_{-\infty}^{(f^*-\mu)/\sigma} \epsilon \phi(\epsilon) d\epsilon</script>
+
+<script type="math/tex; mode=display">EI(x)=(f^* - \mu)\Phi(\frac{f^*-\mu}{\sigma}) + \frac{\sigma}{
+\sqrt{2\pi}} \int_{-\infty}^{(f^*-\mu)/\sigma} (-\epsilon) e^{-\epsilon^2/2} d\epsilon</script>
+
+<script type="math/tex; mode=display">EI(x)=(f^* - \mu)\Phi(\frac{f^*-\mu}{\sigma}) + \frac{\sigma}{
+\sqrt{2\pi}}  e^{-\epsilon^2/2}|_{-\infty}^{(f^*-\mu)/\sigma}</script>
+
+<p><script type="math/tex">EI(x)=(f^* - \mu)\Phi(\frac{f^*-\mu}{\sigma}) + \sigma
+  \big(\phi(\frac{f^*-\mu}{\sigma}) - 0\big)</script>
+<script type="math/tex">EI(x)=(f^* - \mu)\Phi(\frac{f^*-\mu}{\sigma}) + \sigma
+  \phi(\frac{f^*-\mu}{\sigma})</script></p>
+
+<p>where $\phi, \Phi$ are the PDF, CDF of standard normal distribution, respectively.</p>
+
+  </div>
+
+  
+    <div id="disqus_thread"></div>
+    <script>
+    /**
+    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+  
+    var disqus_config = function () {
+    this.page.url = "http://ash-aldujaili.github.io/blog/2018/02/01/ei/"; //'http://ash-aldujaili.github.io/blog/2017/06/06/mse-ego-dace/';  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = "/2018/02/01/ei"; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://ash-aldujaili.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+   
+
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <p>
+      
+
+&copy; Abdullah Al-Dujaili - Powered by <a href="https://jekyllrb.com">Jekyll</a> &amp; <a href="https://github.com/yous/whiteglass">whiteglass</a> - Subscribe via <a href="http://ash-aldujaili.github.io/blog/feed.xml">RSS</a>
+
+    </p>
+
+  </div>
+
+</footer>
+
+
+    
+  </body>
+
+</html>
