@@ -115,528 +115,108 @@
 
   
 
-  <ul class="post-list">
+  <ul class="post-archives">
     
       
       
 
       <li>
-        <header class="post-header">
-          <h1 class="post-title">
-            <a class="post-link" href="/blog/2018/02/01/ei/">Expected Improvement for Bayesian Optimization: A Derivation</a>
-          </h1>
+        <span class="post-meta">Feb 1, 2018</span>
 
-          <p class="post-meta">Feb 1, 2018</p>
-        </header>
-
-        <div class="post-content">
-          <p>In this post, we derive the closed-form expression of the Expected Improvement $($EI$)$ criterion commonly used in Bayesian Optimization.</p>
-
-<p>Modelled with a Gaussian Process, the function value at a given point $x$ can be considered as a normal random variable with mean $\mu$ and variance $\sigma^2$. Given the best $($minimum in a minimization setup$)$ function value obtained so far-let’s denote it by 
-$f^*$:</p>
-
-<p>we are interested in quantifying the improvement over 
-$f^*$ 
-we will have 
-if we sample a point 
-$x$ 
-. Mathematically, the improvement at 
-$x$ 
-can be expressed as follows</p>
-
-<p>$I(x) = \max(f^* - Y,0)$</p>
-
-<p>where $Y$ is the random variable $\sim \mathcal{N}(\mu, \sigma^2)$ that corresponds to the function value at $x$. Since $I$ is a random variable, one can consider the average $($expected$)$ improvement $($EI$)$ to assess $x$:</p>
-
-<p>$EI(x) =  E_{Y\sim \mathcal{N}(\mu, \sigma^2)}[I(x)]$</p>
-
-<p>With the reparameterization trick, $Y=\mu + \sigma \epsilon$ where 
-$\epsilon\sim\mathcal{N}(0,1)$, we have:</p>
-
-<p>$EI(x) =  E_{\epsilon\sim \mathcal{N}(0,1)}[I(x)]$</p>
-
-<p>which can be written as $($from linearity of integral, and the definition of  $\frac{d}{d\epsilon}e^{-\epsilon^2 / 2}$ derivative $)$</p>
-
-<script type="math/tex; mode=display">EI(x) = \int_{-\infty}^{\infty} I(x) \phi(\epsilon) d\epsilon</script>
-
-<script type="math/tex; mode=display">EI(x) =  \int_{-\infty}^{(f^*-\mu)/\sigma} (f^* - \mu - \sigma \epsilon) \phi(\epsilon) d\epsilon</script>
-
-<script type="math/tex; mode=display">EI(x)= (f^* - \mu)\Phi(\frac{f^*-\mu}{\sigma}) - \sigma \int_{-\infty}^{(f^*-\mu)/\sigma} \epsilon \phi(\epsilon) d\epsilon</script>
-
-<script type="math/tex; mode=display">EI(x)=(f^* - \mu)\Phi(\frac{f^*-\mu}{\sigma}) + \frac{\sigma}{
-\sqrt{2\pi}} \int_{-\infty}^{(f^*-\mu)/\sigma} (-\epsilon) e^{-\epsilon^2/2} d\epsilon</script>
-
-<script type="math/tex; mode=display">EI(x)=(f^* - \mu)\Phi(\frac{f^*-\mu}{\sigma}) + \frac{\sigma}{
-\sqrt{2\pi}}  e^{-\epsilon^2/2}|_{-\infty}^{(f^*-\mu)/\sigma}</script>
-
-<p><script type="math/tex">EI(x)=(f^* - \mu)\Phi(\frac{f^*-\mu}{\sigma}) + \sigma
-  \big(\phi(\frac{f^*-\mu}{\sigma}) - 0\big)</script>
-<script type="math/tex">EI(x)=(f^* - \mu)\Phi(\frac{f^*-\mu}{\sigma}) + \sigma
-  \phi(\frac{f^*-\mu}{\sigma})</script></p>
-
-<p>where $\phi, \Phi$ are the PDF, CDF of standard normal distribution, respectively.</p>
-
-        </div>
-        
+        <h2>
+          <a class="post-link" href="/blog/2018/02/01/ei/">Expected Improvement for Bayesian Optimization: A Derivation</a>
+        </h2>
       </li>
     
       
       
 
       <li>
-        <header class="post-header">
-          <h1 class="post-title">
-            <a class="post-link" href="/blog/2018/01/08/wma/">Weighted Majority Algorithm: A beautiful algorithm for Learning from Experts</a>
-          </h1>
+        <span class="post-meta">Jan 8, 2018</span>
 
-          <p class="post-meta">Jan 8, 2018</p>
-        </header>
-
-        <div class="post-content">
-          <p>In this post, we demonstrate the theoretical gurantee on the performance of the <strong>Weighted Majority Alogorithm</strong> (<em>WMA</em>) with empirical validation. WMA is one of the beautiful algorithms in the framework of online learning and sequential decision making under uncertainity.</p>
-
-<p>First, let’s describe a setup where WMA can be used. Assume that a friend of yours challenges to a <strong>True or False</strong> quiz where you’re allowed to seek help / advice from $n$ advisors throughout the game.</p>
-
-<p>With this challenge at hand, WMA helps you play the game such that the number of your mistakes is upper bounded by roughly twice the number of mistakes made by your best advisor, i.e., the least number of mistakes made among your $n$ advisors. In the next paragraph, we’ll see how you can use WMA in the game.</p>
-
-<p>For each advisor $i$ and question (round) $t$, WMA associates a weight $w^t_i$. With $w^1_i=1\;, \forall i=1,\ldots, n.$ Assume the game has $T$ rounds. If advisor $i$ makes a mistake at round $t$, its weight is adjusted by a multiplicative factor $1-\eta$ where $\eta\in(0,1/2)$. That is, $w^{t+1}_i= (1-\eta) w^t_i$ if $i$ makes a mistake. Otherwise, $w^{t+1}_i=w^t_i$. At each round $t$, your decision is governed by the sum of weights of advisors who think the answer is <strong>True</strong> versus that of those who think the answer should be <strong>False</strong>. Mathematically, denote your answer at round $t$ by $y^t$, and the advisors’ answers by $x^t_i$. These variables take the values $0$ and $1$ to represent <em>True</em> and <em>False</em> respectively: we have</p>
-
-<script type="math/tex; mode=display">y^t = \mathbf{1}\big\{\sum_{i}x^t_i * w^t_i \geq \sum_{i} (1-x^t_i) * w^t_i \big\}</script>
-
-<p>Let’s put WMA in action. Below, I have created $n$ advisors whose decisions at each round are based on tossing coins whose bias is sampled uniformly, $p_i\sim \mathcal{U}(0,1)$. Likewise, the game generates questions whose answers follows a Bernoulli distribution with $p_g\sim\mathcal{U}(0,1)$. We denote the correct answer at round $t$ by $z^t$. Also, let’s try to validate the theoretical bound on its performance. From <a href="https://www.cs.princeton.edu/courses/archive/fall13/cos521/lecnotes/lec8.pdf">this</a>, after $\hat{t}$ rounds,</p>
-
-<script type="math/tex; mode=display">|\text{your mistakes}| \leq 2 (1+ \eta)\;|\text{best_advisors_mistakes}|\; + \frac{2 \ln n}{\eta}</script>
-
-<p>That is,</p>
-
-<script type="math/tex; mode=display">2(1+\eta) \min(\sum_{t=0}^{\hat{t}}\mathbf{1}\{x^t_1 \neq z^t\}, \ldots, \sum_{t=0}^{\hat{t}}\mathbf{1}\{x^t_n \neq z^t\}) + \frac{2\ln n}{\eta}-  \sum_{t=0}^{\hat{t}} \mathbf{1}\{y^t\neq z^t\} \geq 0\;, \hat{t}= 1,\ldots, T</script>
-
-<p>Let’s verify the above with the following 100 games with 1000 rounds each.</p>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>import numpy as np
-
-# let's try 100 games each with 1000 rounds,  
-num_runs = 100
-T = 1000
-
-diff = np.zeros((num_runs, T))
-for run in range(num_runs):
-    n = np.random.randint(1,10)
-    ps = np.random.random(n)
-    ws = np.ones(n)
-    p_g = np.random.random()
-    eta = 0.25
-
-    # your mistakes
-    m = 0
-    # advisors mistakes
-    ms = np.zeros(n, dtype=np.int32)
-
-    for t in range(T):
-        # game correct answer
-        z = np.random.random() &gt;= p_g
-        # advisors answers
-        xs = np.random.random(n) &gt;= ps
-        # your answer
-        y = np.sum(xs * ws) &gt;= np.sum((1-xs) * ws)
-
-        # your mistakes
-        m += (y != z)
-        # advistors mistakes
-        ms[xs != z] += 1
-
-        # theoretical bound
-        th_ub = 2 * (1+eta) * min(ms) + 2. * np.log(n) / eta
-        diff[run, t] = th_ub - m
-        
-        # update weights
-        ws[xs != z] = (1-eta) * ws[xs != z]
-
-
-assert np.min(diff) &gt;= 0, "Theoretical gap should be non-negative"
-</code></pre>
-</div>
-
-<p>Our mistakes never exceeded the theoretical upper limit, as can be seen from the non-negative theoretical gap across all the runs and rounds of the game.</p>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>import matplotlib.pyplot as plt
-
-_ = plt.plot(diff.T)
-plt.xlabel('round')
-plt.ylabel('Theoretical Gap')
-plt.show()
-</code></pre>
-</div>
-
-<p align="center">
-  <img src="http://ash-aldujaili.github.io/blog/assets/wma/wma.png" width="500" />
-<br /><br />
-</p>
-
-        </div>
-        
+        <h2>
+          <a class="post-link" href="/blog/2018/01/08/wma/">Weighted Majority Algorithm: A beautiful algorithm for Learning from Experts</a>
+        </h2>
       </li>
     
       
       
 
       <li>
-        <header class="post-header">
-          <h1 class="post-title">
-            <a class="post-link" href="/blog/2017/12/26/sampling/">A Gentle Tour through Sampling Techniques</a>
-          </h1>
+        <span class="post-meta">Dec 26, 2017</span>
 
-          <p class="post-meta">Dec 26, 2017</p>
-        </header>
-
-        <div class="post-content">
-          <p>In this post, we’ll take a quick tour into the sampling world and how it might be handy in some applications. Let’s start with some setup code.</p>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>import numpy as np
-import pandas as pd
-import numpy.random as rnd
-import seaborn as sns
-import scipy
-from mpl_toolkits.mplot3d import Axes3D
-%pylab inline
-</code></pre>
-</div>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>Populating the interactive namespace from numpy and matplotlib
-</code></pre>
-</div>
-
-<h4>Sampling from an aribitrary 2-D distribution</h4>
-
-<p>Let $x\in \mathbb{R}^2$ be a continuous random variable with from a probability distribution $q(x)$. We are interested in obtaining values that $x$ can take in a way that confirms to its probability distribution $q(x)$. Let’s assume $q(x)$ has the following form:</p>
-
-<script type="math/tex; mode=display">x\sim q(x)= \frac{1}{Z} [(x_1 - 0.5)^2 + (x_2 - 0.5)^2]\;,</script>
-
-<p>where <script type="math/tex">\frac{1}{Z} = \int^{1}_{0} (x_1 - 0.5)^2 dx_1+ \int^{1}_{0} (x_2 - 0.5)^2 dx_2 = \frac{1}{6}</script></p>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>q = lambda x: ((x[0] - 0.5)**2 + (x[1] - 0.5)**2) / 6.
-</code></pre>
-</div>
-
-<p>Let’s have a look at how does this distribution look like</p>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>n = 100
-x_1s, x_2s = np.meshgrid(*[np.linspace(0,1, n)]*2)
-@np.vectorize
-def compute_q(x_1,x_2):
-    return q([x_1,x_2])
-q_s = compute_q(x_1s, x_2s)
-fig = plt.figure()
-ax = fig.gca(projection='3d')
-surf = ax.plot_trisurf(x_1s.ravel(), x_2s.ravel(), q_s.ravel(), 
-                       cmap=plt.cm.BrBG_r, linewidth=0.2)
-fig.colorbar(surf, shrink=0.5, aspect=5)
-ax.view_init(30, 45)
-plt.show()
-
-</code></pre>
-</div>
-
-<p align="center">
-  <img src="http://ash-aldujaili.github.io/blog/assets/sampling/output_5_0.png" width="500" />
-<br /><br />
-</p>
-
-<p>The density accumulates at the boundaries of the distribution’s support. So when we sample, we expect more values around the boundaries rather than the center. The question is how to make our sampling process conforms to the same. In the rest of this post, we will discuss three methods: Rejection Sampling, Gibbs Sampling, Metropolis Hastings.</p>
-
-<h3>Rejection Sampling:</h3>
-
-<p>The gist of this method is to find a distribution $p(x)$ from which we know how to sample. We scale $p(x)$ by a factor $C$ such that 
-<script type="math/tex">q(x) \leq C p(x)</script></p>
-
-<p>If the above can be obtained, then our sampling procedure is as follows:</p>
-<ol>
-  <li>Sample $\bar{x}\sim p(\bar{x})$.</li>
-  <li>Toss a biased coin to accept $\bar{x}$ as a sample coming from $q$. The coin bias is $\frac{q(\bar{x})}{Cp(\bar{x})}$</li>
-</ol>
-
-<p>Intuitvely, you can think of this procedure as a correction scheme to account for the mismatch: how accurately $p(x)$ describes $q(x)$. Put it differently, the area under curve $Cp(x)$ is $C$, while under $q(x)$, it is $1$. And since $q(x)\leq Cp(x)$,  if we full the area under $Cp(x)$ with points uniformly, then $1/C$ of these points will be under $q(x)$.</p>
-
-<p>In the demo below, we choose $p$ to be the uniform distribution:
-<script type="math/tex">x_1 \sim \mathcal{U}(0,1)</script>
-<script type="math/tex">x_2 \sim \mathcal{U}(0,1)</script>
-<script type="math/tex">p(x) = 1</script></p>
-
-<p>And $C$ to be $\max_{x} q(x)= 0.0833333$</p>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>C = q([0.,0.]) #max_x q(x)
-p = lambda x: 1
-samples = []
-num_samples = 10000
-while len(samples) &lt; num_samples:
-    x = rnd.rand(2)
-    if rnd.rand() &lt;= ( q(x) / (C * p(x))):
-        samples.append({'x_1':x[0], 'x_2':x[1]})
-    
-</code></pre>
-</div>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>df = pd.DataFrame(samples)
-_ = sns.jointplot(x=df.x_1, y=df.x_2, kind='kde')
-</code></pre>
-</div>
-
-<p align="center">
-  <img src="http://ash-aldujaili.github.io/blog/assets/sampling/output_9_0.png" width="500" />
-<br /><br />
-</p>
-
-<p>We can see how the histogram of the collected samples agrees to the mass distribution of $q$. However, this approach becomes challenging in higher dimensions: higher rejection probability $($which makes the process extremely slow$)$ and less known upper-bounding scaled distributions. For this, Markov Chain Monte Carlo $($MCMC$)$ methods come to the rescue</p>
-
-<h3>Markov Chain Monte Carlo</h3>
-
-<p>Based on the notion of stationary distribution,</p>
-
-<p><script type="math/tex">\pi(\bar{x})=\sum_{x}\pi(x)T(\bar{x}|x)</script>
-we can generate our samples from a dynamical systems over the states $($values$)$ which the random variable $x$ can take. That is, i. Specify a transition probability in line with the system dynamics $T(\bar{x}|x)$ $($or proposal distribution- to propose the next state $\bar{x}$ given the present state $x$ $)$. ii. Let the system interact, iii. The system will converge to the underlying $($unique$)$ distribution of $\pi$. Note that, if:
-<script type="math/tex">T(\bar{x}|x)>0\;, \forall x, \bar{x}\;,</script>
-there exists a unique stationary $\pi$</p>
-
-<p>The challenge in this setup is how to define / sample from the valid transition distribution $($e.g., in higher dimensions$)$. Among other approaches we discuss two here.</p>
-
-<h4>Gibbs Sampling</h4>
-
-<p>Given a random $($initialized$)$ state of our systems variables $($here, $x_1$ and $x_2$$)$, one can condition one variable on the other to obtain a 1-D distriubution, which we assume we can sample from $($i.e., rejection sampling, central limit theorem, or other techniques$)$. Iteratively, we will obtain samples. Neverthelss, we need to give it some time till we converge to the stationary distribution of our system. In our example, we will make use of rejection sampling in 1-D to obtain our 1-D sample.</p>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>
-q = lambda x: ((x[0] - 0.5)**2 + (x[1] - 0.5)**2) / 6.
-# q(x_1|x_2)
-q_1 = lambda x: 6 * q(x)/((x[1]-0.5)**2 + 2. * 0.5**3 / 3.) 
-# q(x_2|x_1)
-q_2 = lambda x: 6 * q(x)/((x[0]-0.5)**2 + 2. * 0.5**3 / 3.) 
-# p (upper bounding), here we are using uniform dist
-p = lambda x: 1 
-
-def reject_uniform_sample(q, C):
-    while True:
-        x_ = rnd.rand()
-        if rnd.rand() &lt;= q(x_) /(C * 1.):
-            return x_
-
-# aribtrary value, by right we should use max_x q_1, max_x q_2
-C_1 = 1.5
-C_2 = 1.5
-samples = [{'x_1':rnd.rand(), 'x_2': rnd.rand()}]
-num_samples = 10000
-while len(samples) &lt; num_samples:
-    x_1 = reject_uniform_sample(lambda x_: q_1([x_, samples[-1]['x_2']]), C_1)
-    x_2 = reject_uniform_sample(lambda x_: q_2([samples[-1]['x_1'], x_]), C_2)
-    samples.append({'x_1':x_1, 'x_2':x_2})
-</code></pre>
-</div>
-
-<p>While burning:</p>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>df = pd.DataFrame(samples[:50])
-_ = sns.jointplot(x=df.x_1, y=df.x_2, kind='kde')
-</code></pre>
-</div>
-
-<p align="center">
-  <img src="http://ash-aldujaili.github.io/blog/assets/sampling/output_16_0.png" width="500" />
-<br /><br />
-</p>
-
-<p>After discarding some samples away:</p>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>df = pd.DataFrame(samples[500:])
-_ = sns.jointplot(x=df.x_1, y=df.x_2, kind='kde')
-</code></pre>
-</div>
-
-<p align="center">
-  <img src="http://ash-aldujaili.github.io/blog/assets/sampling/output_18_0.png" width="500" />
-<br /><br />
-</p>
-
-<h4>Metropolis-Hastings Sampling</h4>
-
-<p>In Gibbs sampling, the idea is to generate samples for each of our system’s variables from their posterior distribution with respect to the current values of the rest of the variables. Multi-dimensioanly sampling is reduced into a sequence of 1-D sampling procedures. We saw above, this approach might be a little bit slow and generates highly correlated samples $($again: we are generating samples that are highly probable given the past values of the rest of the variables$)$. Furthermore, what if we can’t compute nor sample from the posterior distribution. Can we propose transitions from one state to another arbitrarily and sitll converge? The idea of MH-sampling is to incorporate rejection sampling with aribtrary proposal distribution such that the transition probability $($which uniquely defines the Markov process$)$ can be constructed.</p>
-
-<p>Let’s step back and summarise the above:</p>
-
-<ol>
-  <li>
-    <p>We would like to sample from our system’s distribution <script type="math/tex">q( x )</script>.</p>
-  </li>
-  <li>We are using Markov Chain $($process$)$ to simulate our system of random variables. That is the Markov chain asymptotically converges to a stationary distribution <script type="math/tex">\pi(x)</script> and which is <script type="math/tex">q(x)</script>.</li>
-  <li>To converge to $ q(x) $, we need to construct the corresponding chain’s transition probability $ T(\bar{x}|x) $
- because it uniquely defines the process and hence its stationary distribution.</li>
-  <li>One way of achieving that is through the detailed balance, sufficient but not a necessary condition:
-$ q(x) T(\bar{x}|x) = q(\bar{x}) T(x|\bar{x}) $</li>
-</ol>
-
-<p>We can make use of the above formula to construct a transition probability  that is a product of an arbitrary distribution 
-$g(\bar{x}|x)$ 
-, which is referred to as the proposal distribution as mentioned above, and the acceptance distribution 
-$A(\bar{x}|x)$</p>
-
-<script type="math/tex; mode=display">T(\bar{x}|x)= g(\bar{x}|x)A(\bar{x}|x)</script>
-
-<p>Plugging this in the detailed balance condition, we have:</p>
-
-<script type="math/tex; mode=display">A(\bar{x}|x)=\min\{1, \frac{q(\bar{x})g(x|\bar{x})}{q(x)g(\bar{x}|x)}\}</script>
-
-<p>Let’s see how we can realize this in code: Let’s define our</p>
-
-<script type="math/tex; mode=display">g(\bar{x}|x)\sim \mathcal{N}(x,0.25I)</script>
-
-<p>and here we are assuming that we can sample efficiently from this 2-D Gaussian distribution $($ otherwise, we may use one of the techniques above as rejection sampling $)$. Notice here, there is nothing preventing us from sampling outside the support of $q(x)$, so we need to explicitly state that. I.e., $q(x)=0$ outside $q$’s support. Also, our choice of proposal distribution might affect the convergence progress.</p>
-
-<div class="highlighter-rouge"><pre class="highlight"><code># target distribution (the one we'd like the MC to converge to)
-q = lambda x: ((x[0] - 0.5)**2 + (x[1] - 0.5)**2) / 6.
-# assuming 2-d Gaussian sampling is doable here (via function call)
-sigma = 0.5
-propose_x = lambda x_prev: x_prev + sigma * np.dot(rnd.randn(1,2),np.eye(2))[0,:]
-# proposal distribution:
-from scipy.stats import multivariate_normal
-g = lambda x_new, x_prev: multivariate_normal.pdf(x_new, mean=x_prev, cov =sigma * np.eye(2))
-# random initialization of the sample which we'll eventually discard
-samples = [{'x_1':rnd.rand(), 'x_2': rnd.rand()}]
-num_samples = 10000
-while len(samples) &lt; num_samples:
-    x_prev = np.array([samples[-1]['x_1'], samples[-1]['x_2']])
-    x_new = propose_x(x_prev)
-    # to discard samples out of support
-    if max(x_new) &gt; 1. or min(x_new) &lt; 0.:
-        continue
-    if rnd.rand() &lt;= min(1, q(x_new) * g(x_prev,x_new) / (q(x_prev) * g(x_new, x_prev))):
-        samples.append({'x_1':x_new[0], 'x_2':x_new[1]})
-</code></pre>
-</div>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>df = pd.DataFrame(samples[:50])
-_ = sns.jointplot(x=df.x_1, y=df.x_2, kind='kde')
-</code></pre>
-</div>
-
-<p align="center">
-  <img src="http://ash-aldujaili.github.io/blog/assets/sampling/output_21_0.png" width="500" />
-<br /><br />
-</p>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>df = pd.DataFrame(samples[1500:])
-_ = sns.jointplot(x=df.x_1, y=df.x_2, kind='kde')
-</code></pre>
-</div>
-
-<p align="center">
-  <img src="http://ash-aldujaili.github.io/blog/assets/sampling/output_22_0.png" width="500" />
-<br /><br />
-</p>
-
-
-        </div>
-        
+        <h2>
+          <a class="post-link" href="/blog/2017/12/26/sampling/">A Gentle Tour through Sampling Techniques</a>
+        </h2>
       </li>
     
       
       
 
       <li>
-        <header class="post-header">
-          <h1 class="post-title">
-            <a class="post-link" href="/blog/2017/09/20/covariance-matrix/">On the Positive Definitness of Multivariate Gaussian&#39;s  Covariance Matrix</a>
-          </h1>
+        <span class="post-meta">Sep 20, 2017</span>
 
-          <p class="post-meta">Sep 20, 2017</p>
-        </header>
-
-        <div class="post-content">
-          <p>$
-\newcommand{\vx}{\mathbf{x}}
-\newcommand{\vy}{\mathbf{y}}
-\newcommand{\vz}{\mathbf{z}}
-\newcommand{\covmat}{\Sigma}
-$</p>
-
-<p>In this short post, we show why the covariance matrix $\Sigma \in \mathbb{R}^{n\times n}$ of a multivariate Gaussian $\vx\in\mathbb{R}^n$ is always symmetric positive definite. That is,</p>
-
-<ol>
-  <li>for all non-zero vector $\vy \in \mathbb{R}^n$, $\vy^T\Sigma \vy&gt;0$</li>
-  <li>$\Sigma_{ij} = \Sigma_{ji}$.</li>
-</ol>
-
-<p>The latter condition $(2)$ follows from the definition of the covariance matrix and the commutative property of multiplication. For condition $(1)$, we can prove it in two steps:</p>
-
-<p>First, for all non-zero vector $\vy \in \mathbb{R}^n$, $\vy^T\Sigma \vy \geq 0$. This follows from
-<script type="math/tex">{\vx}^T\Sigma \vx=\sum_{ij} y_i y_j \Sigma_{ij}=\sum_{ij}y_i y_j E[(x_i - \bar{x}_i)(x_j - \bar{x}_j)]=E\big[\sum_{ij}y_i y_j (x_i - \bar{x}_i)(x_j - \bar{x}_j)\big]\;,</script>
-with $z_i =x_i - \bar{x}_i$, we have <script type="math/tex">% <![CDATA[
-\vx^T\Sigma \vx=E[\sum_{ij} y_i z_iy_jz_j]=E[\sum_{i} y^2_iz^2_i + 2 \sum_{i<j} y_iz_i y_j z_j]=E[(\vy^T\vz)^2]\geq 0\;, %]]></script> since $(\vy^T\vz)^2\geq 0$.</p>
-
-<p>Second, for $\Sigma$ to hold as a covariance matrix for a multivariate Gaussian, it must be invertible. That is to say, its rank is $n$, i.e., $n$ non-zero eigenvalues ${\lambda_i }_{1\leq i \leq n}$ which are also positive $($from step 1$)$. This means that all non-zero vectors $\vx \in \mathbb{R}^n$ can be written as linear combinations of $\Sigma$’s eigen vectors 
-<script type="math/tex">\{\mathbf{v}_i\}_{1\leq i \leq n}\;.</script></p>
-
-<p>Therefore, <script type="math/tex">{\vx}^T \Sigma \vx= \sum_{ij} w_i \mathbf{v}^T_i \lambda_j w_j \mathbf{v}_j= \sum_{i} \lambda_i w^2_i > 0\;.</script></p>
-
-
-        </div>
-        
+        <h2>
+          <a class="post-link" href="/blog/2017/09/20/covariance-matrix/">On the Positive Definitness of Multivariate Gaussian&#39;s  Covariance Matrix</a>
+        </h2>
       </li>
     
       
       
 
       <li>
-        <header class="post-header">
-          <h1 class="post-title">
-            <a class="post-link" href="/blog/2017/08/01/quadratic-form-opt/">Quadratic Function Optimization via Linear Algebra</a>
-          </h1>
+        <span class="post-meta">Aug 1, 2017</span>
 
-          <p class="post-meta">Aug 1, 2017</p>
-        </header>
+        <h2>
+          <a class="post-link" href="/blog/2017/08/01/quadratic-form-opt/">Quadratic Function Optimization via Linear Algebra</a>
+        </h2>
+      </li>
+    
+      
+      
 
-        <div class="post-content">
-          <p>In this post, we show how Linear Algebra can be used to solve one of the common optimization problems that arise in a variety of domains. In particular, we are interested in the quadratic optimization problem of the form
-$
-\newcommand{\vx}{\mathbf{x}}
-\newcommand{\vq}{\mathbf{q}}
-\newcommand{\lm}{\lambda}
-\newcommand{\norm}[1]{||#1||_2}
-$</p>
+      <li>
+        <span class="post-meta">Jul 31, 2017</span>
 
-<p>\begin{align}
-\text{max}_{\vx}\hspace{1.15cm} \vx^TA\vx \newline
-\hspace{1em}\text{s.t.}\hspace{1em} \norm{\vx}=1
-\label{eq:opt-problem}
-\end{align}</p>
+        <h2>
+          <a class="post-link" href="/blog/2017/07/31/matrix-inversion/">A Practical Summary to Matrix Inversion</a>
+        </h2>
+      </li>
+    
+      
+      
 
-<p>where $A\in\mathbb{R}^{n^2}$ is a real symmetric $($square$)$ matrix, $\vx\in\mathbb{R}^n$. An optimal solution of this problem is $\vq_1\in\mathbb{R}^n$, the eigenvector that corresponds to $\lambda_1\in \mathbb{R}$, the largest eigenvalue of $A$.</p>
+      <li>
+        <span class="post-meta">Jun 6, 2017</span>
 
-<p>Now that we have defined the problem, let’s try to solve it by making use of Linear Algebra, from which we know the following.</p>
+        <h2>
+          <a class="post-link" href="/blog/2017/06/06/mse-ego-dace/">DACE/BLUP MSE for EGO</a>
+        </h2>
+      </li>
+    
+      
+      
 
-<ol>
-  <li>If $Q\in\mathbb{R}^{n^2}$ is an orthogonal matrix, then $Q^{T}Q=QQ^T=I_n$ where $I_n\in\mathbb{R}^{n^2}$ is the $n\times n$ identity matrix.</li>
-  <li>Columns (and rows) of an orthogonal matrix have unit norm.</li>
-  <li>Any real symmetric matrix $A$ can be decomposed into $Q\Lambda Q^T$, where $Q\in\mathbb{R}^{n^2}$ is an orthogonal matrix whose columns are the eigenvectors of $A$, while $\Lambda = diag(\mathbf{\lambda})$ is a diagonal matrix whose diagonal entries are the eign values of $A$ such that $\lambda_1\geq \lambda_2 \geq \cdots\geq \lambda_n$ and  $\lambda_i$ is the eigenvalue of the $i^{th}$ column of $Q$.</li>
-</ol>
+      <li>
+        <span class="post-meta">May 8, 2017</span>
 
-<p>From (3.), one can write $\vx^TA\vx$ as $\vx^T Q\Lambda Q^T \vx \leq \lambda_1 \vx^T QI_n Q^T \vx$. Based on (1.) and the constraint of $\vx$’s unit norm, the last term can further be simplified to have $\vx^TA\vx \leq \lambda_1 \norm{\vx}\leq \lambda_1$.</p>
+        <h2>
+          <a class="post-link" href="/blog/2017/05/08/rand-proj-lipschitz/">Random Projections for Lipschitz Functions</a>
+        </h2>
+      </li>
+    
+      
+      
 
-<p>On the one hand, we found that $\max_{\vx} \vx^T A \vx = \lambda_1$. On the other hand, $A\vq_1 = \lambda_1\vq_1$, and thus $\vq_1^TA\vq_1 = \lambda_1$. Therefore, $\vq_1 \in \arg\max_{\vx} \vx^T A \vx$.</p>
+      <li>
+        <span class="post-meta">Mar 1, 2017</span>
 
-
-        </div>
-        
+        <h2>
+          <a class="post-link" href="/blog/2017/03/01/exp-opt/">Stochastic Processes for Expensive Black-Box Optimization</a>
+        </h2>
       </li>
     
   </ul>
-
-  
-  <div class="pagination">
-    
-      <a class="previous" href="/blog/posts/2/">&laquo; Older</a>
-    
-
-    
-  </div>
-
-
 
 </div>
 
