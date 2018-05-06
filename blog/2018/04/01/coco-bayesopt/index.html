@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  
+  
+  <title>Benchmarking Open-Source Bayesian Optimization Implementations on the COCO Noiseless Testbed</title>
+  <meta name="description" content="There have been several open-source implementations of Bayesian Optimization algorithms. In this post, we evaluate a couple of them $($tabulated in the table below$)$ on the COCO benchmark platform. Implementation Source SkGP https://github.com/scikit-optimize/scikit-optimize/ SkGBRT https://github.com/scikit-optimize/scikit-optimize/ GPyOptimize http://sheffieldml.github.io/GPyOpt/ BO https://github.com/fmfn/BayesianOptimization PyBO https://github.com/mwhoffman/pybo YelpMOE https://github.com/Yelp/MOE/ HyperOpt http://hyperopt.github.io/hyperopt/ Spearmint https://github.com/HIPS/Spearmint     Results from experiments according to [6] and [2] on the benchmark functions given in [1, 5] are presented in the figures below. The experiments were performed with COCO [4], version 2.0, with an evaluation budget of 20 times the problem dimensionaliy. The average runtime (aRT), used in the figures and tables, depends on a given target function value, $f_t = f_{opt} + \triangle f$ , and is computed over all relevant trials as the number of function evaluations executed during each trial while the best function value did not reach $f_t$, summed over all trials and divided by the number of trials that actually reached $f_t$ [3, 7]. In terms of running time, from slowest to fastest: GPyOptimize, Spearmint, BO, PyBO, SkGP, YelpMOE, SKGBRT, HyperOpt. In terms of performance, in low-dimension $(D\leq 10)$, PyBO appears to be outperforming consistently. With higher dimensions, most of the algorithms get extremely slow and algorithms like SkGP and SkGBRT seem to be a good tradeoff. Note: The figures about 20-D and 40-D $($ and even 10-D to some extent $)$ should be considered carefully. Not all the algorithms manage to solve the probelms at the time of producing the results. E.g., Spearmint manages to solve 20-D separable functions, while the rest of the problems are not solved $($ can you see its curve is present in the separable fcts subplot but not the rest $)$. This in turn, affects its final standing in the all fcts subplot. The 2-D and 3-D plots are the only ones in which all the algorithms manage to solve all the problems. S. Finck, N. Hansen, R. Ros, and A. Auger. 2009. Real-Parameter Black-Box Optimization Benchmarking 2009: Presentation of the Noiseless Functions. Technical Report 2009/20. Research Center PPE. hp://coco.lri.fr/downloads/download15.03/bbobdocfunctions.pdf Updated February 2010. N. Hansen, A Auger, D. Brockho, D. Tuˇsar, and T. Tuˇsar. 2016. COCO: Performance Assessment. ArXiv e-prints arXiv:1605.03560 (2016). N. Hansen, A. Auger, S. Finck, and R. Ros. 2012. Real-Parameter Black-Box Optimization Benchmarking 2012: Experimental Setup. Technical Report. INRIA. hp://coco.gforge.inria.fr/bbob2012-downloads N. Hansen, A. Auger, O. Mersmann, T. Tuˇsar, and D. Brockho. 2016. COCO: A Platform for Comparing Continuous Optimizers in a Black-Box Seing. ArXiv e-prints arXiv:1603.08785 (2016). N. Hansen, S. Finck, R. Ros, and A. Auger. 2009. Real-Parameter Black-Box Optimization Benchmarking 2009: Noiseless Functions Denitions. Technical Report RR-6829. INRIA. hp://coco.lri.fr/downloads/download15.03/bbobdocfunctions.pdf Updated February 2010. N. Hansen, T. Tuˇsar, O. Mersmann, A. Auger, and D. Brockho. 2016. COCO: e Experimental Procedure. ArXiv e-prints arXiv:1603.08776 (2016). [7] Kenneth Price. 1997. Dierential evolution vs. the functions of the second ICEO. In Proceedings of the IEEE International Congress on Evolutionary Computation. IEEE, Piscataway, NJ, USA, 153–157. DOI:hp://dx.doi.org/10.1109/ICEC.1997.592287">
+  
+
+  <link rel="stylesheet" href="/blog/assets/main.css">
+  <link rel="canonical" href="http://ash-aldujaili.github.io/blog/2018/04/01/coco-bayesopt/">
+  
+  
+  <link rel="alternate" type="application/rss+xml" title="Hunting Optima" href="http://ash-aldujaili.github.io/blog/feed.xml">
+
+  
+
+  
+  <meta name="twitter:card" content="summary">
+  
+  <meta name="twitter:title" content="Benchmarking Open-Source Bayesian Optimization Implementations on t...">
+  <meta name="twitter:description" content="There have been several open-source implementations of Bayesian Optimization algorithms. In this post, we evaluate a couple of them $($tabulated in the table below$)$ on the COCO benchmark platform...">
+  
+  
+
+  <script type="text/javascript">
+  WebFontConfig = {
+    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
+  };
+  (function() {
+    var wf = document.createElement('script');
+    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+    wf.type = 'text/javascript';
+    wf.async = 'true';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(wf, s);
+  })();
+</script>
+
+  
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-68645681-6', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+
+
+</head>
+
+  <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    TeX: {
+      equationNumbers: {
+        autoNumber: "AMS"
+      }
+    },
+    tex2jax: {
+      inlineMath: [ ['$','$'], ['\(', '\)'] ],
+      displayMath: [ ['$$','$$'] ],
+      processEscapes: true,
+    }
+  });
+</script>
+<script type="text/javascript"
+        src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/blog/">Hunting Optima</a>
+
+    <nav class="site-nav">
+      
+        
+        <a class="page-link" href="http://ash-aldujaili.github.io/">Home</a>
+      
+        
+        <a class="page-link" href="/blog/about/">About my blog</a>
+      
+        
+        <a class="page-link" href="/blog/archives/">Archives</a>
+      
+        
+        <a class="page-link" href="https://github.com/ash-aldujaili">GitHub</a>
+      
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    
+      <h1 class="post-title" itemprop="name headline">Benchmarking Open-Source Bayesian Optimization Implementations on the COCO Noiseless Testbed</h1>
+                                       
+
+    <p class="post-meta"><time datetime="2018-04-01T00:00:00-08:00" itemprop="datePublished">Apr 1, 2018</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>There have been several open-source implementations of Bayesian Optimization algorithms. In this post, we evaluate a couple of them $($tabulated in the table below$)$ on the COCO benchmark platform.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Implementation</th>
+      <th style="text-align: left">Source</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">SkGP</td>
+      <td style="text-align: left">https://github.com/scikit-optimize/scikit-optimize/</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">SkGBRT</td>
+      <td style="text-align: left">https://github.com/scikit-optimize/scikit-optimize/</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">GPyOptimize</td>
+      <td style="text-align: left">http://sheffieldml.github.io/GPyOpt/</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">BO</td>
+      <td style="text-align: left">https://github.com/fmfn/BayesianOptimization</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">PyBO</td>
+      <td style="text-align: left">https://github.com/mwhoffman/pybo</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">YelpMOE</td>
+      <td style="text-align: left">https://github.com/Yelp/MOE/</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">HyperOpt</td>
+      <td style="text-align: left">http://hyperopt.github.io/hyperopt/</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Spearmint</td>
+      <td style="text-align: left">https://github.com/HIPS/Spearmint</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"> </td>
+      <td style="text-align: left"> </td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Results from experiments according to [6] and [2] on the benchmark functions given in [1, 5] are presented in the figures below. The experiments were performed with COCO [4], version 2.0, with an evaluation budget of 20 times the problem dimensionaliy.</p>
+
+<p>The average runtime (aRT), used in the figures and tables, depends on a given target function value, $f_t = f_{opt} + \triangle f$ ,
+and is computed over all relevant trials as the number of function evaluations executed during each trial while the best function value did not reach $f_t$, summed over all trials and divided by the number of trials that actually reached $f_t$ [3, 7].</p>
+
+<p>In terms of running time, from slowest to fastest: GPyOptimize, Spearmint, BO, PyBO, SkGP, YelpMOE, SKGBRT, HyperOpt.</p>
+
+<p>In terms of performance, in low-dimension $(D\leq 10)$, PyBO appears to be outperforming consistently. With higher dimensions, most of the algorithms get extremely slow and algorithms like SkGP and SkGBRT seem to be a good tradeoff.</p>
+
+<p>Note: The figures about 20-D and 40-D $($ and even 10-D to some extent $)$ should be considered carefully. Not all the algorithms manage to solve the probelms at the time of producing the results. E.g., Spearmint manages to solve 20-D separable functions, while the rest  of the problems are not solved $($ can you see its curve is present in the <code class="highlighter-rouge">separable fcts</code> subplot but not the rest $)$. This in turn, affects its final standing in the <code class="highlighter-rouge">all fcts</code> subplot. The 2-D and 3-D plots are the only ones in which all the algorithms manage to solve all the problems.</p>
+
+<p align="center">
+  <img src="http://ash-aldujaili.github.io/blog/assets/bayescoco/1.png" width="500" />
+<br /><br />
+</p>
+
+<p align="center">
+  <img src="http://ash-aldujaili.github.io/blog/assets/bayescoco/2.png" width="500" />
+<br /><br />
+</p>
+
+<p align="center">
+  <img src="http://ash-aldujaili.github.io/blog/assets/bayescoco/3.png" width="500" />
+<br /><br />
+</p>
+
+<p align="center">
+  <img src="http://ash-aldujaili.github.io/blog/assets/bayescoco/4.png" width="500" />
+<br /><br />
+</p>
+
+<p align="center">
+  <img src="http://ash-aldujaili.github.io/blog/assets/bayescoco/5.png" width="500" />
+<br /><br />
+</p>
+
+<p align="center">
+  <img src="http://ash-aldujaili.github.io/blog/assets/bayescoco/6.png" width="500" />
+<br /><br />
+</p>
+
+<ol>
+  <li>S. Finck, N. Hansen, R. Ros, and A. Auger. 2009. Real-Parameter Black-Box Optimization Benchmarking 2009: Presentation of the Noiseless Functions.
+Technical Report 2009/20. Research Center PPE. hp://coco.lri.fr/downloads/download15.03/bbobdocfunctions.pdf Updated February 2010.</li>
+  <li>N. Hansen, A Auger, D. Brockho, D. Tuˇsar, and T. Tuˇsar. 2016. COCO: Performance Assessment. ArXiv e-prints arXiv:1605.03560 (2016).</li>
+  <li>N. Hansen, A. Auger, S. Finck, and R. Ros. 2012. Real-Parameter Black-Box Optimization Benchmarking 2012: Experimental Setup. Technical Report.
+INRIA. hp://coco.gforge.inria.fr/bbob2012-downloads</li>
+  <li>N. Hansen, A. Auger, O. Mersmann, T. Tuˇsar, and D. Brockho. 2016. COCO: A Platform for Comparing Continuous Optimizers in a Black-Box
+Seing. ArXiv e-prints arXiv:1603.08785 (2016).</li>
+  <li>N. Hansen, S. Finck, R. Ros, and A. Auger. 2009. Real-Parameter Black-Box Optimization Benchmarking 2009: Noiseless Functions Denitions. Technical
+Report RR-6829. INRIA. hp://coco.lri.fr/downloads/download15.03/bbobdocfunctions.pdf Updated February 2010.</li>
+  <li>N. Hansen, T. Tuˇsar, O. Mersmann, A. Auger, and D. Brockho. 2016. COCO: e Experimental Procedure. ArXiv e-prints arXiv:1603.08776 (2016).
+[7] Kenneth Price. 1997. Dierential evolution vs. the functions of the second ICEO. In Proceedings of the IEEE International Congress on Evolutionary
+Computation. IEEE, Piscataway, NJ, USA, 153–157. DOI:hp://dx.doi.org/10.1109/ICEC.1997.592287</li>
+</ol>
+
+  </div>
+
+  
+    <div id="disqus_thread"></div>
+    <script>
+    /**
+    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+  
+    var disqus_config = function () {
+    this.page.url = "http://ash-aldujaili.github.io/blog/2018/04/01/coco-bayesopt/"; //'http://ash-aldujaili.github.io/blog/2017/06/06/mse-ego-dace/';  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = "/2018/04/01/coco-bayesopt"; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://ash-aldujaili.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+   
+
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <p>
+      
+
+&copy; Abdullah Al-Dujaili - Powered by <a href="https://jekyllrb.com">Jekyll</a> &amp; <a href="https://github.com/yous/whiteglass">whiteglass</a> - Subscribe via <a href="http://ash-aldujaili.github.io/blog/feed.xml">RSS</a>
+
+    </p>
+
+  </div>
+
+</footer>
+
+
+    
+  </body>
+
+</html>

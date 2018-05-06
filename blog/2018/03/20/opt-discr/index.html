@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  
+  
+  <title>Computing the Optimal Discriminator between Mixture of Gaussians</title>
+  <meta name="description" content="Let $p$ and $q$ be two mixtures of $k$ univariate Gaussians as follows: We are interested in a discriminator $D$ that distinguishes between the above distributions. Let’s assess $D$’s performance with the WGAN objective That is, the greater $L$ is, the better our discriminator $D$ is. Let the output range of $D$ be $[0,1]$. $L(D)$ can be written as Since $D(x)\geq 0$, $L(D)$ is maximized with $D(x)=0$ for $p(x)&amp;lt;q(x)$ and $D(x)=1$ for $p(x)\geq q(x)$. With this observation at hand, one can think of the discriminator as an indicator function, with the optimal one being $D^*(x)=\mathbb{1}{p(x)\geq q(x)}$. For univariate Gaussians, $D^*(x)=1$ on interavls where $p(x)\geq q(x)$ and $0$ otherwise. To find these intervals, one can look for the zero-crossings of the function $p(x)-q(x)$. From Theorem A.2, the linear combination $p(x)-q(x)$ has at most $2k-1$ zero-crossings. With $k=2$, we have 3 zero-crossings, which we can find with a root-finding solver given good initial guesses. Subsequently, $p(x)\geq q(x)$ over at most $2k-2=2$ disjoint intervals. What’s left now is computing the lower and upper bounds of these intervals for an optimal discriminator. We will demonstrate this in the following snippets. import numpy as np import matplotlib.pyplot as plt from scipy.optimize import root from scipy.stats import norm def f(_x, *args): &quot;&quot;&quot; evaluate p(x) - q(x) It is assumed that sigma = 1 for all the Gaussians &quot;&quot;&quot; _params = args[0] p_x = 0.5 * (norm.pdf(_x, loc=_params[&#39;p_mu_1&#39;]) + norm.pdf(_x, loc=_params[&#39;p_mu_2&#39;])) q_x = 0.5 * (norm.pdf(_x, loc=_params[&#39;q_mu_1&#39;]) + norm.pdf(_x, loc=_params[&#39;q_mu_2&#39;])) return p_x - q_x def solve_fx(_f, x0, _params): &quot;&quot;&quot; Find the zero crossing &quot;&quot;&quot; _res = root(_f, x0, _params) return float(_res.x) def get_optimal_bounds(params): &quot;&quot;&quot; computes the optimal bounds &quot;&quot;&quot; sorted_param_names = sorted(params, key=params.get) x = np.linspace(params[sorted_param_names[0]], params[sorted_param_names[-1]], 1000) y = f(x, params) crosses = np.where(np.diff(np.sign(y[y != 0])))[0] positives = np.where(y &amp;gt;= 0)[0] x0s = x[crosses] res = root(f, x0s, params) vals = list(res.x) if len(vals) == 1: if y[crosses[0]] &amp;gt; 0: l_1 = - np.float(&quot;inf&quot;) r_1 = vals[0] l_2 = r_1 r_2 = l_2 else: l_1 = vals[0] r_1 = vals[0] l_2 = vals[0] r_2 = np.float(&quot;inf&quot;) elif len(vals) == 2: if y[crosses[0]] &amp;gt; 0: l_1 = - np.float(&quot;inf&quot;) r_1 = vals[0] l_2 = vals[1] r_2 = np.float(&quot;inf&quot;) else: l_1 = vals[0] r_1 = 0.5 * (vals[0] + vals[1]) l_2 = r_1 r_2 = vals[1] elif len(vals) == 3: if y[crosses[0]] &amp;gt; 0: l_1 = - np.float(&quot;inf&quot;) r_1 = vals[0] l_2 = vals[1] r_2 = vals[2] else: l_1 = vals[0] r_1 = vals[1] l_2 = vals[2] r_2 = np.float(&quot;inf&quot;) elif len(vals) == 0: # any arbitrary value l_1, r_1, l_2, r_2 = -10., 0., 0., 10. else: raise Exception(&quot;There should be at most 3 crossings!&quot;) return l_1, r_1, l_2, r_2 Let’s visulaize an arbitrary set of intervals, note here we have two mixture of 2 Gaussian, that is there exist at most 3 zero crossings. # viz intervals for D(x) = 1{-3&amp;lt;=x&amp;lt;= -1} | 1{1&amp;lt;=x&amp;lt;=3} plot_bounds([-3, -1, 1, 3], {&#39;p_mu_1&#39;: -2, &#39;p_mu_2&#39;: 2, &#39;q_mu_1&#39;: 1, &#39;q_mu_2&#39;: 5}) The bounds are covering regions where $p(x) &amp;lt; q(x)$, this should not be the case for an optimal discriminator $D^*(x)$ as shown below. # viz opt disc bounds D^*(x) params = {&#39;p_mu_1&#39;: -2, &#39;p_mu_2&#39;: 2, &#39;q_mu_1&#39;: 1, &#39;q_mu_2&#39;: 5} plot_opt_disc(params)">
+  
+
+  <link rel="stylesheet" href="/blog/assets/main.css">
+  <link rel="canonical" href="http://ash-aldujaili.github.io/blog/2018/03/20/opt-discr/">
+  
+  
+  <link rel="alternate" type="application/rss+xml" title="Hunting Optima" href="http://ash-aldujaili.github.io/blog/feed.xml">
+
+  
+
+  
+  <meta name="twitter:card" content="summary">
+  
+  <meta name="twitter:title" content="Computing the Optimal Discriminator between Mixture of Gaussians">
+  <meta name="twitter:description" content="Let $p$ and $q$ be two mixtures of $k$ univariate Gaussians as follows: We are interested in a discriminator $D$ that distinguishes between the above distributions. Let’s assess $D$’s performance w...">
+  
+  
+
+  <script type="text/javascript">
+  WebFontConfig = {
+    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
+  };
+  (function() {
+    var wf = document.createElement('script');
+    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+    wf.type = 'text/javascript';
+    wf.async = 'true';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(wf, s);
+  })();
+</script>
+
+  
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-68645681-6', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+
+
+</head>
+
+  <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    TeX: {
+      equationNumbers: {
+        autoNumber: "AMS"
+      }
+    },
+    tex2jax: {
+      inlineMath: [ ['$','$'], ['\(', '\)'] ],
+      displayMath: [ ['$$','$$'] ],
+      processEscapes: true,
+    }
+  });
+</script>
+<script type="text/javascript"
+        src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/blog/">Hunting Optima</a>
+
+    <nav class="site-nav">
+      
+        
+        <a class="page-link" href="http://ash-aldujaili.github.io/">Home</a>
+      
+        
+        <a class="page-link" href="/blog/about/">About my blog</a>
+      
+        
+        <a class="page-link" href="/blog/archives/">Archives</a>
+      
+        
+        <a class="page-link" href="https://github.com/ash-aldujaili">GitHub</a>
+      
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    
+      <h1 class="post-title" itemprop="name headline">Computing the Optimal Discriminator between Mixture of Gaussians</h1>
+                                       
+
+    <p class="post-meta"><time datetime="2018-03-20T00:00:00-08:00" itemprop="datePublished">Mar 20, 2018</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>Let $p$ and $q$ be two mixtures of $k$ univariate Gaussians as follows:</p>
+
+<script type="math/tex; mode=display">p(x)=\sum^{k}_{i=1} \pi^{(i)}_p \mathcal{N}(\mu^{(i)}_p, \sigma^{(i)}_p)</script>
+
+<script type="math/tex; mode=display">q(x)=\sum^{k}_{j=1} \pi^{(j)}_q \mathcal{N}(\mu^{(j)}_q, \sigma^{(j)}_q)</script>
+
+<p>We are interested in a discriminator $D$ that distinguishes between the above distributions. Let’s assess $D$’s performance with the WGAN objective</p>
+
+<script type="math/tex; mode=display">L(D) = \mathbb{E}_{x\sim p}[D(x)] + \mathbb{E}_{x\sim q}[1-D(x)]</script>
+
+<p>That is, the greater $L$ is, the better our discriminator $D$ is. Let the output range of $D$ be $[0,1]$. $L(D)$ can be written as</p>
+
+<script type="math/tex; mode=display">L(D)=\int_{\mathcal{X}}D(x) (p(x)-q(x)) dx+ 1</script>
+
+<p>Since $D(x)\geq 0$, $L(D)$ is maximized with $D(x)=0$ for $p(x)&lt;q(x)$ and $D(x)=1$ for $p(x)\geq q(x)$. With this observation at hand, one can think of the discriminator as an indicator function, with the optimal one being $D^*(x)=\mathbb{1}{p(x)\geq q(x)}$.</p>
+
+<p>For univariate Gaussians, $D^*(x)=1$ on interavls where $p(x)\geq q(x)$ and $0$ otherwise. To find these intervals, one can look for the zero-crossings of the function $p(x)-q(x)$. From <a href="https://arxiv.org/pdf/1706.09884.pdf">Theorem A.2</a>, the linear combination $p(x)-q(x)$ has at most $2k-1$ zero-crossings.</p>
+
+<p>With $k=2$, we have 3 zero-crossings, which we can find with a root-finding solver given good initial guesses. Subsequently, $p(x)\geq q(x)$ over at most $2k-2=2$ disjoint intervals. What’s left now is computing the lower and upper bounds of these intervals for an optimal discriminator. We will demonstrate this in the following snippets.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>import numpy as np
+import matplotlib.pyplot as plt
+from scipy.optimize import root
+from scipy.stats import norm
+
+
+def f(_x, *args):
+	"""
+	evaluate p(x) - q(x)
+	It is assumed that sigma = 1 for all the Gaussians
+	"""
+    _params = args[0]
+    p_x = 0.5 * (norm.pdf(_x, loc=_params['p_mu_1']) + norm.pdf(_x, loc=_params['p_mu_2']))
+    q_x = 0.5 * (norm.pdf(_x, loc=_params['q_mu_1']) + norm.pdf(_x, loc=_params['q_mu_2']))
+    return p_x - q_x
+
+
+def solve_fx(_f, x0, _params):
+	"""
+		Find the zero crossing
+	"""
+    _res = root(_f, x0, _params)
+    return float(_res.x)
+
+def get_optimal_bounds(params):
+	"""
+		computes the optimal bounds
+	"""
+    sorted_param_names = sorted(params, key=params.get)
+
+    x = np.linspace(params[sorted_param_names[0]], params[sorted_param_names[-1]], 1000)
+    y = f(x, params)
+
+    crosses = np.where(np.diff(np.sign(y[y != 0])))[0]
+    positives = np.where(y &gt;= 0)[0]
+
+    x0s = x[crosses]
+    res = root(f, x0s, params)
+
+    vals = list(res.x)
+
+    if len(vals) == 1:
+        if y[crosses[0]] &gt; 0:
+            l_1 = - np.float("inf")
+            r_1 = vals[0]
+            l_2 = r_1
+            r_2 = l_2
+        else:
+            l_1 = vals[0]
+            r_1 = vals[0]
+            l_2 = vals[0]
+            r_2 = np.float("inf")
+    elif len(vals) == 2:
+        if y[crosses[0]] &gt; 0:
+            l_1 = - np.float("inf")
+            r_1 = vals[0]
+            l_2 = vals[1]
+            r_2 = np.float("inf")
+        else:
+            l_1 = vals[0]
+            r_1 = 0.5 * (vals[0] + vals[1])
+            l_2 = r_1
+            r_2 = vals[1]
+    elif len(vals) == 3:
+        if y[crosses[0]] &gt; 0:
+            l_1 = - np.float("inf")
+            r_1 = vals[0]
+            l_2 = vals[1]
+            r_2 = vals[2]
+        else:
+            l_1 = vals[0]
+            r_1 = vals[1]
+            l_2 = vals[2]
+            r_2 = np.float("inf")
+    elif len(vals) == 0:
+        # any arbitrary value
+        l_1, r_1, l_2, r_2 = -10., 0., 0., 10.
+    else:
+        raise Exception("There should be at most 3 crossings!")
+
+    return l_1, r_1, l_2, r_2
+</code></pre>
+</div>
+
+<p>Let’s visulaize an arbitrary set of intervals, note here we have two mixture of 2 Gaussian, that is there exist at most 3 zero crossings.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code># viz intervals for D(x) =  1{-3&lt;=x&lt;= -1} | 1{1&lt;=x&lt;=3}
+plot_bounds([-3, -1, 1, 3],
+            {'p_mu_1': -2, 'p_mu_2': 2, 'q_mu_1': 1, 'q_mu_2': 5})
+</code></pre>
+</div>
+
+<p align="center">
+  <img src="http://ash-aldujaili.github.io/blog/assets/optdiscr/discr.png" width="500" />
+<br /><br />
+</p>
+
+<p>The bounds are covering regions where $p(x) &lt; q(x)$, this should not be the case for an optimal discriminator $D^*(x)$ as shown below.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code># viz opt disc bounds D^*(x)
+params = {'p_mu_1': -2, 'p_mu_2': 2, 'q_mu_1': 1, 'q_mu_2': 5}
+plot_opt_disc(params)
+</code></pre>
+</div>
+
+<p align="center">
+  <img src="http://ash-aldujaili.github.io/blog/assets/optdiscr/optdiscr.png" width="500" />
+<br /><br />
+</p>
+
+  </div>
+
+  
+    <div id="disqus_thread"></div>
+    <script>
+    /**
+    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+  
+    var disqus_config = function () {
+    this.page.url = "http://ash-aldujaili.github.io/blog/2018/03/20/opt-discr/"; //'http://ash-aldujaili.github.io/blog/2017/06/06/mse-ego-dace/';  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = "/2018/03/20/opt-discr"; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://ash-aldujaili.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+   
+
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <p>
+      
+
+&copy; Abdullah Al-Dujaili - Powered by <a href="https://jekyllrb.com">Jekyll</a> &amp; <a href="https://github.com/yous/whiteglass">whiteglass</a> - Subscribe via <a href="http://ash-aldujaili.github.io/blog/feed.xml">RSS</a>
+
+    </p>
+
+  </div>
+
+</footer>
+
+
+    
+  </body>
+
+</html>

@@ -1,4 +1,386 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="3.4.3">Jekyll</generator><link href="http://ash-aldujaili.github.io/blog/feed.xml" rel="self" type="application/atom+xml" /><link href="http://ash-aldujaili.github.io/blog/" rel="alternate" type="text/html" hreflang="en" /><updated>2018-03-11T12:41:03-08:00</updated><id>http://ash-aldujaili.github.io/blog/</id><title type="html">Hunting Optima</title><subtitle>Write-ups on optimization</subtitle><author><name>Abdullah Al-Dujaili</name></author><entry><title type="html">Expected Improvement for Bayesian Optimization: A Derivation</title><link href="http://ash-aldujaili.github.io/blog/2018/02/01/ei/" rel="alternate" type="text/html" title="Expected Improvement for Bayesian Optimization: A Derivation" /><published>2018-02-01T00:00:00-08:00</published><updated>2018-02-01T00:00:00-08:00</updated><id>http://ash-aldujaili.github.io/blog/2018/02/01/ei</id><content type="html" xml:base="http://ash-aldujaili.github.io/blog/2018/02/01/ei/">&lt;p&gt;In this post, we derive the closed-form expression of the Expected Improvement $($EI$)$ criterion commonly used in Bayesian Optimization.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="3.4.3">Jekyll</generator><link href="http://ash-aldujaili.github.io/blog/feed.xml" rel="self" type="application/atom+xml" /><link href="http://ash-aldujaili.github.io/blog/" rel="alternate" type="text/html" hreflang="en" /><updated>2018-05-06T14:57:21-08:00</updated><id>http://ash-aldujaili.github.io/blog/</id><title type="html">Hunting Optima</title><subtitle>Write-ups on optimization</subtitle><author><name>Abdullah Al-Dujaili</name></author><entry><title type="html">Benchmarking Open-Source Bayesian Optimization Implementations on the COCO Noiseless Testbed</title><link href="http://ash-aldujaili.github.io/blog/2018/04/01/coco-bayesopt/" rel="alternate" type="text/html" title="Benchmarking Open-Source Bayesian Optimization Implementations on the COCO Noiseless Testbed" /><published>2018-04-01T00:00:00-08:00</published><updated>2018-04-01T00:00:00-08:00</updated><id>http://ash-aldujaili.github.io/blog/2018/04/01/coco-bayesopt</id><content type="html" xml:base="http://ash-aldujaili.github.io/blog/2018/04/01/coco-bayesopt/">&lt;p&gt;There have been several open-source implementations of Bayesian Optimization algorithms. In this post, we evaluate a couple of them $($tabulated in the table below$)$ on the COCO benchmark platform.&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th style=&quot;text-align: left&quot;&gt;Implementation&lt;/th&gt;
+      &lt;th style=&quot;text-align: left&quot;&gt;Source&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;SkGP&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;https://github.com/scikit-optimize/scikit-optimize/&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;SkGBRT&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;https://github.com/scikit-optimize/scikit-optimize/&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;GPyOptimize&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;http://sheffieldml.github.io/GPyOpt/&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;BO&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;https://github.com/fmfn/BayesianOptimization&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;PyBO&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;https://github.com/mwhoffman/pybo&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;YelpMOE&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;https://github.com/Yelp/MOE/&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;HyperOpt&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;http://hyperopt.github.io/hyperopt/&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Spearmint&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;https://github.com/HIPS/Spearmint&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt; &lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt; &lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;Results from experiments according to [6] and [2] on the benchmark functions given in [1, 5] are presented in the figures below. The experiments were performed with COCO [4], version 2.0, with an evaluation budget of 20 times the problem dimensionaliy.&lt;/p&gt;
+
+&lt;p&gt;The average runtime (aRT), used in the figures and tables, depends on a given target function value, $f_t = f_{opt} + \triangle f$ ,
+and is computed over all relevant trials as the number of function evaluations executed during each trial while the best function value did not reach $f_t$, summed over all trials and divided by the number of trials that actually reached $f_t$ [3, 7].&lt;/p&gt;
+
+&lt;p&gt;In terms of running time, from slowest to fastest: GPyOptimize, Spearmint, BO, PyBO, SkGP, YelpMOE, SKGBRT, HyperOpt.&lt;/p&gt;
+
+&lt;p&gt;In terms of performance, in low-dimension $(D\leq 10)$, PyBO appears to be outperforming consistently. With higher dimensions, most of the algorithms get extremely slow and algorithms like SkGP and SkGBRT seem to be a good tradeoff.&lt;/p&gt;
+
+&lt;p&gt;Note: The figures about 20-D and 40-D $($ and even 10-D to some extent $)$ should be considered carefully. Not all the algorithms manage to solve the probelms at the time of producing the results. E.g., Spearmint manages to solve 20-D separable functions, while the rest  of the problems are not solved $($ can you see its curve is present in the &lt;code class=&quot;highlighter-rouge&quot;&gt;separable fcts&lt;/code&gt; subplot but not the rest $)$. This in turn, affects its final standing in the &lt;code class=&quot;highlighter-rouge&quot;&gt;all fcts&lt;/code&gt; subplot. The 2-D and 3-D plots are the only ones in which all the algorithms manage to solve all the problems.&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+  &lt;img src=&quot;http://ash-aldujaili.github.io/blog/assets/bayescoco/1.png&quot; width=&quot;500&quot; /&gt;
+&lt;br /&gt;&lt;br /&gt;
+&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+  &lt;img src=&quot;http://ash-aldujaili.github.io/blog/assets/bayescoco/2.png&quot; width=&quot;500&quot; /&gt;
+&lt;br /&gt;&lt;br /&gt;
+&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+  &lt;img src=&quot;http://ash-aldujaili.github.io/blog/assets/bayescoco/3.png&quot; width=&quot;500&quot; /&gt;
+&lt;br /&gt;&lt;br /&gt;
+&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+  &lt;img src=&quot;http://ash-aldujaili.github.io/blog/assets/bayescoco/4.png&quot; width=&quot;500&quot; /&gt;
+&lt;br /&gt;&lt;br /&gt;
+&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+  &lt;img src=&quot;http://ash-aldujaili.github.io/blog/assets/bayescoco/5.png&quot; width=&quot;500&quot; /&gt;
+&lt;br /&gt;&lt;br /&gt;
+&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+  &lt;img src=&quot;http://ash-aldujaili.github.io/blog/assets/bayescoco/6.png&quot; width=&quot;500&quot; /&gt;
+&lt;br /&gt;&lt;br /&gt;
+&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;S. Finck, N. Hansen, R. Ros, and A. Auger. 2009. Real-Parameter Black-Box Optimization Benchmarking 2009: Presentation of the Noiseless Functions.
+Technical Report 2009/20. Research Center PPE. hp://coco.lri.fr/downloads/download15.03/bbobdocfunctions.pdf Updated February 2010.&lt;/li&gt;
+  &lt;li&gt;N. Hansen, A Auger, D. Brockho, D. Tuˇsar, and T. Tuˇsar. 2016. COCO: Performance Assessment. ArXiv e-prints arXiv:1605.03560 (2016).&lt;/li&gt;
+  &lt;li&gt;N. Hansen, A. Auger, S. Finck, and R. Ros. 2012. Real-Parameter Black-Box Optimization Benchmarking 2012: Experimental Setup. Technical Report.
+INRIA. hp://coco.gforge.inria.fr/bbob2012-downloads&lt;/li&gt;
+  &lt;li&gt;N. Hansen, A. Auger, O. Mersmann, T. Tuˇsar, and D. Brockho. 2016. COCO: A Platform for Comparing Continuous Optimizers in a Black-Box
+Seing. ArXiv e-prints arXiv:1603.08785 (2016).&lt;/li&gt;
+  &lt;li&gt;N. Hansen, S. Finck, R. Ros, and A. Auger. 2009. Real-Parameter Black-Box Optimization Benchmarking 2009: Noiseless Functions Denitions. Technical
+Report RR-6829. INRIA. hp://coco.lri.fr/downloads/download15.03/bbobdocfunctions.pdf Updated February 2010.&lt;/li&gt;
+  &lt;li&gt;N. Hansen, T. Tuˇsar, O. Mersmann, A. Auger, and D. Brockho. 2016. COCO: e Experimental Procedure. ArXiv e-prints arXiv:1603.08776 (2016).
+[7] Kenneth Price. 1997. Dierential evolution vs. the functions of the second ICEO. In Proceedings of the IEEE International Congress on Evolutionary
+Computation. IEEE, Piscataway, NJ, USA, 153–157. DOI:hp://dx.doi.org/10.1109/ICEC.1997.592287&lt;/li&gt;
+&lt;/ol&gt;</content><author><name>Abdullah Al-Dujaili</name></author><summary type="html">There have been several open-source implementations of Bayesian Optimization algorithms. In this post, we evaluate a couple of them $($tabulated in the table below$)$ on the COCO benchmark platform. Implementation Source SkGP https://github.com/scikit-optimize/scikit-optimize/ SkGBRT https://github.com/scikit-optimize/scikit-optimize/ GPyOptimize http://sheffieldml.github.io/GPyOpt/ BO https://github.com/fmfn/BayesianOptimization PyBO https://github.com/mwhoffman/pybo YelpMOE https://github.com/Yelp/MOE/ HyperOpt http://hyperopt.github.io/hyperopt/ Spearmint https://github.com/HIPS/Spearmint     Results from experiments according to [6] and [2] on the benchmark functions given in [1, 5] are presented in the figures below. The experiments were performed with COCO [4], version 2.0, with an evaluation budget of 20 times the problem dimensionaliy. The average runtime (aRT), used in the figures and tables, depends on a given target function value, $f_t = f_{opt} + \triangle f$ , and is computed over all relevant trials as the number of function evaluations executed during each trial while the best function value did not reach $f_t$, summed over all trials and divided by the number of trials that actually reached $f_t$ [3, 7]. In terms of running time, from slowest to fastest: GPyOptimize, Spearmint, BO, PyBO, SkGP, YelpMOE, SKGBRT, HyperOpt. In terms of performance, in low-dimension $(D\leq 10)$, PyBO appears to be outperforming consistently. With higher dimensions, most of the algorithms get extremely slow and algorithms like SkGP and SkGBRT seem to be a good tradeoff. Note: The figures about 20-D and 40-D $($ and even 10-D to some extent $)$ should be considered carefully. Not all the algorithms manage to solve the probelms at the time of producing the results. E.g., Spearmint manages to solve 20-D separable functions, while the rest of the problems are not solved $($ can you see its curve is present in the separable fcts subplot but not the rest $)$. This in turn, affects its final standing in the all fcts subplot. The 2-D and 3-D plots are the only ones in which all the algorithms manage to solve all the problems. S. Finck, N. Hansen, R. Ros, and A. Auger. 2009. Real-Parameter Black-Box Optimization Benchmarking 2009: Presentation of the Noiseless Functions. Technical Report 2009/20. Research Center PPE. hp://coco.lri.fr/downloads/download15.03/bbobdocfunctions.pdf Updated February 2010. N. Hansen, A Auger, D. Brockho, D. Tuˇsar, and T. Tuˇsar. 2016. COCO: Performance Assessment. ArXiv e-prints arXiv:1605.03560 (2016). N. Hansen, A. Auger, S. Finck, and R. Ros. 2012. Real-Parameter Black-Box Optimization Benchmarking 2012: Experimental Setup. Technical Report. INRIA. hp://coco.gforge.inria.fr/bbob2012-downloads N. Hansen, A. Auger, O. Mersmann, T. Tuˇsar, and D. Brockho. 2016. COCO: A Platform for Comparing Continuous Optimizers in a Black-Box Seing. ArXiv e-prints arXiv:1603.08785 (2016). N. Hansen, S. Finck, R. Ros, and A. Auger. 2009. Real-Parameter Black-Box Optimization Benchmarking 2009: Noiseless Functions Denitions. Technical Report RR-6829. INRIA. hp://coco.lri.fr/downloads/download15.03/bbobdocfunctions.pdf Updated February 2010. N. Hansen, T. Tuˇsar, O. Mersmann, A. Auger, and D. Brockho. 2016. COCO: e Experimental Procedure. ArXiv e-prints arXiv:1603.08776 (2016). [7] Kenneth Price. 1997. Dierential evolution vs. the functions of the second ICEO. In Proceedings of the IEEE International Congress on Evolutionary Computation. IEEE, Piscataway, NJ, USA, 153–157. DOI:hp://dx.doi.org/10.1109/ICEC.1997.592287</summary></entry><entry><title type="html">Computing the Optimal Discriminator between Mixture of Gaussians</title><link href="http://ash-aldujaili.github.io/blog/2018/03/20/opt-discr/" rel="alternate" type="text/html" title="Computing the Optimal Discriminator between Mixture of Gaussians" /><published>2018-03-20T00:00:00-08:00</published><updated>2018-03-20T00:00:00-08:00</updated><id>http://ash-aldujaili.github.io/blog/2018/03/20/opt-discr</id><content type="html" xml:base="http://ash-aldujaili.github.io/blog/2018/03/20/opt-discr/">&lt;p&gt;Let $p$ and $q$ be two mixtures of $k$ univariate Gaussians as follows:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(x)=\sum^{k}_{i=1} \pi^{(i)}_p \mathcal{N}(\mu^{(i)}_p, \sigma^{(i)}_p)&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;q(x)=\sum^{k}_{j=1} \pi^{(j)}_q \mathcal{N}(\mu^{(j)}_q, \sigma^{(j)}_q)&lt;/script&gt;
+
+&lt;p&gt;We are interested in a discriminator $D$ that distinguishes between the above distributions. Let’s assess $D$’s performance with the WGAN objective&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;L(D) = \mathbb{E}_{x\sim p}[D(x)] + \mathbb{E}_{x\sim q}[1-D(x)]&lt;/script&gt;
+
+&lt;p&gt;That is, the greater $L$ is, the better our discriminator $D$ is. Let the output range of $D$ be $[0,1]$. $L(D)$ can be written as&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;L(D)=\int_{\mathcal{X}}D(x) (p(x)-q(x)) dx+ 1&lt;/script&gt;
+
+&lt;p&gt;Since $D(x)\geq 0$, $L(D)$ is maximized with $D(x)=0$ for $p(x)&amp;lt;q(x)$ and $D(x)=1$ for $p(x)\geq q(x)$. With this observation at hand, one can think of the discriminator as an indicator function, with the optimal one being $D^*(x)=\mathbb{1}{p(x)\geq q(x)}$.&lt;/p&gt;
+
+&lt;p&gt;For univariate Gaussians, $D^*(x)=1$ on interavls where $p(x)\geq q(x)$ and $0$ otherwise. To find these intervals, one can look for the zero-crossings of the function $p(x)-q(x)$. From &lt;a href=&quot;https://arxiv.org/pdf/1706.09884.pdf&quot;&gt;Theorem A.2&lt;/a&gt;, the linear combination $p(x)-q(x)$ has at most $2k-1$ zero-crossings.&lt;/p&gt;
+
+&lt;p&gt;With $k=2$, we have 3 zero-crossings, which we can find with a root-finding solver given good initial guesses. Subsequently, $p(x)\geq q(x)$ over at most $2k-2=2$ disjoint intervals. What’s left now is computing the lower and upper bounds of these intervals for an optimal discriminator. We will demonstrate this in the following snippets.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;import numpy as np
+import matplotlib.pyplot as plt
+from scipy.optimize import root
+from scipy.stats import norm
+
+
+def f(_x, *args):
+	&quot;&quot;&quot;
+	evaluate p(x) - q(x)
+	It is assumed that sigma = 1 for all the Gaussians
+	&quot;&quot;&quot;
+    _params = args[0]
+    p_x = 0.5 * (norm.pdf(_x, loc=_params['p_mu_1']) + norm.pdf(_x, loc=_params['p_mu_2']))
+    q_x = 0.5 * (norm.pdf(_x, loc=_params['q_mu_1']) + norm.pdf(_x, loc=_params['q_mu_2']))
+    return p_x - q_x
+
+
+def solve_fx(_f, x0, _params):
+	&quot;&quot;&quot;
+		Find the zero crossing
+	&quot;&quot;&quot;
+    _res = root(_f, x0, _params)
+    return float(_res.x)
+
+def get_optimal_bounds(params):
+	&quot;&quot;&quot;
+		computes the optimal bounds
+	&quot;&quot;&quot;
+    sorted_param_names = sorted(params, key=params.get)
+
+    x = np.linspace(params[sorted_param_names[0]], params[sorted_param_names[-1]], 1000)
+    y = f(x, params)
+
+    crosses = np.where(np.diff(np.sign(y[y != 0])))[0]
+    positives = np.where(y &amp;gt;= 0)[0]
+
+    x0s = x[crosses]
+    res = root(f, x0s, params)
+
+    vals = list(res.x)
+
+    if len(vals) == 1:
+        if y[crosses[0]] &amp;gt; 0:
+            l_1 = - np.float(&quot;inf&quot;)
+            r_1 = vals[0]
+            l_2 = r_1
+            r_2 = l_2
+        else:
+            l_1 = vals[0]
+            r_1 = vals[0]
+            l_2 = vals[0]
+            r_2 = np.float(&quot;inf&quot;)
+    elif len(vals) == 2:
+        if y[crosses[0]] &amp;gt; 0:
+            l_1 = - np.float(&quot;inf&quot;)
+            r_1 = vals[0]
+            l_2 = vals[1]
+            r_2 = np.float(&quot;inf&quot;)
+        else:
+            l_1 = vals[0]
+            r_1 = 0.5 * (vals[0] + vals[1])
+            l_2 = r_1
+            r_2 = vals[1]
+    elif len(vals) == 3:
+        if y[crosses[0]] &amp;gt; 0:
+            l_1 = - np.float(&quot;inf&quot;)
+            r_1 = vals[0]
+            l_2 = vals[1]
+            r_2 = vals[2]
+        else:
+            l_1 = vals[0]
+            r_1 = vals[1]
+            l_2 = vals[2]
+            r_2 = np.float(&quot;inf&quot;)
+    elif len(vals) == 0:
+        # any arbitrary value
+        l_1, r_1, l_2, r_2 = -10., 0., 0., 10.
+    else:
+        raise Exception(&quot;There should be at most 3 crossings!&quot;)
+
+    return l_1, r_1, l_2, r_2
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Let’s visulaize an arbitrary set of intervals, note here we have two mixture of 2 Gaussian, that is there exist at most 3 zero crossings.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# viz intervals for D(x) =  1{-3&amp;lt;=x&amp;lt;= -1} | 1{1&amp;lt;=x&amp;lt;=3}
+plot_bounds([-3, -1, 1, 3],
+            {'p_mu_1': -2, 'p_mu_2': 2, 'q_mu_1': 1, 'q_mu_2': 5})
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+  &lt;img src=&quot;http://ash-aldujaili.github.io/blog/assets/optdiscr/discr.png&quot; width=&quot;500&quot; /&gt;
+&lt;br /&gt;&lt;br /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;The bounds are covering regions where $p(x) &amp;lt; q(x)$, this should not be the case for an optimal discriminator $D^*(x)$ as shown below.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# viz opt disc bounds D^*(x)
+params = {'p_mu_1': -2, 'p_mu_2': 2, 'q_mu_1': 1, 'q_mu_2': 5}
+plot_opt_disc(params)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+  &lt;img src=&quot;http://ash-aldujaili.github.io/blog/assets/optdiscr/optdiscr.png&quot; width=&quot;500&quot; /&gt;
+&lt;br /&gt;&lt;br /&gt;
+&lt;/p&gt;</content><author><name>Abdullah Al-Dujaili</name></author><summary type="html">Let $p$ and $q$ be two mixtures of $k$ univariate Gaussians as follows: We are interested in a discriminator $D$ that distinguishes between the above distributions. Let’s assess $D$’s performance with the WGAN objective That is, the greater $L$ is, the better our discriminator $D$ is. Let the output range of $D$ be $[0,1]$. $L(D)$ can be written as Since $D(x)\geq 0$, $L(D)$ is maximized with $D(x)=0$ for $p(x)&amp;lt;q(x)$ and $D(x)=1$ for $p(x)\geq q(x)$. With this observation at hand, one can think of the discriminator as an indicator function, with the optimal one being $D^*(x)=\mathbb{1}{p(x)\geq q(x)}$. For univariate Gaussians, $D^*(x)=1$ on interavls where $p(x)\geq q(x)$ and $0$ otherwise. To find these intervals, one can look for the zero-crossings of the function $p(x)-q(x)$. From Theorem A.2, the linear combination $p(x)-q(x)$ has at most $2k-1$ zero-crossings. With $k=2$, we have 3 zero-crossings, which we can find with a root-finding solver given good initial guesses. Subsequently, $p(x)\geq q(x)$ over at most $2k-2=2$ disjoint intervals. What’s left now is computing the lower and upper bounds of these intervals for an optimal discriminator. We will demonstrate this in the following snippets. import numpy as np import matplotlib.pyplot as plt from scipy.optimize import root from scipy.stats import norm def f(_x, *args): &quot;&quot;&quot; evaluate p(x) - q(x) It is assumed that sigma = 1 for all the Gaussians &quot;&quot;&quot; _params = args[0] p_x = 0.5 * (norm.pdf(_x, loc=_params['p_mu_1']) + norm.pdf(_x, loc=_params['p_mu_2'])) q_x = 0.5 * (norm.pdf(_x, loc=_params['q_mu_1']) + norm.pdf(_x, loc=_params['q_mu_2'])) return p_x - q_x def solve_fx(_f, x0, _params): &quot;&quot;&quot; Find the zero crossing &quot;&quot;&quot; _res = root(_f, x0, _params) return float(_res.x) def get_optimal_bounds(params): &quot;&quot;&quot; computes the optimal bounds &quot;&quot;&quot; sorted_param_names = sorted(params, key=params.get) x = np.linspace(params[sorted_param_names[0]], params[sorted_param_names[-1]], 1000) y = f(x, params) crosses = np.where(np.diff(np.sign(y[y != 0])))[0] positives = np.where(y &amp;gt;= 0)[0] x0s = x[crosses] res = root(f, x0s, params) vals = list(res.x) if len(vals) == 1: if y[crosses[0]] &amp;gt; 0: l_1 = - np.float(&quot;inf&quot;) r_1 = vals[0] l_2 = r_1 r_2 = l_2 else: l_1 = vals[0] r_1 = vals[0] l_2 = vals[0] r_2 = np.float(&quot;inf&quot;) elif len(vals) == 2: if y[crosses[0]] &amp;gt; 0: l_1 = - np.float(&quot;inf&quot;) r_1 = vals[0] l_2 = vals[1] r_2 = np.float(&quot;inf&quot;) else: l_1 = vals[0] r_1 = 0.5 * (vals[0] + vals[1]) l_2 = r_1 r_2 = vals[1] elif len(vals) == 3: if y[crosses[0]] &amp;gt; 0: l_1 = - np.float(&quot;inf&quot;) r_1 = vals[0] l_2 = vals[1] r_2 = vals[2] else: l_1 = vals[0] r_1 = vals[1] l_2 = vals[2] r_2 = np.float(&quot;inf&quot;) elif len(vals) == 0: # any arbitrary value l_1, r_1, l_2, r_2 = -10., 0., 0., 10. else: raise Exception(&quot;There should be at most 3 crossings!&quot;) return l_1, r_1, l_2, r_2 Let’s visulaize an arbitrary set of intervals, note here we have two mixture of 2 Gaussian, that is there exist at most 3 zero crossings. # viz intervals for D(x) = 1{-3&amp;lt;=x&amp;lt;= -1} | 1{1&amp;lt;=x&amp;lt;=3} plot_bounds([-3, -1, 1, 3], {'p_mu_1': -2, 'p_mu_2': 2, 'q_mu_1': 1, 'q_mu_2': 5}) The bounds are covering regions where $p(x) &amp;lt; q(x)$, this should not be the case for an optimal discriminator $D^*(x)$ as shown below. # viz opt disc bounds D^*(x) params = {'p_mu_1': -2, 'p_mu_2': 2, 'q_mu_1': 1, 'q_mu_2': 5} plot_opt_disc(params)</summary></entry><entry><title type="html">On DeepMind’s Population-Based Training</title><link href="http://ash-aldujaili.github.io/blog/2018/03/15/pbt/" rel="alternate" type="text/html" title="On DeepMind's Population-Based Training" /><published>2018-03-15T00:00:00-08:00</published><updated>2018-03-15T00:00:00-08:00</updated><id>http://ash-aldujaili.github.io/blog/2018/03/15/pbt</id><content type="html" xml:base="http://ash-aldujaili.github.io/blog/2018/03/15/pbt/">&lt;p&gt;DeepMind has recently released a &lt;a href=&quot;https://arxiv.org/abs/1711.09846&quot;&gt;paper&lt;/a&gt; about population-based training of neural nets. The proposition is a simple asynchronous optimization algorithm, which jointly optimizes a population of models and their hyperparameters. In this post, I aim to demonstrate a simple implementation of the algorithm by reproducing the paper’s Figure 2.&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+  &lt;img src=&quot;http://ash-aldujaili.github.io/blog/assets/pbt/pbt-paper-demo.png&quot; width=&quot;750&quot; /&gt;
+&lt;br /&gt;&lt;br /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;The objective is to maximize the function&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;Q(\theta) = 1.2 - (\theta^2_0 + \theta^2_1)&lt;/script&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;def q(theta):
+    return 1.2 - np.sum(np.array(theta)**2)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Think of the above function as the validation set performance whose closed-form expression is unknown. However, we can still query its value $($ evaluate $)$ at specific $\theta$. While our goal is to maximize it and achieve a model with good generalization capabilities, we optimize our neural model $($ tune its parameters $)$ with respect to the training set performance. That is, our model is optimized w.r.t. to a surrogate objective $\hat{Q}$ function rather than the objective function we are after.&lt;/p&gt;
+
+&lt;p&gt;In an ideal setup, one would like $\hat{Q}=Q$ $($ or at least optimizing $\hat{Q}$ should correspond to optimizing $Q$ as well$)$, but this is not the case in general. The quality of this approximation $($or coupled optimization $)$  is often dependent on the model at hand and how we are training it: the hyperparameters. In other words, when we optimize $\hat{Q}$ w.r.t. $\theta$, we are doing so given $($ conditioned on $)$ a set of hyperparameters, $\hat{Q}(\theta\mid h)$.&lt;/p&gt;
+
+&lt;p&gt;In the considered toy example, let the mpirical loss / training set performance by parameterized by $h$ as follows.
+&lt;script type=&quot;math/tex&quot;&gt;\hat{Q}(\theta|h) = 1.2 - (h_0\theta^2_0 + h_1\theta^2_1)&lt;/script&gt;&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;def q_hat(theta, h):
+    # this is used by `step` function to perform
+    # gradient updates 
+    return 1.2 - np.sum(np.dot(np.array(h), np.array(theta)**2))
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The task now boils down to using $\hat{Q}$ to tune $\theta$ while searching for $h$ to make the tuning process as efficient as possible in $($ indirectly $)$ optimizing $Q$. PBT is one solution to do so. Here is the pesudocode, and below is an implementation of the same.&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+  &lt;img src=&quot;http://ash-aldujaili.github.io/blog/assets/pbt/pbt-alg.png&quot; width=&quot;750&quot; /&gt;
+&lt;br /&gt;&lt;br /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;Let’s start with modeling the population members:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;class Member(object):
+    def __init__(self, theta=[0., 0.], h=[0., 0.], _id=1, _eta=0.01, _sigma=1e-1):
+        self.theta = theta
+        self.h = h
+        self.id = _id
+        self.num_steps = 0
+        self.p = q(self.theta)
+        self._eta = _eta
+        self._sigma = _sigma
+        ## for visualization
+        self.trace = []
+        self.ps = [self.p]
+
+    def eval(self):
+        self.p = q(self.theta)
+
+    def ready(self):
+        return self.num_steps &amp;gt; 10
+
+    def step(self):
+        for i in range(2):
+            self.theta[i] +=  self._eta * (-2. * self.h[i] * self.theta[i])
+        self.num_steps += 1
+
+    def explore(self):
+        for i in range(2):
+            self.h[i] = np.clip(self.h[i] + self._sigma * np.random.randn(), 0, 1)
+
+    def exploit(self, other):
+        if self.p &amp;lt;= other.p:
+            self.theta = list(other.theta)
+            self.p = other.p
+            self.num_steps = 0
+            return True
+        else:
+            return False
+
+    def log(self):
+        self.trace.append(list(self.theta))
+        self.ps.append(self.p)
+
+    def __str__(self):
+        return 'theta:' + '%.2f' % self.theta[0] + ',%.2f' % self.theta[1] + \
+               '| h:' + '%.2f' % self.h[0] + ',%.2f' % self.h[1] + '| id' + str(self.id) + \
+               '| p:' + '%.2f' % self.p + '| steps:' + str(self.num_steps)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Here’s PBT implementation. I’ve put flags to show PBT in explore, exploit, grid search modes.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;def pbt(grid=False, explore_only=False, exploit_only=False):
+    # a check to ensure only one mode is selected for PBT
+    assert grid + exploit_only + explore_only &amp;lt;= 1, &quot;at most one flag can be set for PBT modes&quot;
+    # init population
+    population = [
+        Member(theta=[0.9, 0.9], h=[0,1], _id=0),
+        Member(theta=[0.9, 0.9], h=[1,0], _id=1)
+        ]
+    member_ids = np.arange(len(population))
+    # begin training
+    for _ in range(75):
+        np.random.shuffle(member_ids)
+        for mem_id in member_ids:
+            member = population[mem_id]
+            member.step()
+            member.eval()
+            if member.ready() and not grid:
+                if explore_only:
+                    member.explore()
+                else:
+                    member.exploit(population[(mem_id + 1) % 2])
+                    if not exploit_only:
+                        member.explore()
+                    member.eval()
+            member.log()
+
+    traces = [population[i].trace for i in range(len(population))]
+    ps = [population[i].ps for i in range(len(population))]
+    return traces, ps
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Let’s plot the four modes&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;f, axes = plt.subplots(2, 4)#, sharex=True)
+
+traces, ps = pbt(grid=True)
+plot_traces(axes[0,0], traces, title='Grid Search')
+plot_curves(axes[0,2], ps, title='Grid Serach')
+
+traces, ps = pbt(exploit_only=True)
+plot_traces(axes[0,1], traces, title='Exploit Only')
+plot_curves(axes[0,3], ps, title='Exploit Only')
+
+traces, ps = pbt(explore_only=True)
+plot_traces(axes[1,0], traces, title='Explore Only')
+plot_curves(axes[1,2], ps, title='Explore Only')
+
+traces, ps = pbt()
+plot_traces(axes[1,1], traces, title='PBT')
+plot_curves(axes[1,3], ps, title='PBT')
+
+plt.tight_layout()
+plt.show()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;which results in the following:&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+  &lt;img src=&quot;http://ash-aldujaili.github.io/blog/assets/pbt/pbt-demo.png&quot; width=&quot;850&quot; /&gt;
+&lt;br /&gt;&lt;br /&gt;
+&lt;/p&gt;</content><author><name>Abdullah Al-Dujaili</name></author><summary type="html">DeepMind has recently released a paper about population-based training of neural nets. The proposition is a simple asynchronous optimization algorithm, which jointly optimizes a population of models and their hyperparameters. In this post, I aim to demonstrate a simple implementation of the algorithm by reproducing the paper’s Figure 2. The objective is to maximize the function def q(theta): return 1.2 - np.sum(np.array(theta)**2) Think of the above function as the validation set performance whose closed-form expression is unknown. However, we can still query its value $($ evaluate $)$ at specific $\theta$. While our goal is to maximize it and achieve a model with good generalization capabilities, we optimize our neural model $($ tune its parameters $)$ with respect to the training set performance. That is, our model is optimized w.r.t. to a surrogate objective $\hat{Q}$ function rather than the objective function we are after. In an ideal setup, one would like $\hat{Q}=Q$ $($ or at least optimizing $\hat{Q}$ should correspond to optimizing $Q$ as well$)$, but this is not the case in general. The quality of this approximation $($or coupled optimization $)$ is often dependent on the model at hand and how we are training it: the hyperparameters. In other words, when we optimize $\hat{Q}$ w.r.t. $\theta$, we are doing so given $($ conditioned on $)$ a set of hyperparameters, $\hat{Q}(\theta\mid h)$. In the considered toy example, let the mpirical loss / training set performance by parameterized by $h$ as follows. def q_hat(theta, h): # this is used by `step` function to perform # gradient updates return 1.2 - np.sum(np.dot(np.array(h), np.array(theta)**2)) The task now boils down to using $\hat{Q}$ to tune $\theta$ while searching for $h$ to make the tuning process as efficient as possible in $($ indirectly $)$ optimizing $Q$. PBT is one solution to do so. Here is the pesudocode, and below is an implementation of the same. Let’s start with modeling the population members: class Member(object): def __init__(self, theta=[0., 0.], h=[0., 0.], _id=1, _eta=0.01, _sigma=1e-1): self.theta = theta self.h = h self.id = _id self.num_steps = 0 self.p = q(self.theta) self._eta = _eta self._sigma = _sigma ## for visualization self.trace = [] self.ps = [self.p] def eval(self): self.p = q(self.theta) def ready(self): return self.num_steps &amp;gt; 10 def step(self): for i in range(2): self.theta[i] += self._eta * (-2. * self.h[i] * self.theta[i]) self.num_steps += 1 def explore(self): for i in range(2): self.h[i] = np.clip(self.h[i] + self._sigma * np.random.randn(), 0, 1) def exploit(self, other): if self.p &amp;lt;= other.p: self.theta = list(other.theta) self.p = other.p self.num_steps = 0 return True else: return False def log(self): self.trace.append(list(self.theta)) self.ps.append(self.p) def __str__(self): return 'theta:' + '%.2f' % self.theta[0] + ',%.2f' % self.theta[1] + \ '| h:' + '%.2f' % self.h[0] + ',%.2f' % self.h[1] + '| id' + str(self.id) + \ '| p:' + '%.2f' % self.p + '| steps:' + str(self.num_steps) Here’s PBT implementation. I’ve put flags to show PBT in explore, exploit, grid search modes. def pbt(grid=False, explore_only=False, exploit_only=False): # a check to ensure only one mode is selected for PBT assert grid + exploit_only + explore_only &amp;lt;= 1, &quot;at most one flag can be set for PBT modes&quot; # init population population = [ Member(theta=[0.9, 0.9], h=[0,1], _id=0), Member(theta=[0.9, 0.9], h=[1,0], _id=1) ] member_ids = np.arange(len(population)) # begin training for _ in range(75): np.random.shuffle(member_ids) for mem_id in member_ids: member = population[mem_id] member.step() member.eval() if member.ready() and not grid: if explore_only: member.explore() else: member.exploit(population[(mem_id + 1) % 2]) if not exploit_only: member.explore() member.eval() member.log() traces = [population[i].trace for i in range(len(population))] ps = [population[i].ps for i in range(len(population))] return traces, ps Let’s plot the four modes f, axes = plt.subplots(2, 4)#, sharex=True) traces, ps = pbt(grid=True) plot_traces(axes[0,0], traces, title='Grid Search') plot_curves(axes[0,2], ps, title='Grid Serach') traces, ps = pbt(exploit_only=True) plot_traces(axes[0,1], traces, title='Exploit Only') plot_curves(axes[0,3], ps, title='Exploit Only') traces, ps = pbt(explore_only=True) plot_traces(axes[1,0], traces, title='Explore Only') plot_curves(axes[1,2], ps, title='Explore Only') traces, ps = pbt() plot_traces(axes[1,1], traces, title='PBT') plot_curves(axes[1,3], ps, title='PBT') plt.tight_layout() plt.show() which results in the following:</summary></entry><entry><title type="html">Expected Improvement for Bayesian Optimization: A Derivation</title><link href="http://ash-aldujaili.github.io/blog/2018/02/01/ei/" rel="alternate" type="text/html" title="Expected Improvement for Bayesian Optimization: A Derivation" /><published>2018-02-01T00:00:00-08:00</published><updated>2018-02-01T00:00:00-08:00</updated><id>http://ash-aldujaili.github.io/blog/2018/02/01/ei</id><content type="html" xml:base="http://ash-aldujaili.github.io/blog/2018/02/01/ei/">&lt;p&gt;In this post, we derive the closed-form expression of the Expected Improvement $($EI$)$ criterion commonly used in Bayesian Optimization.&lt;/p&gt;
 
 &lt;p&gt;Modelled with a Gaussian Process, the function value at a given point $x$ can be considered as a normal random variable with mean $\mu$ and variance $\sigma^2$. Given the best $($minimum in a minimization setup$)$ function value obtained so far-let’s denote it by 
 $f^*$:&lt;/p&gt;
@@ -534,259 +916,4 @@ yields $\vx=(A^{T}A)^{-1}A^T\vb$. Therefore, the pseudo-inverse matrix is $(A^{T
       &lt;p&gt;$AA^T$ is a square matrix. What is left to show is that columns of $AA^T$ are linearly independent, and thus $AA^T$ is invertible. We know that the columns of $A^T$ are linearly independent,  which means its null space is ${\mathbf{0}}$. By contradiction, let’s assume that $\mathbf{v}$ is a non-zero vector that belongs to  $AA^T$’s null space, which means $AA^T \mathbf{v}= \mathbf{0}$. Mutiplying both sides by $\mathbf{v}$ yields $(A^T \mathbf{v})^{T}(A^T \mathbf{v})=0$, i.e., $A^T \mathbf{v}= \mathbf{0}$. This contradicts the fact that $A^T$’s null space is the zero vector. Therefore, $\mathbf{v}$ can not be zero and $AA^T$’s null space has no non-zero vector, and all of its columns are linearly independent.&amp;nbsp;&lt;a href=&quot;#fnref:1&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
     &lt;/li&gt;
   &lt;/ol&gt;
-&lt;/div&gt;</content><author><name>Abdullah Al-Dujaili</name></author><summary type="html">$ \newcommand{\vx}{\mathbf{x}} \newcommand{\vq}{\mathbf{q}} \newcommand{\vb}{\mathbf{b}} \newcommand{\lm}{\lambda} \newcommand{\norm}[1]{||#1||_2} \newcommand{\mat}[1]{\left[#1\right]} $ Matrix inversion is a handy procedure in solving a linear system of equations based on the notion of identity matrix $I_n\in\mathbb{R}^{n^2}$ whose all entries are zero except the entries along the main diagonal. For a linear system $A\vx=\vb$ where $A\in\mathbb{R}^{m\times n}$ is a known matrix, $\vb\in\mathbb{R}^m$ is a known vector, and $\vx\in\mathbb{R}^n$ is a vector of unknown values, one can find a solution if a matrix $B\in\mathbb{R}^{n\times m}$ can be found such that $BA=I_n$ since for all $\vx \in \mathbb{R}^n$, $I_n \vx=\vx$. We refer to $B$ as the inverse of $A$ $($commonly denoted as $A^{-1})$. Mathematically, Of course, such solution can be found if $A$ is invertible. That is it is possible to find $A^{-1}$. I am writing this post to summarize possible scenarios one may face when inverting a matrix. Before delving into the details, I intend to present a geometric view of linear systems of equations. This will help us understand why we could have exactly one, infinitely many, or no solution at all. And subsequently, why some matrices are invertible and others are not. Problem Setup One can think of $\vb$ as a point in the $m$-dimensional space. Furthermore, consider $A\vx$ as a linear combination $A$’s column vectors where the $i^{th}$ column $A_{:,i}$ is scaled by the $i^{th}$ entry of $\vx$, $x_i$. In other words, when we say that $\vb=A\vx$, we mean that $\vb$ is reachable from the origin $(\mathbf{0}\in\mathbb{R}^m)$ by moving $x_1$ units along the vector $A_{:,1}$, $x_2$ units along the vector $A_{:,2}$, …, and $x_n$ units along the vector $A_{:,n}$. For different $\vx\in\mathbb{R}^n$, we may reach different points in the $m$-dimensional space. The set of such points are referred to as the span of $A$ $($or range of $A$, column space of $A)$. That is, the set of points reachable by a linear combination of $A$’s columns. Mathematically, Therefore, a solution exists for $A\vx=\vb$ if $\vb\in span(A\text{‘s columns})$. A necessary and sufficient condition for a solution to exist for all possible values of $\vb$ $(\mathbb{R}^m)$ is that $A$’s columns constitute at least one set of $m$ linearly independent vectors. Let’s note that there is no set of $m$-dimensional vectors has more than $m$ linearly indepdent vectors. The following examples provide an illustration. $A=\mat{\begin{array}{cc} 1 &amp;amp; 2 , 0 &amp;amp; 0\end{array}}$, $\vb =\mat{\begin{array}{c} 1 , 1\end{array}}$. In this example, $A$’s span is $\mathbb{R}^1$ along the vector $\mat{\begin{array}{c}1 , 0\end{array}}$ and no matter how $\vx$ is set, we can not reach $\vb$, because it does not lie at the intersection of its plane $\mathbb{R}^2$ and $A$’s space. With regard to the remark made above, we notice that $m=2$, but we do not have $2$ linearly independent vectors in $A$’s columns. $A=\mat{\begin{array}{cc} 1 &amp;amp; 2 , 0 &amp;amp; 0\end{array}}$, $\vb =\mat{\begin{array}{c} 1 , 0\end{array}}$. In this example, $A$ is the same as $(1.)$’s but we moved $\vb$ to make it reachable. One may note that the effective dimension of the problem at hand is one (the second entry of all the columns is zero). In other words, we have matrix of $1\times 2$ with $m=1$ and we have $2$ linearly dependent vectors of length 1 that can reach $\vb$ through any solution that satisfies $x_1+ 2x_2=1$, for which there are infinitely many. Such example fulfills the sufficient and necessary condition aforementioned, but here we have more than $m$ columns. Thus, there are infinitely many solutions rather than exactly one. $A=\mat{\begin{array}{cc} 1 &amp;amp; 0 , 0 &amp;amp; 1\end{array}}$, $\vb =\mat{\begin{array}{c} 1 , 1\end{array}}$. In this example, we made $A$ spans $\mathbb{R}^2$ with exactly $m=2$ linearly indepdendent vectors, and so we can reach $\vb$ with exactly one particular $\vx$. This example fulfils the sufficient and necessary condition with exactly $n=m$ columns. Based on the above, one can conclude the following: When $A$ is a square matrix $(m=n)$ with $m$ mutually independent column vectors, there is exactly one solution for any $\vb\in\mathbb{R}^{m}$. Thus, $A$ is invertible. When $A$ is a square matrix $(m=n)$ with linearly depdenent column vectors, there exists some $\vb$ for which no solution exists. Thus, $A$ is non-invertible and we say that $A$ is a singular matrix. When $A$ is a rectangular matrix $(m&amp;gt;n)$, there exists some $\vb$ for which no solution exists. Thus, $A$ is non-invertible, and we say that the system is overdetermined. When $A$ is a rectangular matrix $(m&amp;lt; n)$ with $m$ linearly indendent column vectors, there exist infinitely many solutions for any $\vb \in \mathbb{R}^m$. Thus, $A$ is non-invertible, and we say that the system is underdetermined. When $A$ is a rectangular matrix $(m&amp;lt; n)$ with $&amp;lt; m$ linearly indendent column vectors, it is possible that there exists some $\vb$ for which no solution exists. Thus, $A$ is non-invertible. We still say the system is underdetermined. There are several procedures to compute $A^{-1}$ for invertible matrices such as the Gauss elimination method $($some others are listed in the figure at the bottom of this page$)$. Non-Invertible Matrices So what do we do when $A$ is non-invertible and we are still interested in finding a solution for a system? Well, we can use a pseudo-inverse matrix with some compromise on the solution’s quality as follows. If there is no solution. That is we can’t reach $\vb$ and the system is overdetermined. Then, we can choose one with the least squares error. Mathematically, Differentiating w.r.t $\vx$ and setting it to zero, yields $\vx=(A^{T}A)^{-1}A^T\vb$. Therefore, the pseudo-inverse matrix is $(A^{T}A)^{-1}A^T$ If there are infinitely many solutions. That is the system is underdetermined. Then, one can choose one with the minimum norm. Mathematically, With the Lagrangian multipliers trick, the above can be solved as follows. Differentiating w.r.t $\vx$ and setting it to zero, $A^{T}$ is not invertible, but $AA^{T}$ is.1 Therefore, we can solve for $\mathbf{\lambda}$ as follows. Thus, $\vx=A^T(AA^T)^{-1}\vb$ Interestingly, both of the above pseudo-inverses are equivalent to the Moore-Penrose pseudo-inverse which can be computed from the singular value decomposition $($SVD$)$. Ill-Conditioned Matrices Let’s motivate this issue with an example. Assume you are reading a measurement, which you have to scale by dividing by a very small number. If your reading deviates a little, the absolute error will extremely large. Such large oscillations might be undesirable and we’d like to dampen them. In the matrix world, dividing by a small number corresponds to to multiplying by the inverse of an ill-conditioned matrix. An ill-conditioned matrix is still invertible, but it is numerically unstable. In addition to the measurement error $($here the measurement is captured by $\vb$$)$, inverting an ill-conditioned matrix also suffers from loss of precision in floating point arithmetic.To cope with this unstability, we compromise the quality of the solution and use regularization techniques to have a stable numerical outcome. The bulk of these techniques aim to increase $($or replace$)$ the value of the smallest eigenvalue with respect to the greatest eigenvalue. Common techniques are: Truncated SVD Tikhonov Regularization $($which can also be used for non-invertible matrices$)$. It is important to consider the regularization effect on the final solution and whether it makes sense to our system or not. Matrix Inversion Summary Below is a summary on matrix inversion. Summary of Matrix Inverse Techniques. $AA^T$ is a square matrix. What is left to show is that columns of $AA^T$ are linearly independent, and thus $AA^T$ is invertible. We know that the columns of $A^T$ are linearly independent, which means its null space is ${\mathbf{0}}$. By contradiction, let’s assume that $\mathbf{v}$ is a non-zero vector that belongs to $AA^T$’s null space, which means $AA^T \mathbf{v}= \mathbf{0}$. Mutiplying both sides by $\mathbf{v}$ yields $(A^T \mathbf{v})^{T}(A^T \mathbf{v})=0$, i.e., $A^T \mathbf{v}= \mathbf{0}$. This contradicts the fact that $A^T$’s null space is the zero vector. Therefore, $\mathbf{v}$ can not be zero and $AA^T$’s null space has no non-zero vector, and all of its columns are linearly independent.&amp;nbsp;&amp;#8617;</summary></entry><entry><title type="html">DACE/BLUP MSE for EGO</title><link href="http://ash-aldujaili.github.io/blog/2017/06/06/mse-ego-dace/" rel="alternate" type="text/html" title="DACE/BLUP MSE for EGO" /><published>2017-06-06T00:00:00-08:00</published><updated>2017-06-06T00:00:00-08:00</updated><id>http://ash-aldujaili.github.io/blog/2017/06/06/mse-ego-dace</id><content type="html" xml:base="http://ash-aldujaili.github.io/blog/2017/06/06/mse-ego-dace/">&lt;p&gt;$\newcommand{\hy}{\hat{y}}
-\newcommand{\hmu}{\hat{\mu}}
-\newcommand{\R}{\mathbf{R}}
-\newcommand{\hmu}{\hat{\mu}}
-\newcommand{\rR}{\mathbf{r}^TR^{-1}}
-\newcommand{\rRr}{\mathbf{r}^TR^{-1}\mathbf{r}}
-\newcommand{\oRr}{\mathbf{1}^TR^{-1}\mathbf{r}}
-\newcommand{\ymu}{(\mathbf{y}-\mathbf{1}\hmu)}
-\newcommand{\hyexp}{\hmu+\rR\ymu}
-\newcommand{\oRy}{\mathbf{1}^T\mathbf{R}
-^{-1}\mathbf{y}}
-\newcommand{\yRo}{\mathbf{y}^T\mathbf{R}
-^{-1}\mathbf{1}}
-\newcommand{\oRo}{\mathbf{1}^T\mathbf{R}^{-1}\mathbf{1}}
-\newcommand{\hmuexp}{\frac{\oRy}{\oRo}}
-\newcommand{\st}{\sigma^2}
-\newcommand{\mt}{\mu^2}$
-This post shows a derivation of the DACE predictor’s MSE discussed in &lt;a href=&quot;http://ash-aldujaili.github.io/blog/2017/03/01/exp-opt/&quot;&gt;Stochastic Processes for Expensive Black-Box Optimization&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;The mean squared error of a predictor at $\mathbf{x}$ based on the stochastic Gaussian process is&lt;/p&gt;
-
-&lt;p&gt;\begin{equation}MSE(\mathbf{x})=E[(\hat{y}(\mathbf{x})-y(\mathbf{x}))^2] =\sigma \big[1 - {\mathbf{r}(\mathbf{x})}^{T}\mathbf{R}^{-1}\mathbf{r}(\mathbf{x})-\frac{(1-\mathbf{1}^T\mathbf{R}^{-1}\mathbf{r}(\mathbf{x}))^2}{(\mathbf{1}^T\mathbf{R}\mathbf{1})}\big]\;,
-\label{eq:final-mse}
-\end{equation}&lt;/p&gt;
-
-&lt;p&gt;where $\mu$ is process’s mean and $\sigma^2\mathbf{R}$ is its covariance matrix over a sample $\mathcal{D}={(x^{(i)},y^{(i)})}_{1\leq i \leq n}$. For brevity, we will drop $\mathbf{x}$ henceforth. Before proceeding with the proof, let’s recall some terms and their definitions that will be useful in the proof.
-\begin{equation}
-\hy=\hyexp
-\end{equation}&lt;/p&gt;
-
-&lt;p&gt;\begin{equation}
-\hmu=\hmuexp
-\end{equation}&lt;/p&gt;
-
-&lt;p&gt;From the above, we have 
-$E[y^2]=\sigma^2 + \mu^2$, $E[\mathbf{y}\mathbf{y}^{T}]=\sigma^2\R+\mu^2\mathbf{1}\mathbf{1}^T$.&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;E[\hmu]=\frac{(\oRy)(\yRo)}{(\oRo)^2}=\sigma^2\cdot \frac{(\oRo)}{(\oRo)^2}+ \mu^2\cdot \frac{(\oRo)^2}{(\oRo)^2}=\frac{\st}{\oRo}+\mt&lt;/script&gt;
-
-&lt;p&gt;Thus, we can expand the MSE term as&lt;/p&gt;
-
-&lt;p&gt;\begin{equation}
-MSE= \sigma^2 + \mu^2 + E[{\hy}^2] - 2 E[y\hy]\;.
-\label{eq:mse}
-\end{equation}
-Where 
-\begin{equation}
-E[\hy^2]=\frac{\st}{\oRo}+\mt + \st (\rRr) - \st \frac{(\oRr)^2}{\oRo}
-\label{eq:h2}
-\end{equation}
-and&lt;/p&gt;
-
-&lt;p&gt;\begin{equation}
--2E[y\hy]=-2\st(\rRr)-2\mt-2\st\frac{\oRr}{\oRo}+2\st\frac{(\oRr)^2}{\oRo}\;.
-\label{eq:h3}
-\end{equation}&lt;/p&gt;
-
-&lt;p&gt;Plugging Equations \ref{eq:h2} and \ref{eq:h3} into Eq. \ref{eq:mse} results in Eq. \ref{eq:final-mse}.&lt;/p&gt;</content><author><name>Abdullah Al-Dujaili</name></author><summary type="html">$\newcommand{\hy}{\hat{y}} \newcommand{\hmu}{\hat{\mu}} \newcommand{\R}{\mathbf{R}} \newcommand{\hmu}{\hat{\mu}} \newcommand{\rR}{\mathbf{r}^TR^{-1}} \newcommand{\rRr}{\mathbf{r}^TR^{-1}\mathbf{r}} \newcommand{\oRr}{\mathbf{1}^TR^{-1}\mathbf{r}} \newcommand{\ymu}{(\mathbf{y}-\mathbf{1}\hmu)} \newcommand{\hyexp}{\hmu+\rR\ymu} \newcommand{\oRy}{\mathbf{1}^T\mathbf{R} ^{-1}\mathbf{y}} \newcommand{\yRo}{\mathbf{y}^T\mathbf{R} ^{-1}\mathbf{1}} \newcommand{\oRo}{\mathbf{1}^T\mathbf{R}^{-1}\mathbf{1}} \newcommand{\hmuexp}{\frac{\oRy}{\oRo}} \newcommand{\st}{\sigma^2} \newcommand{\mt}{\mu^2}$ This post shows a derivation of the DACE predictor’s MSE discussed in Stochastic Processes for Expensive Black-Box Optimization. The mean squared error of a predictor at $\mathbf{x}$ based on the stochastic Gaussian process is \begin{equation}MSE(\mathbf{x})=E[(\hat{y}(\mathbf{x})-y(\mathbf{x}))^2] =\sigma \big[1 - {\mathbf{r}(\mathbf{x})}^{T}\mathbf{R}^{-1}\mathbf{r}(\mathbf{x})-\frac{(1-\mathbf{1}^T\mathbf{R}^{-1}\mathbf{r}(\mathbf{x}))^2}{(\mathbf{1}^T\mathbf{R}\mathbf{1})}\big]\;, \label{eq:final-mse} \end{equation} where $\mu$ is process’s mean and $\sigma^2\mathbf{R}$ is its covariance matrix over a sample $\mathcal{D}={(x^{(i)},y^{(i)})}_{1\leq i \leq n}$. For brevity, we will drop $\mathbf{x}$ henceforth. Before proceeding with the proof, let’s recall some terms and their definitions that will be useful in the proof. \begin{equation} \hy=\hyexp \end{equation} \begin{equation} \hmu=\hmuexp \end{equation} From the above, we have $E[y^2]=\sigma^2 + \mu^2$, $E[\mathbf{y}\mathbf{y}^{T}]=\sigma^2\R+\mu^2\mathbf{1}\mathbf{1}^T$. Thus, we can expand the MSE term as \begin{equation} MSE= \sigma^2 + \mu^2 + E[{\hy}^2] - 2 E[y\hy]\;. \label{eq:mse} \end{equation} Where \begin{equation} E[\hy^2]=\frac{\st}{\oRo}+\mt + \st (\rRr) - \st \frac{(\oRr)^2}{\oRo} \label{eq:h2} \end{equation} and \begin{equation} -2E[y\hy]=-2\st(\rRr)-2\mt-2\st\frac{\oRr}{\oRo}+2\st\frac{(\oRr)^2}{\oRo}\;. \label{eq:h3} \end{equation} Plugging Equations \ref{eq:h2} and \ref{eq:h3} into Eq. \ref{eq:mse} results in Eq. \ref{eq:final-mse}.</summary></entry><entry><title type="html">Random Projections for Lipschitz Functions</title><link href="http://ash-aldujaili.github.io/blog/2017/05/08/rand-proj-lipschitz/" rel="alternate" type="text/html" title="Random Projections for Lipschitz Functions" /><published>2017-05-08T00:00:00-08:00</published><updated>2017-05-08T00:00:00-08:00</updated><id>http://ash-aldujaili.github.io/blog/2017/05/08/rand-proj-lipschitz</id><content type="html" xml:base="http://ash-aldujaili.github.io/blog/2017/05/08/rand-proj-lipschitz/">&lt;p&gt;In this post, we’ll shed some light on the behavior of Lipschitz-continuous functions at random projections of the same point in another space. Consider Figure 1; we have a point in the $\mathbf{y}$ in the lower dimensional space $\mathcal{Y}$ that is projected randomly to the higher dimensional space $\mathcal{X}$ twice using two randomly sampled matrices $A_p$ and $A_q$. With this setting at hand, we are interested in the following question: is there a relation between the function values at $A_p\mathbf{y}$ and $A_q\mathbf{y}$. This has been addressed in [1, Theorem I]. Here, we provide a numerical validation of [1]’s result besides reiterating the formal proof. Before we delve into this further, let’s introduce some notation in accordance with [1].&lt;/p&gt;
-
-&lt;p align=&quot;center&quot;&gt;
-  &lt;img src=&quot;http://ash-aldujaili.github.io/blog/assets/illust_rand_lipschitz.png&quot; width=&quot;1000&quot; /&gt;
-&lt;br /&gt;&lt;br /&gt;
-  Figure 1. Two random projections of $\mathbf{y}$ to $\mathcal{X}$.
-&lt;/p&gt;
-
-&lt;h4&gt;Notation&lt;/h4&gt;
-
-&lt;p align=&quot;center&quot;&gt;
-  &lt;img src=&quot;http://ash-aldujaili.github.io/blog/assets/notation_rand_lipschitz.png&quot; width=&quot;600&quot; /&gt;
-&lt;br /&gt;&lt;br /&gt;
-
-&lt;/p&gt;
-
-&lt;h4&gt;Theorem I [1]&lt;/h4&gt;
-
-&lt;p&gt;It has been shown in [1] that the mean variation in the objective value for a point $\mathbf{y}$ in the low-dimensional
-space $\mathcal{Y} \subset \mathbb{R}^d$ projected randomly into the decision space $\mathcal{X}\subset\mathbb{R}^n$ of Lipschitz-continuous
-problems is &lt;strong&gt;bounded&lt;/strong&gt;.&lt;/p&gt;
-
-&lt;p&gt;Mathematically, for all $\mathbf{y} \in \mathcal{Y}$, we have
-&lt;script type=&quot;math/tex&quot;&gt;\mathbb{E}[|g_p(\mathbf{y}) − g_q(\mathbf{y})|] \leq \sqrt{8} \cdot L 
-\cdot ||\mathbf{y}||\;.&lt;/script&gt;&lt;/p&gt;
-
-&lt;p&gt;Here, we reproduce [1]’s proof for completeness, then we validate the theorem numerically.&lt;/p&gt;
-
-&lt;h4&gt;Proof&lt;/h4&gt;
-
-&lt;p align=&quot;center&quot;&gt;
-  &lt;img src=&quot;http://ash-aldujaili.github.io/blog/assets/proof_rand_lipschitz.png&quot; width=&quot;600&quot; /&gt;
-&lt;br /&gt;&lt;br /&gt;
-
-&lt;/p&gt;
-&lt;h4&gt;Numerical Validation&lt;/h4&gt;
-
-&lt;p&gt;Here, we carry out a numerical validation of [1]’s Theorem I over four popular Lipschitz-like benchmark functions $($namely, Cigar, Sphere, Rastrigin, and Bohachevsky$)$.&lt;/p&gt;
-
-&lt;p&gt;First, we sampled 100 points $\mathbf{y}\in\mathcal{Y}\subset \mathbb{R}^d$ whose norms span the range $[0,1]$. E.g., with $d=1$, $\mathbf{y}\in[-1,1]$.&lt;/p&gt;
-
-&lt;p&gt;Second, each of these 100 points are projected to the function space $\mathcal{X}\subset\mathbb{R}^n$ using 20 random matrices ${A_p}_{1\leq p\leq 20}$.&lt;/p&gt;
-
-&lt;p&gt;Third, the four considered functions are evaluated at these random projections. Note that for each of these functions, $100*20$ function evaluations are performed.&lt;/p&gt;
-
-&lt;p&gt;Fourth, we average over the absolute difference between function values at projections of the same point $\mathbf{y}$. That is, for each of the 100 points, we compute the mean of $\frac{20*20- 20}{2}=190$ values, each of which representing the absolute difference of the function value at two random projections of the corresponding point $\mathbf{y}$.&lt;/p&gt;
-
-&lt;p&gt;Fifth, the computed average values are plotted as a function of the  corresponding point $\mathbf{y}$ in Figure 1. One can see how the trend of the plot follows the curve of $||\mathbf{y}||$ in accordance with [1]’s Theorem I.&lt;/p&gt;
-
-&lt;p align=&quot;center&quot;&gt;
-  &lt;img src=&quot;http://ash-aldujaili.github.io/blog/assets/rand_lipschitz.jpg&quot; width=&quot;1000&quot; /&gt;
-&lt;br /&gt;&lt;br /&gt;
-  Figure 2. Empirical mean of the absolute value difference of four functions evaluated at 20 random projections in $\mathbb{R}^n$ of a point in $\mathbb{R}^d$, where $d=2$ and $n=10^3$.
-&lt;/p&gt;
-&lt;hr /&gt;
-
-&lt;h4&gt;References&lt;/h4&gt;
-
-&lt;p&gt;This post is based on the following papers:&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;&lt;strong&gt;Al-Dujaili, Abdullah, and S. Suresh.&lt;/strong&gt; &lt;em&gt;“Embedded Bandits for Large-Scale Black-Box Optimization.”&lt;/em&gt; Thirty-First AAAI Conference on Artificial Intelligence. 2017.&lt;/li&gt;
-&lt;/ol&gt;</content><author><name>Abdullah Al-Dujaili</name></author><summary type="html">In this post, we’ll shed some light on the behavior of Lipschitz-continuous functions at random projections of the same point in another space. Consider Figure 1; we have a point in the $\mathbf{y}$ in the lower dimensional space $\mathcal{Y}$ that is projected randomly to the higher dimensional space $\mathcal{X}$ twice using two randomly sampled matrices $A_p$ and $A_q$. With this setting at hand, we are interested in the following question: is there a relation between the function values at $A_p\mathbf{y}$ and $A_q\mathbf{y}$. This has been addressed in [1, Theorem I]. Here, we provide a numerical validation of [1]’s result besides reiterating the formal proof. Before we delve into this further, let’s introduce some notation in accordance with [1]. Figure 1. Two random projections of $\mathbf{y}$ to $\mathcal{X}$. Notation Theorem I [1] It has been shown in [1] that the mean variation in the objective value for a point $\mathbf{y}$ in the low-dimensional space $\mathcal{Y} \subset \mathbb{R}^d$ projected randomly into the decision space $\mathcal{X}\subset\mathbb{R}^n$ of Lipschitz-continuous problems is bounded. Mathematically, for all $\mathbf{y} \in \mathcal{Y}$, we have Here, we reproduce [1]’s proof for completeness, then we validate the theorem numerically. Proof Numerical Validation Here, we carry out a numerical validation of [1]’s Theorem I over four popular Lipschitz-like benchmark functions $($namely, Cigar, Sphere, Rastrigin, and Bohachevsky$)$. First, we sampled 100 points $\mathbf{y}\in\mathcal{Y}\subset \mathbb{R}^d$ whose norms span the range $[0,1]$. E.g., with $d=1$, $\mathbf{y}\in[-1,1]$. Second, each of these 100 points are projected to the function space $\mathcal{X}\subset\mathbb{R}^n$ using 20 random matrices ${A_p}_{1\leq p\leq 20}$. Third, the four considered functions are evaluated at these random projections. Note that for each of these functions, $100*20$ function evaluations are performed. Fourth, we average over the absolute difference between function values at projections of the same point $\mathbf{y}$. That is, for each of the 100 points, we compute the mean of $\frac{20*20- 20}{2}=190$ values, each of which representing the absolute difference of the function value at two random projections of the corresponding point $\mathbf{y}$. Fifth, the computed average values are plotted as a function of the corresponding point $\mathbf{y}$ in Figure 1. One can see how the trend of the plot follows the curve of $||\mathbf{y}||$ in accordance with [1]’s Theorem I. Figure 2. Empirical mean of the absolute value difference of four functions evaluated at 20 random projections in $\mathbb{R}^n$ of a point in $\mathbb{R}^d$, where $d=2$ and $n=10^3$. References This post is based on the following papers: Al-Dujaili, Abdullah, and S. Suresh. “Embedded Bandits for Large-Scale Black-Box Optimization.” Thirty-First AAAI Conference on Artificial Intelligence. 2017.</summary></entry><entry><title type="html">Stochastic Processes for Expensive Black-Box Optimization</title><link href="http://ash-aldujaili.github.io/blog/2017/03/01/exp-opt/" rel="alternate" type="text/html" title="Stochastic Processes for Expensive Black-Box Optimization" /><published>2017-03-01T00:00:00-08:00</published><updated>2017-03-01T00:00:00-08:00</updated><id>http://ash-aldujaili.github.io/blog/2017/03/01/exp-opt</id><content type="html" xml:base="http://ash-aldujaili.github.io/blog/2017/03/01/exp-opt/">&lt;p&gt;In this post, we’ll go through one of the techniques of Black-Box Deterministic Optimization: &lt;strong&gt;Response Surface Methdology&lt;/strong&gt;. In general, this approach models the objective and constraint functions with stochastic processes based on a few evaluations at points in the search space; with the goal of predicting the functions’ behavior as we move away from the evaluated points by different amounts in each coordinate direction.&lt;/p&gt;
-
-&lt;p&gt;The stochastic process approach has been used in several fields under such names as ‘kriging’, ‘Bayesian optimization’, and ‘random function approach’. It comes with two main advantages:&lt;/p&gt;
-&lt;ol&gt;
-  &lt;li&gt;Suitability for Expensive Optimization - as it quickly captures the trends over the search space.&lt;/li&gt;
-  &lt;li&gt;Ease of establishing reasonable stopping rules - as it provide statistical confidence intervals.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;hr /&gt;
-
-&lt;h4&gt;Modelling Alternatives&lt;/h4&gt;
-
-&lt;p&gt;Let’s say we have evaluated a deterministic function,  $~y:\mathbb{R}^k\to \mathbb{R}$, at $n$ points. In other words, we have a sample $\mathcal{D}={(x^{(i)},y^{(i)})}_{1\leq i \leq n}$ 
-from the $k$-dimensional space, and we would like to use these observation in guiding our search for the optimal point. Let’s explore possible models that may help us in that.&lt;/p&gt;
-
-&lt;hr /&gt;
-&lt;h4&gt;1. &lt;strong&gt;Linear Regression&lt;/strong&gt;&lt;/h4&gt;
-
-&lt;p&gt;One can use linear regression as a simple way to fit a response surface to $\mathcal{D}$. In linear regression, the observations are assumed to be generated from the following model.&lt;/p&gt;
-
-&lt;p&gt;\begin{equation}
-y(\mathbf{x}^{(i)}) = \sum_{h} \beta_{h}f_h(\mathbf{x}^{(i)}) + \epsilon^{(i)}\; (i = 1,\ldots,n).
-\label{eq:lin-reg}
-\end{equation}&lt;/p&gt;
-
-&lt;p&gt;In the above equation, the $f_h(\mathbf{x})$’s are a set of linear or non-linear functions of $\mathbf{x}$; the $\beta_h$’s are unknown parameters of the model to be estimated; and the $\epsilon^{(i)}$’s are independent error terms with a normal distribution of zero mean and $\sigma^2$ variance.&lt;/p&gt;
-
-&lt;p&gt;Employing Eq. \ref{eq:lin-reg} has two main concerns:&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;A Conceptual Concern: Our function $f$ is deterministic. Therefore, any improper fit of Eq. \ref{eq:lin-reg} will be a modelling error—i.e., incomplete regression term $\sum_{h} \beta_{h}f_h(\mathbf{x}^{(i)})$—rather than measurement noise or error—i.e., the $\epsilon^{(i)}$ term. In essence $\epsilon^{(i)}=\epsilon(\mathbf{x}^{(i)})$ captures the value of the left-out regression terms at $\mathbf{x}^{(i)}$. And if $y(\mathbf{x})$ is continuous, then $\epsilon(\mathbf{x})$ is continuous as well. Thus, if two points $\mathbf{x}^{(i)}$ and $\mathbf{x}^{(j)}$ are close, then the errors $\epsilon(\mathbf{x}^{(i)})$ and $\epsilon(\mathbf{x}^{(j)})$ should be close as well.&lt;/li&gt;
-  &lt;li&gt;A Practical Concern: How to define the $f_h$’s functions. Indeed, if we knew the perfect form of Eq. \ref{eq:lin-reg}, our function $f$ would not have been a black box in the first place. One can certainly employ a meta-model $($some referred to it as flexible functional form$)$ approach to decide the most suitable form of Eq. \ref{eq:lin-reg}. However, this approach comes with an additional set of parameters $($hyperparameters$)$ and requires many more function evaluations.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;In light of the above concerns, it makes no sense to assume that the error terms $\epsilon^{(i)}$’s are independent. Alternatively, we can assume that these terms are associated / related and that the level of such association $($correlation$)$ is low when the corresponding points $\mathbf{x}^{(i)}$’s are far away and high when they are close. The following equation captures this assumption of correlation.&lt;/p&gt;
-
-&lt;p&gt;\begin{equation}
-Corr[\epsilon(\mathbf{x}^{(i)}),\epsilon(\mathbf{x}^{(j)})] = \exp\big(- \sum_{h=1}^{k} \theta_h |x^{(j)}_h-x^{(j)}_h|^{p_h}\big)\;, \theta_h \geq 0\;, p_h \in [0,1]\;.
-\label{eq:corr-fct}
-\end{equation}&lt;/p&gt;
-
-&lt;p&gt;The parameters $\theta_h$’s and $p_h$’s controls how fast the degree of correlation changes between two errors terms as the (weighted) distance between the corresponding points changes as shown in the figure below. In general, $\theta_h$ measures the importance / activity of the $h^{th}$ variable $x_h$ $($the higher $\theta_h$ is, the faster the correlation drops as the corresponding points move away in the coordinate direction $h)$, while $p_h$ captures the function smoothness in the coordinate direction $h$ $(p_h$ = 2 is for smooth functions$)$.&lt;/p&gt;
-
-&lt;p align=&quot;center&quot;&gt;
-  &lt;img src=&quot;http://ash-aldujaili.github.io/blog/assets/err_corr.jpg&quot; width=&quot;400&quot; /&gt;
-&lt;br /&gt;&lt;br /&gt;
-  Figure 1. Correlation Function $($Eq. \ref{eq:corr-fct}$)$ with different parameters.
-&lt;/p&gt;
-
-&lt;p&gt;Having modelled the correlation between our observations, fitting the regression term to our observations is less of a concern now. In fact, this forms the basis of the stochastic process model presented next.&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;h4&gt;2. &lt;strong&gt;DACE&lt;/strong&gt; $($Design and Analysis of Computer Experiments [1]$)$&lt;/h4&gt;
-
-&lt;p&gt;Based on the correlation model $($Eq. \ref{eq:corr-fct}$)$, one can view the
-error term $\epsilon(\mathbf{x})$ as a stochastic process - a set of correlated random variables indexed by the $k$-dimensional space of $\mathbf{x}$. Therefore, the observations can be modeled with the following stochastic process:&lt;/p&gt;
-
-&lt;p&gt;\begin{equation}
-y^{(i)} = \mu + \epsilon(\mathbf{x}^{(i)})\; (i=1, \ldots, n).
-\label{eq:dace}
-\end{equation}&lt;/p&gt;
-
-&lt;p&gt;In comparison to Eq. \ref{eq:lin-reg}, $\mu$ $($the mean of the stochastic process$)$ is the simplest regression term $($ a constant $)$; $\epsilon(\mathbf{x}^{(i)})\sim \mathcal{N}(0, \sigma^2)$ with a correlation given by Eq. \ref{eq:corr-fct}. This model is commonly referred to as &lt;strong&gt;DACE&lt;/strong&gt; - an acronym to the paper that popularized it [1].&lt;/p&gt;
-
-&lt;p&gt;We can estimate DACE’s $2k+2$ parameters by maximizing the likelihood of our sample $\mathcal{D}$. With the correlation between two error terms defined as above, the vector $\mathbf{y}=[y^{(1)},\ldots, y^{(n)}]$ of observed function values is a normal random $n$-vector. That is, $\mathbf{y}\sim\mathcal{N}(\mu, \sigma^2\mathbf{R})$. Thus, the likelihood function of our samples can be written as follows.&lt;sup id=&quot;fnref:1&quot;&gt;&lt;a href=&quot;#fn:1&quot; class=&quot;footnote&quot;&gt;1&lt;/a&gt;&lt;/sup&gt; 
-\begin{equation}
-f(\mathbf{y};\theta,p, \mu, \sigma) = 
-\frac{1}
-{(2\pi)^{n/2}(\sigma^2)^{n/2}|\mathbf{R}|^{(1/2)}}
-\exp\big(-\frac{(\mathbf{y}-\mathbf{1}\mu)^{T} \mathbf{R}^{-1} (\mathbf{y}-\mathbf{1}\mu)}{2\sigma^2}\big)
-\label{eq:likelihood}
-\end{equation}&lt;/p&gt;
-
-&lt;p&gt;Eq. $\ref{eq:likelihood}$ can be optimized with respect to $\mu$ and $\sigma^2$ in closed form by taking the partial derivative of its log:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\hat{\mu}=\frac{\mathbf{1}^{T}\mathbf{R}^{-1}\mathbf{y}}{\mathbf{1}^{T}\mathbf{R}^{-1}\mathbf{1}}&lt;/script&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\hat{\sigma}^2 = \frac{(\mathbf{y}-\mathbf{1}\hat{\mu})^{T} \mathbf{R}^{-1} (\mathbf{y}-\mathbf{1}\hat{\mu})}{n}&lt;/script&gt;
-
-&lt;p&gt;The above equations can in turn be plugged into the likelihood function to form a &lt;em&gt;concentrated likelihood function&lt;/em&gt;, which can be optimized with resepct to the parameters $\theta_h$’s and $p_h$’s. Subsequently, the corresponding values of $\hat{\mu}$ and $\hat{\sigma}^2$ are computed.&lt;/p&gt;
-
-&lt;p&gt;Having estimated the parameters of our stochastic process model, we can now use it to predict the function value at new points in the $k$-dimensional space. The stochastic process model encodes the left-out terms of the regression model using the correlated errors. In other words, these correlated errors must be employed to adjust the prediction above or below the constant regression term $\hat{\mu}$. To see how this can be done, assume that we are interested in predicting the function value at $x^{(n+1)}$ and let $y^{*}$ be some prediction candidate for $f(x^{(n+1)})$. To measure how well $(x^{(n+1)},y^{*})$ fits the sample $\mathcal{D}$, one can compute the joint $($augmented$)$ likelihood function of $\tilde{\mathbf{y}} = (\mathbf{y}\; y^{*})$ - $f(\tilde{\mathbf{y}};\theta,p, \hat{\mu}, \hat{\sigma})$ from Eq. \ref{eq:likelihood}’s $f(\mathbf{y};\theta,p, \mu, \sigma)$. Taking the log of Eq. \ref{eq:likelihood}, it is easy to see that the only term that depends on $y^{*}$ is $(\tilde{\mathbf{y}}- \mathbf{1}\hat{\mu})^{T}{\tilde{\mathbf{R}}}^{-1}(\tilde{\mathbf{y}}- \mathbf{1}\hat{\mu})$ with 
-&lt;script type=&quot;math/tex&quot;&gt;% &lt;![CDATA[
-\tilde{\mathbf{R}} = \begin{bmatrix}
-    \mathbf{R}       &amp; \mathbf{r} \\
-    \mathbf{r}^{T}     &amp; 1 
-\end{bmatrix} %]]&gt;&lt;/script&gt;, where $\mathbf{r} = \mathbf{r}(\mathbf{x}^{(n+1)}) = [Corr[\epsilon(\mathbf{x}^{(1)}),\epsilon(\mathbf{x}^{(n+1)})],\ldots,Corr[\epsilon(\mathbf{x}^{(n)}),\epsilon(\mathbf{x}^{(n+1)})]]$.&lt;/p&gt;
-
-&lt;p&gt;Applying the &lt;a href=&quot;https://en.wikipedia.org/wiki/Invertible_matrix#Blockwise_inversion&quot;&gt;blockwise inversion formula&lt;/a&gt; on $(\tilde{\mathbf{y}}- \mathbf{1}\hat{\mu})^{T}{\tilde{\mathbf{R}}}^{-1}(\tilde{\mathbf{y}}- \mathbf{1}\hat{\mu})$, we have:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\bigg(y^{*}-\text{independent terms}\bigg) + \frac{1}{1-\mathbf{r}^{T}R^{-1}\mathbf{r}}(y^{*}-\hat{\mu})^2 - \frac{2\mathbf{r}^{T}\mathbf{R}^{-1}(\mathbf{y}-\mathbf{1}\hat{\mu})}{1-\mathbf{r}^{T}\mathbf{R}^{-1}\mathbf{r}}(y^{*}-\hat{\mu})&lt;/script&gt;
-
-&lt;p&gt;Thus, setting the derivative of the above term with respect to $y^{*}$ to zero gives the best prediction’s formula at $\mathbf{x}^{(n+1)}$ that fits the sample $\mathcal{D}$ as follows.&lt;/p&gt;
-
-&lt;p&gt;\begin{equation}
-\hat{y}(\mathbf{x}) = \hat{\mu} + {\mathbf{r}(\mathbf{x})}^{T}\mathbf{R}^{-1}(\mathbf{y}-\mathbf{1}\hat{\mu})
-\label{eq:prediction}
-\end{equation}&lt;/p&gt;
-
-&lt;p&gt;While this value maximizes the joint augmented likelihood of $(x^{(n+1)},y^{*})$ and $\mathcal{D}$, it is interesting to note that it also corresponds to the mean of the normal probablity density function of the function value at $x^{(n+1)}$ conditioned on $\mathcal{D}$.&lt;/p&gt;
-
-&lt;p align=&quot;center&quot;&gt;
-  &lt;img src=&quot;http://ash-aldujaili.github.io/blog/assets/stoch_proc_pred.png&quot; width=&quot;400&quot; /&gt;
-&lt;br /&gt;&lt;br /&gt;
-  Figure 2. Application of Eq. \ref{eq:prediction}
-&lt;/p&gt;
-
-&lt;p&gt;Figure 2 shows predicted values of $f$ at different points according to Eq. \ref{eq:prediction}. DACE’s predictor $($Eq. \ref{eq:prediction}$)$ is also an interpolator of $\mathcal{D}$. That is
-$\hat{y}(\mathbf{x}^{(i)}) = \hat{\mu} + {\mathbf{r}(\mathbf{x}^{(i)})}^{T}\mathbf{R}^{-1}(\mathbf{y}-\mathbf{1}\hat{\mu}) = y^{(i)}$, since ${\mathbf{r}(\mathbf{x}^{(i)})}^{T}\mathbf{R}^{-1}={(\mathbf{R}^{-1}\mathbf{R}_i)}^{T}=\mathbf{e}^T_i$. Furthermore, the prediction accuracy can be characterized by the mean squared error, which can be proved to be as follows.&lt;sup id=&quot;fnref:2&quot;&gt;&lt;a href=&quot;#fn:2&quot; class=&quot;footnote&quot;&gt;2&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;E[(\hat{y}(\mathbf{x})-y(\mathbf{x}))^2] =\sigma \big[1 - \mathbf{r}^{T}\mathbf{R}^{-1}\mathbf{r}-\frac{(1-\mathbf{1}^T\mathbf{R}^{-1}\mathbf{r})^2}{(\mathbf{1}^T\mathbf{R}\mathbf{1})}\big]&lt;/script&gt;
-
-&lt;p&gt;&lt;strong&gt;TO BE COMPLETED…&lt;/strong&gt;&lt;/p&gt;
-
-&lt;h4&gt;References&lt;/h4&gt;
-
-&lt;p&gt;This post is based on the following papers:&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;Sacks, Jerome, et al.&lt;/strong&gt; &lt;em&gt;Design and analysis of computer experiments.&lt;/em&gt; Statistical science $($1989$)$: 409-423.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;Jones, Donald R.; Schonlau, Matthias; Welch, William J.&lt;/strong&gt; &lt;em&gt;Efficient global optimization of expensive black-box functions&lt;/em&gt;. J. Global Optim. 13 $($1998$)$, no. 4, 455–492.&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ol&gt;
-&lt;div class=&quot;footnotes&quot;&gt;
-  &lt;ol&gt;
-    &lt;li id=&quot;fn:1&quot;&gt;
-      &lt;p&gt;Make use of: $det(cA)= c^n det(A)$, where A is an $n\times n$-matrix; $Cov[x^{(i)},x^{(j)}] = \sigma^2 \cdot Corr[x^{(i)},x^{(j)}]$; and the multivariate normal probability density function.&amp;nbsp;&lt;a href=&quot;#fnref:1&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
-    &lt;/li&gt;
-    &lt;li id=&quot;fn:2&quot;&gt;
-      &lt;p&gt;This is proved &lt;a href=&quot;&quot;&gt;here&lt;/a&gt;.&amp;nbsp;&lt;a href=&quot;#fnref:2&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
-    &lt;/li&gt;
-  &lt;/ol&gt;
-&lt;/div&gt;</content><author><name>Abdullah Al-Dujaili</name></author><summary type="html">In this post, we’ll go through one of the techniques of Black-Box Deterministic Optimization: Response Surface Methdology. In general, this approach models the objective and constraint functions with stochastic processes based on a few evaluations at points in the search space; with the goal of predicting the functions’ behavior as we move away from the evaluated points by different amounts in each coordinate direction. The stochastic process approach has been used in several fields under such names as ‘kriging’, ‘Bayesian optimization’, and ‘random function approach’. It comes with two main advantages: Suitability for Expensive Optimization - as it quickly captures the trends over the search space. Ease of establishing reasonable stopping rules - as it provide statistical confidence intervals. Modelling Alternatives Let’s say we have evaluated a deterministic function, $~y:\mathbb{R}^k\to \mathbb{R}$, at $n$ points. In other words, we have a sample $\mathcal{D}={(x^{(i)},y^{(i)})}_{1\leq i \leq n}$ from the $k$-dimensional space, and we would like to use these observation in guiding our search for the optimal point. Let’s explore possible models that may help us in that. 1. Linear Regression One can use linear regression as a simple way to fit a response surface to $\mathcal{D}$. In linear regression, the observations are assumed to be generated from the following model. \begin{equation} y(\mathbf{x}^{(i)}) = \sum_{h} \beta_{h}f_h(\mathbf{x}^{(i)}) + \epsilon^{(i)}\; (i = 1,\ldots,n). \label{eq:lin-reg} \end{equation} In the above equation, the $f_h(\mathbf{x})$’s are a set of linear or non-linear functions of $\mathbf{x}$; the $\beta_h$’s are unknown parameters of the model to be estimated; and the $\epsilon^{(i)}$’s are independent error terms with a normal distribution of zero mean and $\sigma^2$ variance. Employing Eq. \ref{eq:lin-reg} has two main concerns: A Conceptual Concern: Our function $f$ is deterministic. Therefore, any improper fit of Eq. \ref{eq:lin-reg} will be a modelling error—i.e., incomplete regression term $\sum_{h} \beta_{h}f_h(\mathbf{x}^{(i)})$—rather than measurement noise or error—i.e., the $\epsilon^{(i)}$ term. In essence $\epsilon^{(i)}=\epsilon(\mathbf{x}^{(i)})$ captures the value of the left-out regression terms at $\mathbf{x}^{(i)}$. And if $y(\mathbf{x})$ is continuous, then $\epsilon(\mathbf{x})$ is continuous as well. Thus, if two points $\mathbf{x}^{(i)}$ and $\mathbf{x}^{(j)}$ are close, then the errors $\epsilon(\mathbf{x}^{(i)})$ and $\epsilon(\mathbf{x}^{(j)})$ should be close as well. A Practical Concern: How to define the $f_h$’s functions. Indeed, if we knew the perfect form of Eq. \ref{eq:lin-reg}, our function $f$ would not have been a black box in the first place. One can certainly employ a meta-model $($some referred to it as flexible functional form$)$ approach to decide the most suitable form of Eq. \ref{eq:lin-reg}. However, this approach comes with an additional set of parameters $($hyperparameters$)$ and requires many more function evaluations. In light of the above concerns, it makes no sense to assume that the error terms $\epsilon^{(i)}$’s are independent. Alternatively, we can assume that these terms are associated / related and that the level of such association $($correlation$)$ is low when the corresponding points $\mathbf{x}^{(i)}$’s are far away and high when they are close. The following equation captures this assumption of correlation. \begin{equation} Corr[\epsilon(\mathbf{x}^{(i)}),\epsilon(\mathbf{x}^{(j)})] = \exp\big(- \sum_{h=1}^{k} \theta_h |x^{(j)}_h-x^{(j)}_h|^{p_h}\big)\;, \theta_h \geq 0\;, p_h \in [0,1]\;. \label{eq:corr-fct} \end{equation} The parameters $\theta_h$’s and $p_h$’s controls how fast the degree of correlation changes between two errors terms as the (weighted) distance between the corresponding points changes as shown in the figure below. In general, $\theta_h$ measures the importance / activity of the $h^{th}$ variable $x_h$ $($the higher $\theta_h$ is, the faster the correlation drops as the corresponding points move away in the coordinate direction $h)$, while $p_h$ captures the function smoothness in the coordinate direction $h$ $(p_h$ = 2 is for smooth functions$)$. Figure 1. Correlation Function $($Eq. \ref{eq:corr-fct}$)$ with different parameters. Having modelled the correlation between our observations, fitting the regression term to our observations is less of a concern now. In fact, this forms the basis of the stochastic process model presented next. 2. DACE $($Design and Analysis of Computer Experiments [1]$)$ Based on the correlation model $($Eq. \ref{eq:corr-fct}$)$, one can view the error term $\epsilon(\mathbf{x})$ as a stochastic process - a set of correlated random variables indexed by the $k$-dimensional space of $\mathbf{x}$. Therefore, the observations can be modeled with the following stochastic process: \begin{equation} y^{(i)} = \mu + \epsilon(\mathbf{x}^{(i)})\; (i=1, \ldots, n). \label{eq:dace} \end{equation} In comparison to Eq. \ref{eq:lin-reg}, $\mu$ $($the mean of the stochastic process$)$ is the simplest regression term $($ a constant $)$; $\epsilon(\mathbf{x}^{(i)})\sim \mathcal{N}(0, \sigma^2)$ with a correlation given by Eq. \ref{eq:corr-fct}. This model is commonly referred to as DACE - an acronym to the paper that popularized it [1]. We can estimate DACE’s $2k+2$ parameters by maximizing the likelihood of our sample $\mathcal{D}$. With the correlation between two error terms defined as above, the vector $\mathbf{y}=[y^{(1)},\ldots, y^{(n)}]$ of observed function values is a normal random $n$-vector. That is, $\mathbf{y}\sim\mathcal{N}(\mu, \sigma^2\mathbf{R})$. Thus, the likelihood function of our samples can be written as follows.1 \begin{equation} f(\mathbf{y};\theta,p, \mu, \sigma) = \frac{1} {(2\pi)^{n/2}(\sigma^2)^{n/2}|\mathbf{R}|^{(1/2)}} \exp\big(-\frac{(\mathbf{y}-\mathbf{1}\mu)^{T} \mathbf{R}^{-1} (\mathbf{y}-\mathbf{1}\mu)}{2\sigma^2}\big) \label{eq:likelihood} \end{equation} Eq. $\ref{eq:likelihood}$ can be optimized with respect to $\mu$ and $\sigma^2$ in closed form by taking the partial derivative of its log: The above equations can in turn be plugged into the likelihood function to form a concentrated likelihood function, which can be optimized with resepct to the parameters $\theta_h$’s and $p_h$’s. Subsequently, the corresponding values of $\hat{\mu}$ and $\hat{\sigma}^2$ are computed. Having estimated the parameters of our stochastic process model, we can now use it to predict the function value at new points in the $k$-dimensional space. The stochastic process model encodes the left-out terms of the regression model using the correlated errors. In other words, these correlated errors must be employed to adjust the prediction above or below the constant regression term $\hat{\mu}$. To see how this can be done, assume that we are interested in predicting the function value at $x^{(n+1)}$ and let $y^{*}$ be some prediction candidate for $f(x^{(n+1)})$. To measure how well $(x^{(n+1)},y^{*})$ fits the sample $\mathcal{D}$, one can compute the joint $($augmented$)$ likelihood function of $\tilde{\mathbf{y}} = (\mathbf{y}\; y^{*})$ - $f(\tilde{\mathbf{y}};\theta,p, \hat{\mu}, \hat{\sigma})$ from Eq. \ref{eq:likelihood}’s $f(\mathbf{y};\theta,p, \mu, \sigma)$. Taking the log of Eq. \ref{eq:likelihood}, it is easy to see that the only term that depends on $y^{*}$ is $(\tilde{\mathbf{y}}- \mathbf{1}\hat{\mu})^{T}{\tilde{\mathbf{R}}}^{-1}(\tilde{\mathbf{y}}- \mathbf{1}\hat{\mu})$ with , where $\mathbf{r} = \mathbf{r}(\mathbf{x}^{(n+1)}) = [Corr[\epsilon(\mathbf{x}^{(1)}),\epsilon(\mathbf{x}^{(n+1)})],\ldots,Corr[\epsilon(\mathbf{x}^{(n)}),\epsilon(\mathbf{x}^{(n+1)})]]$. Applying the blockwise inversion formula on $(\tilde{\mathbf{y}}- \mathbf{1}\hat{\mu})^{T}{\tilde{\mathbf{R}}}^{-1}(\tilde{\mathbf{y}}- \mathbf{1}\hat{\mu})$, we have: Thus, setting the derivative of the above term with respect to $y^{*}$ to zero gives the best prediction’s formula at $\mathbf{x}^{(n+1)}$ that fits the sample $\mathcal{D}$ as follows. \begin{equation} \hat{y}(\mathbf{x}) = \hat{\mu} + {\mathbf{r}(\mathbf{x})}^{T}\mathbf{R}^{-1}(\mathbf{y}-\mathbf{1}\hat{\mu}) \label{eq:prediction} \end{equation} While this value maximizes the joint augmented likelihood of $(x^{(n+1)},y^{*})$ and $\mathcal{D}$, it is interesting to note that it also corresponds to the mean of the normal probablity density function of the function value at $x^{(n+1)}$ conditioned on $\mathcal{D}$. Figure 2. Application of Eq. \ref{eq:prediction} Figure 2 shows predicted values of $f$ at different points according to Eq. \ref{eq:prediction}. DACE’s predictor $($Eq. \ref{eq:prediction}$)$ is also an interpolator of $\mathcal{D}$. That is $\hat{y}(\mathbf{x}^{(i)}) = \hat{\mu} + {\mathbf{r}(\mathbf{x}^{(i)})}^{T}\mathbf{R}^{-1}(\mathbf{y}-\mathbf{1}\hat{\mu}) = y^{(i)}$, since ${\mathbf{r}(\mathbf{x}^{(i)})}^{T}\mathbf{R}^{-1}={(\mathbf{R}^{-1}\mathbf{R}_i)}^{T}=\mathbf{e}^T_i$. Furthermore, the prediction accuracy can be characterized by the mean squared error, which can be proved to be as follows.2 TO BE COMPLETED… References This post is based on the following papers: Sacks, Jerome, et al. Design and analysis of computer experiments. Statistical science $($1989$)$: 409-423. Jones, Donald R.; Schonlau, Matthias; Welch, William J. Efficient global optimization of expensive black-box functions. J. Global Optim. 13 $($1998$)$, no. 4, 455–492. Make use of: $det(cA)= c^n det(A)$, where A is an $n\times n$-matrix; $Cov[x^{(i)},x^{(j)}] = \sigma^2 \cdot Corr[x^{(i)},x^{(j)}]$; and the multivariate normal probability density function.&amp;nbsp;&amp;#8617; This is proved here.&amp;nbsp;&amp;#8617;</summary></entry></feed>
+&lt;/div&gt;</content><author><name>Abdullah Al-Dujaili</name></author><summary type="html">$ \newcommand{\vx}{\mathbf{x}} \newcommand{\vq}{\mathbf{q}} \newcommand{\vb}{\mathbf{b}} \newcommand{\lm}{\lambda} \newcommand{\norm}[1]{||#1||_2} \newcommand{\mat}[1]{\left[#1\right]} $ Matrix inversion is a handy procedure in solving a linear system of equations based on the notion of identity matrix $I_n\in\mathbb{R}^{n^2}$ whose all entries are zero except the entries along the main diagonal. For a linear system $A\vx=\vb$ where $A\in\mathbb{R}^{m\times n}$ is a known matrix, $\vb\in\mathbb{R}^m$ is a known vector, and $\vx\in\mathbb{R}^n$ is a vector of unknown values, one can find a solution if a matrix $B\in\mathbb{R}^{n\times m}$ can be found such that $BA=I_n$ since for all $\vx \in \mathbb{R}^n$, $I_n \vx=\vx$. We refer to $B$ as the inverse of $A$ $($commonly denoted as $A^{-1})$. Mathematically, Of course, such solution can be found if $A$ is invertible. That is it is possible to find $A^{-1}$. I am writing this post to summarize possible scenarios one may face when inverting a matrix. Before delving into the details, I intend to present a geometric view of linear systems of equations. This will help us understand why we could have exactly one, infinitely many, or no solution at all. And subsequently, why some matrices are invertible and others are not. Problem Setup One can think of $\vb$ as a point in the $m$-dimensional space. Furthermore, consider $A\vx$ as a linear combination $A$’s column vectors where the $i^{th}$ column $A_{:,i}$ is scaled by the $i^{th}$ entry of $\vx$, $x_i$. In other words, when we say that $\vb=A\vx$, we mean that $\vb$ is reachable from the origin $(\mathbf{0}\in\mathbb{R}^m)$ by moving $x_1$ units along the vector $A_{:,1}$, $x_2$ units along the vector $A_{:,2}$, …, and $x_n$ units along the vector $A_{:,n}$. For different $\vx\in\mathbb{R}^n$, we may reach different points in the $m$-dimensional space. The set of such points are referred to as the span of $A$ $($or range of $A$, column space of $A)$. That is, the set of points reachable by a linear combination of $A$’s columns. Mathematically, Therefore, a solution exists for $A\vx=\vb$ if $\vb\in span(A\text{‘s columns})$. A necessary and sufficient condition for a solution to exist for all possible values of $\vb$ $(\mathbb{R}^m)$ is that $A$’s columns constitute at least one set of $m$ linearly independent vectors. Let’s note that there is no set of $m$-dimensional vectors has more than $m$ linearly indepdent vectors. The following examples provide an illustration. $A=\mat{\begin{array}{cc} 1 &amp;amp; 2 , 0 &amp;amp; 0\end{array}}$, $\vb =\mat{\begin{array}{c} 1 , 1\end{array}}$. In this example, $A$’s span is $\mathbb{R}^1$ along the vector $\mat{\begin{array}{c}1 , 0\end{array}}$ and no matter how $\vx$ is set, we can not reach $\vb$, because it does not lie at the intersection of its plane $\mathbb{R}^2$ and $A$’s space. With regard to the remark made above, we notice that $m=2$, but we do not have $2$ linearly independent vectors in $A$’s columns. $A=\mat{\begin{array}{cc} 1 &amp;amp; 2 , 0 &amp;amp; 0\end{array}}$, $\vb =\mat{\begin{array}{c} 1 , 0\end{array}}$. In this example, $A$ is the same as $(1.)$’s but we moved $\vb$ to make it reachable. One may note that the effective dimension of the problem at hand is one (the second entry of all the columns is zero). In other words, we have matrix of $1\times 2$ with $m=1$ and we have $2$ linearly dependent vectors of length 1 that can reach $\vb$ through any solution that satisfies $x_1+ 2x_2=1$, for which there are infinitely many. Such example fulfills the sufficient and necessary condition aforementioned, but here we have more than $m$ columns. Thus, there are infinitely many solutions rather than exactly one. $A=\mat{\begin{array}{cc} 1 &amp;amp; 0 , 0 &amp;amp; 1\end{array}}$, $\vb =\mat{\begin{array}{c} 1 , 1\end{array}}$. In this example, we made $A$ spans $\mathbb{R}^2$ with exactly $m=2$ linearly indepdendent vectors, and so we can reach $\vb$ with exactly one particular $\vx$. This example fulfils the sufficient and necessary condition with exactly $n=m$ columns. Based on the above, one can conclude the following: When $A$ is a square matrix $(m=n)$ with $m$ mutually independent column vectors, there is exactly one solution for any $\vb\in\mathbb{R}^{m}$. Thus, $A$ is invertible. When $A$ is a square matrix $(m=n)$ with linearly depdenent column vectors, there exists some $\vb$ for which no solution exists. Thus, $A$ is non-invertible and we say that $A$ is a singular matrix. When $A$ is a rectangular matrix $(m&amp;gt;n)$, there exists some $\vb$ for which no solution exists. Thus, $A$ is non-invertible, and we say that the system is overdetermined. When $A$ is a rectangular matrix $(m&amp;lt; n)$ with $m$ linearly indendent column vectors, there exist infinitely many solutions for any $\vb \in \mathbb{R}^m$. Thus, $A$ is non-invertible, and we say that the system is underdetermined. When $A$ is a rectangular matrix $(m&amp;lt; n)$ with $&amp;lt; m$ linearly indendent column vectors, it is possible that there exists some $\vb$ for which no solution exists. Thus, $A$ is non-invertible. We still say the system is underdetermined. There are several procedures to compute $A^{-1}$ for invertible matrices such as the Gauss elimination method $($some others are listed in the figure at the bottom of this page$)$. Non-Invertible Matrices So what do we do when $A$ is non-invertible and we are still interested in finding a solution for a system? Well, we can use a pseudo-inverse matrix with some compromise on the solution’s quality as follows. If there is no solution. That is we can’t reach $\vb$ and the system is overdetermined. Then, we can choose one with the least squares error. Mathematically, Differentiating w.r.t $\vx$ and setting it to zero, yields $\vx=(A^{T}A)^{-1}A^T\vb$. Therefore, the pseudo-inverse matrix is $(A^{T}A)^{-1}A^T$ If there are infinitely many solutions. That is the system is underdetermined. Then, one can choose one with the minimum norm. Mathematically, With the Lagrangian multipliers trick, the above can be solved as follows. Differentiating w.r.t $\vx$ and setting it to zero, $A^{T}$ is not invertible, but $AA^{T}$ is.1 Therefore, we can solve for $\mathbf{\lambda}$ as follows. Thus, $\vx=A^T(AA^T)^{-1}\vb$ Interestingly, both of the above pseudo-inverses are equivalent to the Moore-Penrose pseudo-inverse which can be computed from the singular value decomposition $($SVD$)$. Ill-Conditioned Matrices Let’s motivate this issue with an example. Assume you are reading a measurement, which you have to scale by dividing by a very small number. If your reading deviates a little, the absolute error will extremely large. Such large oscillations might be undesirable and we’d like to dampen them. In the matrix world, dividing by a small number corresponds to to multiplying by the inverse of an ill-conditioned matrix. An ill-conditioned matrix is still invertible, but it is numerically unstable. In addition to the measurement error $($here the measurement is captured by $\vb$$)$, inverting an ill-conditioned matrix also suffers from loss of precision in floating point arithmetic.To cope with this unstability, we compromise the quality of the solution and use regularization techniques to have a stable numerical outcome. The bulk of these techniques aim to increase $($or replace$)$ the value of the smallest eigenvalue with respect to the greatest eigenvalue. Common techniques are: Truncated SVD Tikhonov Regularization $($which can also be used for non-invertible matrices$)$. It is important to consider the regularization effect on the final solution and whether it makes sense to our system or not. Matrix Inversion Summary Below is a summary on matrix inversion. Summary of Matrix Inverse Techniques. $AA^T$ is a square matrix. What is left to show is that columns of $AA^T$ are linearly independent, and thus $AA^T$ is invertible. We know that the columns of $A^T$ are linearly independent, which means its null space is ${\mathbf{0}}$. By contradiction, let’s assume that $\mathbf{v}$ is a non-zero vector that belongs to $AA^T$’s null space, which means $AA^T \mathbf{v}= \mathbf{0}$. Mutiplying both sides by $\mathbf{v}$ yields $(A^T \mathbf{v})^{T}(A^T \mathbf{v})=0$, i.e., $A^T \mathbf{v}= \mathbf{0}$. This contradicts the fact that $A^T$’s null space is the zero vector. Therefore, $\mathbf{v}$ can not be zero and $AA^T$’s null space has no non-zero vector, and all of its columns are linearly independent.&amp;nbsp;&amp;#8617;</summary></entry></feed>
