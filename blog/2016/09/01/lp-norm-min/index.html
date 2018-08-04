@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  
+  
+  <title>L1-Norm Minimization as a Linear Program</title>
+  <meta name="description" content="In this post, I try to answer the following Quora question: Given two vectors $x,y \in R^n$, how do you find a scalar $c$ s.t. you minimize $   c*x - y   _1$? In the following, a Linear Programming (LP) formulation is described—assuming $c$ to be non-negative, otherwise one can make use of two-non-negative-variable difference trick. In fact, one of the established modelling and solving systems, CVX, automatically transforms both of these problems [$\ell_1, \ell_\inf$] into LPs. Here is a MATLAB script that compares the above with CVX’s solution: % get the vectors n = 10; x = rand(n,1); y = rand(n,1); % formulate the LP problem in MATLAB [opt_sol, fval] = linprog([0,ones(1,n)],[x,-eye(n,n); -x, -eye(n,n)], [y;-y]); c_mat_lp = opt_sol(1); % for comparison with CVX % using CVX builtin expression cvx_begin quiet variable c(1) minimize(norm(c.*x-y,1)) cvx_end % LP formulation in CVX cvx_begin quiet variable clp variable t(n) minimize sum(t) subject to clp .* x - y &amp;lt;= t y - clp.* x &amp;lt;= t cvx_end disp ([&#39;LP MATLAB solver: obj-val &#39; num2str(fval) &#39; c-val &#39; num2str(c_mat_lp)]) disp ([&#39;CVX L1-norm solver: obj-val &#39; num2str(norm(c.*x-y,1)) &#39; c-val &#39; num2str(c)]) disp ([&#39;CVX LP formulation: obj-val &#39; num2str(norm(clp.*x-y,1)) &#39; c-val &#39; num2str(clp)])">
+  
+
+  <link rel="stylesheet" href="/blog/assets/main.css">
+  <link rel="canonical" href="http://ash-aldujaili.github.io/blog/2016/09/01/lp-norm-min/">
+  
+  
+  <link rel="alternate" type="application/rss+xml" title="Hunting Optima" href="http://ash-aldujaili.github.io/blog/feed.xml">
+
+  
+
+  
+  <meta name="twitter:card" content="summary">
+  
+  <meta name="twitter:title" content="L1-Norm Minimization as a Linear Program">
+  <meta name="twitter:description" content="In this post, I try to answer the following Quora question: Given two vectors $x,y \in R^n$, how do you find a scalar $c$ s.t. you minimize $   c*x - y   _1$? In the following, a Linear Programming...">
+  
+  
+
+  <script type="text/javascript">
+  WebFontConfig = {
+    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
+  };
+  (function() {
+    var wf = document.createElement('script');
+    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+    wf.type = 'text/javascript';
+    wf.async = 'true';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(wf, s);
+  })();
+</script>
+
+  
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-68645681-6', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+
+
+</head>
+
+  <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    TeX: {
+      equationNumbers: {
+        autoNumber: "AMS"
+      }
+    },
+    tex2jax: {
+      inlineMath: [ ['$','$'], ['\(', '\)'] ],
+      displayMath: [ ['$$','$$'] ],
+      processEscapes: true,
+    }
+  });
+</script>
+<script type="text/javascript"
+        src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/blog/">Hunting Optima</a>
+
+    <nav class="site-nav">
+      
+        
+        <a class="page-link" href="http://ash-aldujaili.github.io/">Home</a>
+      
+        
+        <a class="page-link" href="/blog/about/">About my blog</a>
+      
+        
+        <a class="page-link" href="/blog/archives/">Archives</a>
+      
+        
+        <a class="page-link" href="https://github.com/ash-aldujaili">GitHub</a>
+      
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    
+      <h1 class="post-title" itemprop="name headline">L1-Norm Minimization as a Linear Program</h1>
+                                       
+
+    <p class="post-meta"><time datetime="2016-09-01T00:00:00-08:00" itemprop="datePublished">Sep 1, 2016</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <table>
+  <tbody>
+    <tr>
+      <td>In this post, I try to answer the following Quora question: Given two vectors $x,y \in R^n$, how do you find a scalar $c$ s.t. you minimize $</td>
+      <td> </td>
+      <td>c*x - y</td>
+      <td> </td>
+      <td>_1$?</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>In the following, a Linear Programming (LP) formulation is described—assuming $c$ to be non-negative, otherwise one can make use of <a href="http://web.mit.edu/15.053/www/AMP-Chapter-02.pdf">two-non-negative-variable difference trick</a>.</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{eqnarray} \min_{c,t} &\mathbf{1}^T \mathbf{t} \\\text{s.t.}&  \forall i \in \{1,\ldots,n\},\\&c \cdot x_i - y_i\leq t_i\\& y_i-c \cdot x_i\leq t_i\nonumber\end{eqnarray} %]]></script>
+
+<p>In fact, one of the established modelling and solving systems, <a href="http://cvxr.com/cvx/doc/CVX.pdf">CVX</a>, automatically transforms both of these problems [$\ell_1, \ell_\inf$] into LPs.
+Here is a MATLAB script that compares the above with CVX’s solution:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>% get the vectors
+n = 10;
+x = rand(n,1);
+y = rand(n,1);
+
+% formulate the LP problem in MATLAB
+[opt_sol, fval] = linprog([0,ones(1,n)],[x,-eye(n,n); -x, -eye(n,n)], [y;-y]);
+c_mat_lp = opt_sol(1);
+% for comparison with CVX 
+% using CVX builtin expression
+cvx_begin quiet
+    variable c(1)
+    minimize(norm(c.*x-y,1))
+cvx_end
+% LP formulation in CVX
+cvx_begin quiet
+    variable clp
+     variable t(n)
+     minimize sum(t)
+     subject to 
+        clp .* x - y &lt;= t
+        y - clp.* x  &lt;= t 
+cvx_end
+
+disp (['LP MATLAB solver: obj-val ' num2str(fval) ' c-val ' num2str(c_mat_lp)])
+disp (['CVX L1-norm solver: obj-val ' num2str(norm(c.*x-y,1)) ' c-val ' num2str(c)])
+disp (['CVX LP formulation: obj-val ' num2str(norm(clp.*x-y,1)) ' c-val ' num2str(clp)])
+</code></pre>
+</div>
+
+  </div>
+
+  
+    <div id="disqus_thread"></div>
+    <script>
+    /**
+    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+  
+    var disqus_config = function () {
+    this.page.url = "http://ash-aldujaili.github.io/blog/2016/09/01/lp-norm-min/"; //'http://ash-aldujaili.github.io/blog/2017/06/06/mse-ego-dace/';  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = "/2016/09/01/lp-norm-min"; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://ash-aldujaili.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+   
+
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <p>
+      
+
+&copy; Abdullah Al-Dujaili - Powered by <a href="https://jekyllrb.com">Jekyll</a> &amp; <a href="https://github.com/yous/whiteglass">whiteglass</a> - Subscribe via <a href="http://ash-aldujaili.github.io/blog/feed.xml">RSS</a>
+
+    </p>
+
+  </div>
+
+</footer>
+
+
+    
+  </body>
+
+</html>
