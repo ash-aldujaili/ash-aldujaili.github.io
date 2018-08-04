@@ -10,7 +10,7 @@
   
   
   <title>L1-Norm Minimization as a Linear Program</title>
-  <meta name="description" content="In this post, I try to answer the following Quora question: Given two vectors $x,y \in R^n$, how do you find a scalar $c$ s.t. you minimize $   c*x - y   _1$? In the following, a Linear Programming (LP) formulation is described—assuming $c$ to be non-negative, otherwise one can make use of two-non-negative-variable difference trick. In fact, one of the established modelling and solving systems, CVX, automatically transforms both of these problems [$\ell_1, \ell_\inf$] into LPs. Here is a MATLAB script that compares the above with CVX’s solution: % get the vectors n = 10; x = rand(n,1); y = rand(n,1); % formulate the LP problem in MATLAB [opt_sol, fval] = linprog([0,ones(1,n)],[x,-eye(n,n); -x, -eye(n,n)], [y;-y]); c_mat_lp = opt_sol(1); % for comparison with CVX % using CVX builtin expression cvx_begin quiet variable c(1) minimize(norm(c.*x-y,1)) cvx_end % LP formulation in CVX cvx_begin quiet variable clp variable t(n) minimize sum(t) subject to clp .* x - y &amp;lt;= t y - clp.* x &amp;lt;= t cvx_end disp ([&#39;LP MATLAB solver: obj-val &#39; num2str(fval) &#39; c-val &#39; num2str(c_mat_lp)]) disp ([&#39;CVX L1-norm solver: obj-val &#39; num2str(norm(c.*x-y,1)) &#39; c-val &#39; num2str(c)]) disp ([&#39;CVX LP formulation: obj-val &#39; num2str(norm(clp.*x-y,1)) &#39; c-val &#39; num2str(clp)])">
+  <meta name="description" content="In this post, I try to answer the following Quora question: Given two vectors $x,y \in R^n$, how do you find a scalar $c$ s.t. you minimize In the following, a Linear Programming (LP) formulation is described—assuming $c$ to be non-negative, otherwise one can make use of two-non-negative-variable difference trick. In fact, one of the established modelling and solving systems, CVX, automatically transforms both of these problems [$\ell_1, \ell_\inf$] into LPs. Here is a MATLAB script that compares the above with CVX’s solution: % get the vectors n = 10; x = rand(n,1); y = rand(n,1); % formulate the LP problem in MATLAB [opt_sol, fval] = linprog([0,ones(1,n)],[x,-eye(n,n); -x, -eye(n,n)], [y;-y]); c_mat_lp = opt_sol(1); % for comparison with CVX % using CVX builtin expression cvx_begin quiet variable c(1) minimize(norm(c.*x-y,1)) cvx_end % LP formulation in CVX cvx_begin quiet variable clp variable t(n) minimize sum(t) subject to clp .* x - y &amp;lt;= t y - clp.* x &amp;lt;= t cvx_end disp ([&#39;LP MATLAB solver: obj-val &#39; num2str(fval) &#39; c-val &#39; num2str(c_mat_lp)]) disp ([&#39;CVX L1-norm solver: obj-val &#39; num2str(norm(c.*x-y,1)) &#39; c-val &#39; num2str(c)]) disp ([&#39;CVX LP formulation: obj-val &#39; num2str(norm(clp.*x-y,1)) &#39; c-val &#39; num2str(clp)])">
   
 
   <link rel="stylesheet" href="/blog/assets/main.css">
@@ -25,7 +25,7 @@
   <meta name="twitter:card" content="summary">
   
   <meta name="twitter:title" content="L1-Norm Minimization as a Linear Program">
-  <meta name="twitter:description" content="In this post, I try to answer the following Quora question: Given two vectors $x,y \in R^n$, how do you find a scalar $c$ s.t. you minimize $   c*x - y   _1$? In the following, a Linear Programming...">
+  <meta name="twitter:description" content="In this post, I try to answer the following Quora question: Given two vectors $x,y \in R^n$, how do you find a scalar $c$ s.t. you minimize In the following, a Linear Programming (LP) formulation i...">
   
   
 
@@ -120,17 +120,8 @@
   </header>
 
   <div class="post-content" itemprop="articleBody">
-    <table>
-  <tbody>
-    <tr>
-      <td>In this post, I try to answer the following Quora question: Given two vectors $x,y \in R^n$, how do you find a scalar $c$ s.t. you minimize $</td>
-      <td> </td>
-      <td>c*x - y</td>
-      <td> </td>
-      <td>_1$?</td>
-    </tr>
-  </tbody>
-</table>
+    <p>In this post, I try to answer the following Quora question: Given two vectors $x,y \in R^n$, how do you find a scalar $c$ s.t. you minimize 
+<script type="math/tex">||c*x - y||_1</script></p>
 
 <p>In the following, a Linear Programming (LP) formulation is described—assuming $c$ to be non-negative, otherwise one can make use of <a href="http://web.mit.edu/15.053/www/AMP-Chapter-02.pdf">two-non-negative-variable difference trick</a>.</p>
 
