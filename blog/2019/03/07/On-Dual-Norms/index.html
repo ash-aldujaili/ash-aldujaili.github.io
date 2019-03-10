@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  
+  
+  <title>On Dual Norms</title>
+  <meta name="description" content="In this post, we will talk about dual norms: a handy tool in optimization. Consider the following optimization problem: \begin{equation} \min_{\mathbf{a}} ||\mathbf{a}||_p \;\;\text{s.t.}\; \mathbf{a}^T\mathbf{b}=c \end{equation} where $\mathbf{a},\mathbf{b} \in \mathbb{R}^n$ How do we find $\mathbf{a}^*$? Well, we have two cases. Case 1. $p=0$, this is straightforward and there exist $n$ optimal solutions, if $c\neq 0$. One optimal solution is of the form: $\mathbf{a}^*=(c/b_1,0, \ldots, 0)$ Case 2. $p&amp;gt;0$, here we make use of the concept of dual norms. Formally, the dual norm $||\cdot||_p$ of the norm $||\cdot||_q$ is defined as In other words, for any arbitray $\mathbf{b}$, we have where $p$ and $q$ are such that $\frac{1}{p}+\frac{1}{q}=1$ or alternatively $p= \frac{q}{q-1}$. This follows from the Young’s inequality for products as shown below briefly: From Young’s inequality, we have for all $i \in [n]$ where equality holds only if $|a_i|^p=|b_i|^q$. Let’s sum over all $i$, we get Now, let $||\mathbf{a}||_p$ $||\mathbf{b}||_q=1$ and $a_i = b_i$, we have Having described dual norms, let’s go back to our case $p&amp;gt;0$ for Eq. (1). From the definintion of dual norm, it is straighforward to see that We found the objective function value at the optimal solution, but how about $\mathbf{a}^*$? Well, we know that So $\mathbf{a}^*$ must be such that From the definition of $||\cdot||_q$ we have In other words, for all $i \in [n]$ Let’s see this in code. # problem setup from cvxopt import normal import numpy as np from cvxopt.modeling import variable, op, max, sum, dot import cvxpy as cp import matplotlib.pyplot as plt n = 10 b = np.random.randn(n) c = np.random.randn() p = 3 def solve_cvxopt(n, b, c, p): a = cp.Variable(shape=n) if p == 0: print(&quot;not supported! exit!&quot;); return obj = cp.Minimize(cp.norm(a, p)) constraint = [cp.sum(cp.multiply(a,b))== c] prob = cp.Problem(obj, constraint) # ECOS and SCS solvers fail to converge before # the iteration limit. Use CVXOPT instead. prob.solve(solver=cp.CVXOPT, verbose=False) return a.value def solve_dual(n, b, c, p): if p == 0: a_opt = np.zeros(n) for i, _b in enumerate(b): if abs(_b) &amp;gt; 0: a_opt[i] = c / b[i] return a_opt elif p == 1: a_opt = np.zeros(n) idx = np.argmax(abs(b)) a_opt[idx] = c / np.max(abs(b)) return a_opt else: if p == np.inf : q = 1 else: q = p / (p - 1) den = np.linalg.norm(b, ord=q) ** q a_opt = c / den * np.sign(b) * (abs(b) ** (q - 1)) return a_opt x_opt = solve_cvxopt(n, b, c, p) x_dual = solve_dual(n, b, c, p) np.linalg.norm(x_opt,p) 0.06388941220368444 np.linalg.norm(x_dual,p) 0.06388941212687518">
+  
+
+  <link rel="stylesheet" href="/blog/assets/main.css">
+  <link rel="canonical" href="http://ash-aldujaili.github.io/blog/2019/03/07/On-Dual-Norms/">
+  
+  
+  <link rel="alternate" type="application/rss+xml" title="Hunting Optima" href="http://ash-aldujaili.github.io/blog/feed.xml">
+
+  
+
+  
+  <meta name="twitter:card" content="summary">
+  
+  <meta name="twitter:title" content="On Dual Norms">
+  <meta name="twitter:description" content="In this post, we will talk about dual norms: a handy tool in optimization. Consider the following optimization problem: \begin{equation} \min_{\mathbf{a}} ||\mathbf{a}||_p \;\;\text{s.t.}\; \mathbf...">
+  
+  
+
+  <script type="text/javascript">
+  WebFontConfig = {
+    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
+  };
+  (function() {
+    var wf = document.createElement('script');
+    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+    wf.type = 'text/javascript';
+    wf.async = 'true';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(wf, s);
+  })();
+</script>
+
+  
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-68645681-6', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+
+
+</head>
+
+  <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    TeX: {
+      equationNumbers: {
+        autoNumber: "AMS"
+      }
+    },
+    tex2jax: {
+      inlineMath: [ ['$','$'] ],
+      displayMath: [ ['$$','$$'] ],
+      processEscapes: false,
+    }
+  });
+</script>
+<script type="text/javascript"
+        src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/blog/">Hunting Optima</a>
+
+    <nav class="site-nav">
+      
+        
+        <a class="page-link" href="http://ash-aldujaili.github.io/">Home</a>
+      
+        
+        <a class="page-link" href="/blog/about/">About my blog</a>
+      
+        
+        <a class="page-link" href="/blog/archives/">Archives</a>
+      
+        
+        <a class="page-link" href="https://github.com/ash-aldujaili">GitHub</a>
+      
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    
+      <h1 class="post-title" itemprop="name headline">On Dual Norms</h1>
+                                       
+
+    <p class="post-meta"><time datetime="2019-03-07T00:00:00-08:00" itemprop="datePublished">Mar 7, 2019</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>In this post, we will talk about dual norms: a handy tool in optimization.</p>
+
+<p>Consider the following optimization problem:</p>
+
+<p>\begin{equation}
+\min_{\mathbf{a}} ||\mathbf{a}||_p \;\;\text{s.t.}\; \mathbf{a}^T\mathbf{b}=c
+\end{equation}</p>
+
+<p>where $\mathbf{a},\mathbf{b} \in \mathbb{R}^n$</p>
+
+<p>How do we find $\mathbf{a}^*$? Well, we have two cases.</p>
+
+<p>Case 1. $p=0$, this is straightforward and there exist $n$ optimal solutions, if $c\neq 0$. One optimal solution is of the form:</p>
+
+<p>$\mathbf{a}^*=(c/b_1,0, \ldots, 0)$</p>
+
+<p>Case 2. $p&gt;0$, here we make use of the concept of dual norms. Formally, the dual norm $||\cdot||_p$ of the norm $||\cdot||_q$ is defined as</p>
+
+<script type="math/tex; mode=display">||\mathbf{a}||_p=\sup\{\mathbf{a}^T\mathbf{b}| ||\mathbf{b}||_q \leq 1 \}</script>
+
+<p>In other words, for any arbitray $\mathbf{b}$, we have</p>
+
+<script type="math/tex; mode=display">\mathbf{a}^T\mathbf{b}\leq |\mathbf{a}^T\mathbf{b}|  \leq ||\mathbf{a}||_p ||\mathbf{b}||_q</script>
+
+<p>where $p$ and $q$ are such that $\frac{1}{p}+\frac{1}{q}=1$ or alternatively $p= \frac{q}{q-1}$. This follows from the <a href="https://en.wikipedia.org/wiki/Young%27s_inequality_for_products">Young’s inequality for products</a> as shown below briefly:</p>
+
+<p>From Young’s inequality, we have for all $i \in [n]$</p>
+
+<script type="math/tex; mode=display">|a_i||b_i|\leq \frac{|a_i|^p}{p} + \frac{|b_i|^q}{q}</script>
+
+<p>where equality holds only if $|a_i|^p=|b_i|^q$. Let’s sum over all $i$, we get
+<script type="math/tex">\mathbf{a}^T\mathbf{b}\leq \frac{||\mathbf{a}||^p_p}{p} + \frac{||\mathbf{b}||^q_q}{q}</script>
+Now, let $||\mathbf{a}||_p$ $||\mathbf{b}||_q=1$ and $a_i = b_i$, we have</p>
+
+<script type="math/tex; mode=display">\frac{1}{p}+\frac{1}{q}=1</script>
+
+<p>Having described dual norms, let’s go back to our case $p&gt;0$ for Eq. (1). From the definintion of dual norm, it is straighforward to see that</p>
+
+<script type="math/tex; mode=display">||\mathbf{a}^*||_p = \frac{|c|}{||\mathbf{b}||_q}</script>
+
+<p>We found the objective function value at the optimal solution, but how about $\mathbf{a}^*$? Well, we know that</p>
+
+<script type="math/tex; mode=display">|\mathbf{a}^{*T}\mathbf{b}|=||\mathbf{a}^*||_p ||\mathbf{b}||_q</script>
+
+<p>So $\mathbf{a}^*$ must be 
+<script type="math/tex">||\mathbf{a}||_p\mathbf{x}</script>
+such that 
+<script type="math/tex">\mathbf{x}^T\mathbf{b}=||\mathbf{b}||_q</script></p>
+
+<p>From the definition of $||\cdot||_q$ we have</p>
+
+<script type="math/tex; mode=display">x_i=\frac{|b_i|^{q-1}\texttt{sign(}b_i\texttt{)}}{||\mathbf{b}||^{q-1}_q}</script>
+
+<p>In other words, for all $i \in [n]$</p>
+
+<script type="math/tex; mode=display">a^*_i= \frac{c}{||\mathbf{b}||^{q}_q} |b_i|^{q-1}\texttt{sign}(b_i)</script>
+
+<p>Let’s see this in code.</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="c"># problem setup</span>
+<span class="kn">from</span> <span class="nn">cvxopt</span> <span class="kn">import</span> <span class="n">normal</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">cvxopt.modeling</span> <span class="kn">import</span> <span class="n">variable</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="nb">max</span><span class="p">,</span> <span class="nb">sum</span><span class="p">,</span> <span class="n">dot</span>
+<span class="kn">import</span> <span class="nn">cvxpy</span> <span class="kn">as</span> <span class="nn">cp</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+
+</code></pre>
+</div>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">n</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">()</span>
+<span class="n">p</span> <span class="o">=</span> <span class="mi">3</span>
+</code></pre>
+</div>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">solve_cvxopt</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">"not supported! exit!"</span><span class="p">);</span> <span class="k">return</span>
+    <span class="n">obj</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Minimize</span><span class="p">(</span><span class="n">cp</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span>
+    <span class="n">constraint</span> <span class="o">=</span> <span class="p">[</span><span class="n">cp</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">cp</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">))</span><span class="o">==</span> <span class="n">c</span><span class="p">]</span>
+    <span class="n">prob</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Problem</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">constraint</span><span class="p">)</span>
+    <span class="c"># ECOS and SCS solvers fail to converge before</span>
+    <span class="c"># the iteration limit. Use CVXOPT instead.</span>
+    <span class="n">prob</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">solver</span><span class="o">=</span><span class="n">cp</span><span class="o">.</span><span class="n">CVXOPT</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">a</span><span class="o">.</span><span class="n">value</span>
+
+<span class="k">def</span> <span class="nf">solve_dual</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">a_opt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">_b</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">_b</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">a_opt</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span> <span class="o">/</span> <span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="k">return</span> <span class="n">a_opt</span>
+    <span class="k">elif</span> <span class="n">p</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">a_opt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+        <span class="n">a_opt</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="nb">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">a_opt</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span> <span class="p">:</span> <span class="n">q</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span> <span class="n">q</span> <span class="o">=</span> <span class="n">p</span> <span class="o">/</span> <span class="p">(</span><span class="n">p</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">den</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="n">q</span><span class="p">)</span> <span class="o">**</span> <span class="n">q</span>
+        <span class="n">a_opt</span> <span class="o">=</span> <span class="n">c</span> <span class="o">/</span> <span class="n">den</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="n">q</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">a_opt</span>
+</code></pre>
+</div>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">x_opt</span> <span class="o">=</span> <span class="n">solve_cvxopt</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">x_dual</span> <span class="o">=</span> <span class="n">solve_dual</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x_opt</span><span class="p">,</span><span class="n">p</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>0.06388941220368444
+</code></pre>
+</div>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x_dual</span><span class="p">,</span><span class="n">p</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>0.06388941212687518
+</code></pre>
+</div>
+
+
+  </div>
+
+  
+    <div id="disqus_thread"></div>
+    <script>
+    /**
+    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+  
+    var disqus_config = function () {
+    this.page.url = "http://ash-aldujaili.github.io/blog/2019/03/07/On-Dual-Norms/"; //'http://ash-aldujaili.github.io/blog/2017/06/06/mse-ego-dace/';  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = "/2019/03/07/On Dual Norms"; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://ash-aldujaili.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+   
+
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <p>
+      
+
+&copy; Abdullah Al-Dujaili - Powered by <a href="https://jekyllrb.com">Jekyll</a> &amp; <a href="https://github.com/yous/whiteglass">whiteglass</a> - Subscribe via <a href="http://ash-aldujaili.github.io/blog/feed.xml">RSS</a>
+
+    </p>
+
+  </div>
+
+</footer>
+
+
+    
+  </body>
+
+</html>
