@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  
+  
+  <title>On Universal Approximation of Neural Nets</title>
+  <meta name="description" content="Neuarl nets are universal function approximators. In this post, we make an empirical tour on some of the theorems that address neural nets’ expressiveness. We will verify two theorems, the first one states that a net with a wide-enough hidden layer is a universal function approximator (Cybenko, 1989). The second states that ResNet with one-neuron hidden layers is a Universal Approximator as shown here. In other words, fully connected networks are not universal approximators if their width is the input dimension $n$. However, with ResNet, this is possible. We are going to do this with pure numpy implementation, demonstrating it a classification problem depicted in the figure below. So let’s first implement some functions (we are going to implement our own autdiff, we could do the same with jax/pytorch or tensorflow, but this is more fun) import numpy as np import matplotlib.pyplot as plt # classification problem np.random.seed(5) num_pts = 500 X = np.random.randn(num_pts, 2) * 1.5 R = np.sum(X * X, axis=1) X = X[np.logical_or(R &amp;gt; 2, R &amp;lt; 1), :] num_pts = X.shape[0] Y = (np.sum(X * X, axis=1) &amp;lt; 1).astype(float) plot(X, Y, label=&#39;Ground Truth&#39;) # implementation of layers, nets for the experiment # each class has a forward (evalution), backward (computation of gradients and accumulating them), # and step (updating the parameters) class LinearLayer(object): def __init__(self, m=10, n=2): self.m = m self.n = n self.A = np.random.randn(m, n) * 0.25 self.b = np.random.randn(m) * 0.25 self.i = None self.o = None self.dA = np.zeros(self.A.shape) self.db = np.zeros(self.b.shape) def forward(self, _in): self.i = _in self.o = np.dot(self.A, _in) + self.b return self.o def backward(self, do): di = np.dot(self.A.T, do) _dA = np.vstack([self.i.T] * self.m) self.dA += _dA * do[:, None] self.db += np.ones(self.m) * do return di def reset_grad(self): self.dA = np.zeros(self.A.shape) self.db = np.zeros(self.b.shape) def step(self, step=0.01): self.A -= step * self.dA self.b -= step * self.db self.reset_grad() class ReLuLayer(object): def __init__(self, m=10, n=2): self.m = m self.n = n self.linear = LinearLayer(m=m, n=n) self.i = None self.o = None def forward(self, _in): self.i = _in self.o = self.linear.forward(self.i) self.o[self.o &amp;lt; 0] = 0. return self.o def backward(self, do): do[self.o &amp;lt; 0] = 0. di = self.linear.backward(do) return di def step(self, step=0.01): self.linear.step(step=step) class OneHiddenNet(object): def __init__(self, w=10, n=2): &quot;&quot;&quot; w : hidden layer width &quot;&quot;&quot; self.w = w self.n = n self.relu = ReLuLayer(m=w, n=n) self.linear = LinearLayer(m=1, n=w) self.i = None self.o = None def forward(self, _in): self.i = _in self.o = self.linear.forward(self.relu.forward(self.i)) return self.o def backward(self, do): di = self.linear.backward(do) di = self.relu.backward(di) return di def step(self, step=0.1): self.linear.step(step=step) self.relu.step(step=step) class ResNetLayer(object): def __init__(self, n=2): self.n = n self.relu = ReLuLayer(m=1, n=n) self.i = None self.o = None def forward(self, _in): self.i = _in self.o = self.relu.forward(self.i) + self.i return self.o def backward(self, do): di = self.relu.backward(do[0,None]) di += do return di def step(self, step=0.1): self.relu.step(step=step) class ResNet(object): def __init__(self, d=3, n=2): &quot;&quot;&quot; d: depth n: input &quot;&quot;&quot; assert d &amp;gt; 0 self.d = d self.n = n self.layers = [ResNetLayer(n=n) for _ in range(d)] self.linear = LinearLayer(m=1, n=n) self.i = None self.o = None def forward(self, _in): self.i = _in for layer in self.layers: _in = layer.forward(_in) o = self.linear.forward(_in) return o def backward(self, do): do = self.linear.backward(do) for layer in self.layers[::-1]: do = layer.backward(do) return do def step(self, step=0.001): self.linear.step(step=step) for layer in self.layers[::-1]: layer.step(step=step) class ReLuNet(object): def __init__(self, d=3, n=2, m=2): &quot;&quot;&quot; d: depth n: input &quot;&quot;&quot; assert d &amp;gt; 0 self.d = d self.n = n self.layers = [ReLuLayer(m=m, n=n)] + [ReLuLayer(m=m, n=m) for _ in range(d-1)] self.linear = LinearLayer(m=1, n=m) self.i = None self.o = None def forward(self, _in): self.i = _in for layer in self.layers: _in = layer.forward(_in) o = self.linear.forward(_in) return o def backward(self, do): do = self.linear.backward(do) for layer in self.layers[::-1]: do = layer.backward(do) return do def step(self, step=0.001): self.linear.step(step=step) for layer in self.layers[::-1]: layer.step(step=step) def plot(X, y, label=None): plt.clf() plt.scatter(X[y==0,0], X[y==0,1], c=&#39;r&#39;) plt.scatter(X[y==1,0], X[y==1,1], c=&#39;b&#39;) plt.title(label) plt.show() def sigmoid(z): return np.exp(z) / (1 + np.exp(z)) def train_net(net, epochs=100, batch_size=100, step=0.01): m = Y.shape[0] num_batches = (m + batch_size - 1) // batch_size for _ in range(epochs): total_loss = 0 for batch in range(num_batches): istart = batch * batch_size iend = min(m, (batch + 1) * batch_size) loss = 0 for _ in range(istart, iend): x = X[_, :] y = Y[_] z = net.forward(x) y_pred = sigmoid(z) # cross entropy loss loss += - y * z + np.log(1 + np.exp(z)) dloss = np.exp(z) / (1 + np.exp(z)) - y #print(dloss) #_do = np.array([2 * (y_pred[0] - Y[0]), 2 * (y_pred[1] - Y[1])]) net.backward(dloss) total_loss = loss #print(&quot;loss per batch: {}&quot;.format(loss / batch_size)) net.step(step=step) print(&quot;=====loss per epoch: {}&quot;.format(total_loss / m)) def net_predict(net): return (np.vstack([net.forward(x) for x in X]) &amp;gt; 0.5).astype(int)[:,0] # Let&#39;s verify that a very wide one-hidden net is a function approximator (at least for our classification task) np.random.seed(1) ohnet = OneHiddenNet(w=200, n=2) train_net(ohnet, epochs=20) plot(X, net_predict(ohnet), label=&#39;One-Hidden-Net&#39;) print(&quot;Verified!&quot;) =====loss per epoch: [0.00817961] =====loss per epoch: [0.00384177] =====loss per epoch: [0.00359306] =====loss per epoch: [0.00243583] =====loss per epoch: [0.00220449] =====loss per epoch: [0.00118371] =====loss per epoch: [0.00113231] =====loss per epoch: [0.0010856] =====loss per epoch: [0.00104092] =====loss per epoch: [0.00100063] =====loss per epoch: [0.00096412] Verified! # Let&#39;s do the same for a RelU with width = n but with multiple hidden layers np.random.seed(1) ohnet = ReLuNet(d=4, n=2, m=3) train_net(ohnet, step=0.001, epochs=1000) plot(X, net_predict(ohnet), label=&#39;ReLuNet-w=n&#39;) =====loss per epoch: [0.01638199] =====loss per epoch: [0.01564627] =====loss per epoch: [0.0150567] =====loss per epoch: [0.01458095] =====loss per epoch: [0.0141948] =====loss per epoch: [0.01387983] =====loss per epoch: [0.01362182] =====loss per epoch: [0.01340963] =====loss per epoch: [0.01230008] =====loss per epoch: [0.01230008] =====loss per epoch: [0.01230008] =====loss per epoch: [0.01230008] =====loss per epoch: [0.01230008] =====loss per epoch: [0.01230008] =====loss per epoch: [0.01230008] =====loss per epoch: [0.01229125] =====loss per epoch: [0.01228903] =====loss per epoch: [0.01228637] # Let&#39;s do the same for a Resnet with width = n but with multiple hidden layers np.random.seed(1) rnet = ResNet(d=4, n=2) train_net(rnet, step=0.001, epochs=400) plot(X, net_predict(rnet), label=&#39;ResNet-w=n&#39;) =====loss per epoch: [0.01337021] =====loss per epoch: [0.01243063] =====loss per epoch: [0.01195057] =====loss per epoch: [0.01165113] =====loss per epoch: [0.01144874] =====loss per epoch: [0.01130361] =====loss per epoch: [0.01119548] =====loss per epoch: [0.01111322] =====loss per epoch: [0.01041971] =====loss per epoch: [0.01040687] =====loss per epoch: [0.00461871] =====loss per epoch: [0.00461584] =====loss per epoch: [0.004613] =====loss per epoch: [0.00461019] =====loss per epoch: [0.00460739] =====loss per epoch: [0.00460462] =====loss per epoch: [0.00460188] =====loss per epoch: [0.00459917] =====loss per epoch: [0.00459648] =====loss per epoch: [0.00459382] Well, we did not manage to get the perfect decision boundary—we implemented our own optimizer, did not regularize, nor did we explore the architecture—but you can see with the ResNet (400 epochs) fits better than the ReLNet (1000 epochs) when the number of neurons equals the 2, the dimensions of the problem at hand.">
+  
+
+  <link rel="stylesheet" href="/blog/assets/main.css">
+  <link rel="canonical" href="http://ash-aldujaili.github.io/blog/2019/04/05/On-Universal-Approximation-of-Neural-Nets/">
+  
+  
+  <link rel="alternate" type="application/rss+xml" title="Hunting Optima" href="http://ash-aldujaili.github.io/blog/feed.xml">
+
+  
+
+  
+  <meta name="twitter:card" content="summary">
+  
+  <meta name="twitter:title" content="On Universal Approximation of Neural Nets">
+  <meta name="twitter:description" content="Neuarl nets are universal function approximators. In this post, we make an empirical tour on some of the theorems that address neural nets’ expressiveness. We will verify two theorems, the first on...">
+  
+  
+
+  <script type="text/javascript">
+  WebFontConfig = {
+    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
+  };
+  (function() {
+    var wf = document.createElement('script');
+    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+    wf.type = 'text/javascript';
+    wf.async = 'true';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(wf, s);
+  })();
+</script>
+
+  
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-68645681-6', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+
+
+</head>
+
+  <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    TeX: {
+      equationNumbers: {
+        autoNumber: "AMS"
+      }
+    },
+    tex2jax: {
+      inlineMath: [ ['$','$'] ],
+      displayMath: [ ['$$','$$'] ],
+      processEscapes: false,
+    }
+  });
+</script>
+<script type="text/javascript"
+        src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/blog/">Hunting Optima</a>
+
+    <nav class="site-nav">
+      
+        
+        <a class="page-link" href="http://ash-aldujaili.github.io/">Home</a>
+      
+        
+        <a class="page-link" href="/blog/about/">About my blog</a>
+      
+        
+        <a class="page-link" href="/blog/archives/">Archives</a>
+      
+        
+        <a class="page-link" href="https://github.com/ash-aldujaili">GitHub</a>
+      
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    
+      <h1 class="post-title" itemprop="name headline">On Universal Approximation of Neural Nets</h1>
+                                       
+
+    <p class="post-meta"><time datetime="2019-04-05T00:00:00-08:00" itemprop="datePublished">Apr 5, 2019</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>Neuarl nets are universal function approximators. In this post, we make an empirical tour on some of the theorems that address neural nets’ expressiveness.</p>
+
+<p>We will verify two theorems, the first one states that a net with a <strong>wide-enough</strong> hidden layer is a universal function approximator (Cybenko, 1989).</p>
+
+<p>The second states that ResNet with one-neuron hidden layers is a Universal Approximator as shown <a href="https://arxiv.org/pdf/1806.10909.pdf">here</a>. In other words, fully connected networks are not universal
+approximators if their width is the input dimension $n$. However, with ResNet, this is possible.</p>
+
+<p>We are going to do this with pure numpy implementation, demonstrating it a classification problem depicted in the figure below. So let’s first implement some functions (we are going to implement our own autdiff, we could do the same with jax/pytorch or tensorflow, but this is more fun)</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+</code></pre>
+</div>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="c"># classification problem</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">num_pts</span> <span class="o">=</span> <span class="mi">500</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">num_pts</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1.5</span>
+<span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">X</span> <span class="o">*</span> <span class="n">X</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">R</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">,</span> <span class="n">R</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">),</span> <span class="p">:]</span>
+<span class="n">num_pts</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">X</span> <span class="o">*</span> <span class="n">X</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Ground Truth'</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p align="center">
+  <img src="http://ash-aldujaili.github.io/blog/assets/nn_approx/output_2_0.png" width="500" />
+<br /><br />
+</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="c"># implementation of layers, nets for the experiment</span>
+<span class="c"># each class has a forward (evalution), backward (computation of gradients and accumulating them),</span>
+<span class="c"># and step (updating the parameters)</span>
+<span class="k">class</span> <span class="nc">LinearLayer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">m</span> <span class="o">=</span> <span class="n">m</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.25</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.25</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">o</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dA</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_in</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i</span> <span class="o">=</span> <span class="n">_in</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">o</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">_in</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">o</span>
+    
+    <span class="k">def</span> <span class="nf">backward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">do</span><span class="p">):</span>
+        <span class="n">di</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">do</span><span class="p">)</span>
+        <span class="n">_dA</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="o">.</span><span class="n">T</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dA</span> <span class="o">+=</span> <span class="n">_dA</span>  <span class="o">*</span> <span class="n">do</span><span class="p">[:,</span> <span class="bp">None</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">)</span> <span class="o">*</span> <span class="n">do</span>
+        <span class="k">return</span> <span class="n">di</span>
+    
+    <span class="k">def</span> <span class="nf">reset_grad</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dA</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">0.01</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">-=</span> <span class="n">step</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dA</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">-=</span> <span class="n">step</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset_grad</span><span class="p">()</span>
+    
+
+<span class="k">class</span> <span class="nc">ReLuLayer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">m</span> <span class="o">=</span> <span class="n">m</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear</span> <span class="o">=</span> <span class="n">LinearLayer</span><span class="p">(</span><span class="n">m</span><span class="o">=</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">o</span> <span class="o">=</span> <span class="bp">None</span>
+        
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_in</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i</span> <span class="o">=</span> <span class="n">_in</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">o</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">o</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">o</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">o</span>
+    
+    <span class="k">def</span> <span class="nf">backward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">do</span><span class="p">):</span>
+        <span class="n">do</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">o</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="n">di</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">do</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">di</span>
+
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">0.01</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">)</span>  
+    
+
+<span class="k">class</span> <span class="nc">OneHiddenNet</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">w</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+        <span class="s">"""
+        w : hidden layer width 
+        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="n">w</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">relu</span> <span class="o">=</span> <span class="n">ReLuLayer</span><span class="p">(</span><span class="n">m</span><span class="o">=</span><span class="n">w</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear</span> <span class="o">=</span> <span class="n">LinearLayer</span><span class="p">(</span><span class="n">m</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">w</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">o</span> <span class="o">=</span> <span class="bp">None</span>
+        
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_in</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i</span> <span class="o">=</span> <span class="n">_in</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">o</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">relu</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">o</span>
+    
+    <span class="k">def</span> <span class="nf">backward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">do</span><span class="p">):</span>
+        <span class="n">di</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">do</span><span class="p">)</span>
+        <span class="n">di</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">relu</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">di</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">di</span>
+
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">relu</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">)</span>
+    
+    
+<span class="k">class</span> <span class="nc">ResNetLayer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">relu</span> <span class="o">=</span> <span class="n">ReLuLayer</span><span class="p">(</span><span class="n">m</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">o</span> <span class="o">=</span> <span class="bp">None</span>
+        
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_in</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i</span> <span class="o">=</span> <span class="n">_in</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">o</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">relu</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">o</span>
+    
+    <span class="k">def</span> <span class="nf">backward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">do</span><span class="p">):</span>
+        <span class="n">di</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">relu</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">do</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="bp">None</span><span class="p">])</span>
+        <span class="n">di</span> <span class="o">+=</span> <span class="n">do</span>
+        <span class="k">return</span> <span class="n">di</span>
+
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">relu</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">)</span> 
+    
+
+<span class="k">class</span> <span class="nc">ResNet</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+        <span class="s">"""
+        d: depth
+        n: input
+        """</span>
+        <span class="k">assert</span> <span class="n">d</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">d</span> <span class="o">=</span> <span class="n">d</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="p">[</span><span class="n">ResNetLayer</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">d</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear</span> <span class="o">=</span> <span class="n">LinearLayer</span><span class="p">(</span><span class="n">m</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">o</span> <span class="o">=</span> <span class="bp">None</span>
+        
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_in</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i</span> <span class="o">=</span> <span class="n">_in</span>
+        <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">:</span>
+            <span class="n">_in</span> <span class="o">=</span> <span class="n">layer</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">_in</span><span class="p">)</span>
+        <span class="n">o</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">_in</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">o</span>
+    
+    <span class="k">def</span> <span class="nf">backward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">do</span><span class="p">):</span>
+        <span class="n">do</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">do</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">do</span> <span class="o">=</span> <span class="n">layer</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">do</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">do</span>
+    
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">0.001</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">layer</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">)</span>
+    
+
+<span class="k">class</span> <span class="nc">ReLuNet</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+        <span class="s">"""
+        d: depth
+        n: input
+        """</span>
+        <span class="k">assert</span> <span class="n">d</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">d</span> <span class="o">=</span> <span class="n">d</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="p">[</span><span class="n">ReLuLayer</span><span class="p">(</span><span class="n">m</span><span class="o">=</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">)]</span> <span class="o">+</span> <span class="p">[</span><span class="n">ReLuLayer</span><span class="p">(</span><span class="n">m</span><span class="o">=</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">m</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">d</span><span class="o">-</span><span class="mi">1</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear</span> <span class="o">=</span> <span class="n">LinearLayer</span><span class="p">(</span><span class="n">m</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">m</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">o</span> <span class="o">=</span> <span class="bp">None</span>
+        
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_in</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i</span> <span class="o">=</span> <span class="n">_in</span>
+        <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">:</span>
+            <span class="n">_in</span> <span class="o">=</span> <span class="n">layer</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">_in</span><span class="p">)</span>
+        <span class="n">o</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">_in</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">o</span>
+    
+    <span class="k">def</span> <span class="nf">backward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">do</span><span class="p">):</span>
+        <span class="n">do</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">do</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">do</span> <span class="o">=</span> <span class="n">layer</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">do</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">do</span>
+    
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">0.001</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">layer</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">y</span><span class="o">==</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">X</span><span class="p">[</span><span class="n">y</span><span class="o">==</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s">'r'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">y</span><span class="o">==</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">X</span><span class="p">[</span><span class="n">y</span><span class="o">==</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s">'b'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    
+<span class="k">def</span> <span class="nf">sigmoid</span><span class="p">(</span><span class="n">z</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">z</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">train_net</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">0.01</span><span class="p">):</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">Y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">num_batches</span> <span class="o">=</span> <span class="p">(</span><span class="n">m</span> <span class="o">+</span> <span class="n">batch_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="n">batch_size</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">):</span>
+        <span class="n">total_loss</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_batches</span><span class="p">):</span>
+            <span class="n">istart</span> <span class="o">=</span> <span class="n">batch</span> <span class="o">*</span> <span class="n">batch_size</span>
+            <span class="n">iend</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="p">(</span><span class="n">batch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">batch_size</span><span class="p">)</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">istart</span><span class="p">,</span> <span class="n">iend</span><span class="p">):</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">_</span><span class="p">,</span> <span class="p">:]</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">Y</span><span class="p">[</span><span class="n">_</span><span class="p">]</span>
+                <span class="n">z</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="n">y_pred</span> <span class="o">=</span> <span class="n">sigmoid</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+                <span class="c"># cross entropy loss</span>
+                <span class="n">loss</span> <span class="o">+=</span> <span class="o">-</span> <span class="n">y</span> <span class="o">*</span> <span class="n">z</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">z</span><span class="p">))</span>
+                <span class="n">dloss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">z</span><span class="p">))</span> <span class="o">-</span> <span class="n">y</span>
+                <span class="c">#print(dloss)</span>
+                <span class="c">#_do = np.array([2 * (y_pred[0] - Y[0]), 2 * (y_pred[1] - Y[1])])</span>
+                <span class="n">net</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">dloss</span><span class="p">)</span>
+            <span class="n">total_loss</span> <span class="o">=</span> <span class="n">loss</span>
+            <span class="c">#print("loss per batch: {}".format(loss / batch_size))</span>
+            <span class="n">net</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"=====loss per epoch: {}"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">total_loss</span> <span class="o">/</span> <span class="n">m</span><span class="p">))</span>
+    
+<span class="k">def</span> <span class="nf">net_predict</span><span class="p">(</span><span class="n">net</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">net</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">X</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)[:,</span><span class="mi">0</span><span class="p">]</span>
+</code></pre>
+</div>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="c"># Let's verify that a very wide one-hidden net is a function approximator (at least for our classification task)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ohnet</span> <span class="o">=</span> <span class="n">OneHiddenNet</span><span class="p">(</span><span class="n">w</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">train_net</span><span class="p">(</span><span class="n">ohnet</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">net_predict</span><span class="p">(</span><span class="n">ohnet</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s">'One-Hidden-Net'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Verified!"</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>=====loss per epoch: [0.00817961]
+=====loss per epoch: [0.00384177]
+=====loss per epoch: [0.00359306]
+=====loss per epoch: [0.00243583]
+=====loss per epoch: [0.00220449]
+=====loss per epoch: [0.00118371]
+=====loss per epoch: [0.00113231]
+=====loss per epoch: [0.0010856]
+=====loss per epoch: [0.00104092]
+=====loss per epoch: [0.00100063]
+=====loss per epoch: [0.00096412]
+</code></pre>
+</div>
+
+<p align="center">
+  <img src="http://ash-aldujaili.github.io/blog/assets/nn_approx/output_5_1.png" width="500" />
+<br /><br />
+</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>Verified!
+</code></pre>
+</div>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="c"># Let's do the same for a RelU with width = n but with multiple hidden layers</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ohnet</span> <span class="o">=</span> <span class="n">ReLuNet</span><span class="p">(</span><span class="n">d</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">train_net</span><span class="p">(</span><span class="n">ohnet</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">net_predict</span><span class="p">(</span><span class="n">ohnet</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s">'ReLuNet-w=n'</span><span class="p">)</span>
+
+</code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>=====loss per epoch: [0.01638199]
+=====loss per epoch: [0.01564627]
+=====loss per epoch: [0.0150567]
+=====loss per epoch: [0.01458095]
+=====loss per epoch: [0.0141948]
+=====loss per epoch: [0.01387983]
+=====loss per epoch: [0.01362182]
+=====loss per epoch: [0.01340963]
+=====loss per epoch: [0.01230008]
+=====loss per epoch: [0.01230008]
+=====loss per epoch: [0.01230008]
+=====loss per epoch: [0.01230008]
+=====loss per epoch: [0.01230008]
+=====loss per epoch: [0.01230008]
+=====loss per epoch: [0.01230008]
+=====loss per epoch: [0.01229125]
+=====loss per epoch: [0.01228903]
+=====loss per epoch: [0.01228637]
+</code></pre>
+</div>
+
+<p align="center">
+  <img src="http://ash-aldujaili.github.io/blog/assets/nn_approx/output_6_1.png" width="500" />
+<br /><br />
+</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="c"># Let's do the same for a Resnet with width = n but with multiple hidden layers</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">rnet</span> <span class="o">=</span> <span class="n">ResNet</span><span class="p">(</span><span class="n">d</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">train_net</span><span class="p">(</span><span class="n">rnet</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">net_predict</span><span class="p">(</span><span class="n">rnet</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s">'ResNet-w=n'</span><span class="p">)</span>
+
+</code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>=====loss per epoch: [0.01337021]
+=====loss per epoch: [0.01243063]
+=====loss per epoch: [0.01195057]
+=====loss per epoch: [0.01165113]
+=====loss per epoch: [0.01144874]
+=====loss per epoch: [0.01130361]
+=====loss per epoch: [0.01119548]
+=====loss per epoch: [0.01111322]
+=====loss per epoch: [0.01041971]
+=====loss per epoch: [0.01040687]
+=====loss per epoch: [0.00461871]
+=====loss per epoch: [0.00461584]
+=====loss per epoch: [0.004613]
+=====loss per epoch: [0.00461019]
+=====loss per epoch: [0.00460739]
+=====loss per epoch: [0.00460462]
+=====loss per epoch: [0.00460188]
+=====loss per epoch: [0.00459917]
+=====loss per epoch: [0.00459648]
+=====loss per epoch: [0.00459382]
+</code></pre>
+</div>
+
+<p align="center">
+  <img src="http://ash-aldujaili.github.io/blog/assets/nn_approx/output_7_1.png" width="500" />
+<br /><br />
+</p>
+
+<p>Well, we did not manage to get the perfect decision boundary—we implemented our own optimizer, did not regularize, nor did we explore the architecture—but you can see with the ResNet (400 epochs) fits better than the ReLNet (1000 epochs) when the number of neurons equals the 2, the dimensions of the problem at hand.</p>
+
+  </div>
+
+  
+    <div id="disqus_thread"></div>
+    <script>
+    /**
+    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+  
+    var disqus_config = function () {
+    this.page.url = "http://ash-aldujaili.github.io/blog/2019/04/05/On-Universal-Approximation-of-Neural-Nets/"; //'http://ash-aldujaili.github.io/blog/2017/06/06/mse-ego-dace/';  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = "/2019/04/05/On Universal Approximation of Neural Nets"; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://ash-aldujaili.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+   
+
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <p>
+      
+
+&copy; Abdullah Al-Dujaili - Powered by <a href="https://jekyllrb.com">Jekyll</a> &amp; <a href="https://github.com/yous/whiteglass">whiteglass</a> - Subscribe via <a href="http://ash-aldujaili.github.io/blog/feed.xml">RSS</a>
+
+    </p>
+
+  </div>
+
+</footer>
+
+
+    
+  </body>
+
+</html>
