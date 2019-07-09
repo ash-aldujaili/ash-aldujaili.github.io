@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  
+  
+  <title>On Maximally Aligned Subspaces</title>
+  <meta name="description" content="Given a vector $v\in {-1,+1}^n$, we are interested in the set of $k$ orthogonal vectors $r_1,\ldots, r_k \in {-1,+1}^n$, that solves From Tramer et al., 2018, it was shown that if for all $i$, $v^Tr_i \geq \alpha n$ for $\alpha \in (0,1)$, then $\alpha \leq 1/\sqrt{k}$. In other words, $OPT=n/\sqrt{k}$. Let’s denote by $R$ the matrix formed by stacking $r_i$ vertically. from scipy.linalg import hadamard import numpy as np import itertools # dim n = 108 # imagenet dim # adv cone size &amp;lt; n k = 36 # target vector v = np.sign(np.random.randn(n)) OPT= n / np.sqrt(k) Naive Construction The following naive method (Tramer et al, 2018) can be used to achieve ~$n/k$, a factor of $\sqrt{k}$ worse than OPT, assuming $k$ divides $n$. def chain_lol(lol): return list(itertools.chain(*lol)) def construct_idx(chunk_size, k, n): &quot;&quot;&quot;a method to get 1d idxs for the R matrix used by the naive construction method &quot;&quot;&quot; return list(filter( lambda x: x &amp;lt; n*k, chain_lol( [range(i*(chunk_size)+j,i*(chunk_size ) + chunk_size+j) for i,j in enumerate(range(0,n*k,n))]))) def naive_R(n, k): chunk_size = (n + k - 1) // k R = np.zeros((k, n)) #print(construct_idx(chunk_size, k, n)) R.ravel()[construct_idx(chunk_size, k, n)] = v return R R = naive_R(n,k) R.dot(v), OPT (array([3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3.]), 18.0) A factor of 10 worse for Imagenet. Let’s consider another construction from Tramer et al., 2018. Tight Randomized Construction with Regular Hadamard matrix Hs = { &#39;4&#39;: np.load(&#39;../reg_hadamard_mats/reg_hadamard_mat_order-4.npy&#39;), &#39;16&#39;:np.load(&#39;../reg_hadamard_mats/reg_hadamard_mat_order-16.npy&#39;), &#39;36&#39;:np.load(&#39;../reg_hadamard_mats/reg_hadamard_mat_order-36.npy&#39;), &#39;64&#39;:np.load(&#39;../reg_hadamard_mats/reg_hadamard_mat_order-64.npy&#39;), &#39;100&#39;:np.load(&#39;../reg_hadamard_mats/reg_hadamard_mat_order-100.npy&#39;), } H = Hs[&#39;100&#39;] k = H.shape[0] # target vector v = np.sign(np.random.randn(n)) OPT= n / np.sqrt(k) R = np.zeros((k, n)) R[:, :n // k * k ] = np.repeat(H, n // k, axis=1) R *= v[None, :] R.dot(v), OPT (array([10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10.]), 10.8) sum(H) array([10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]) H.dot(H.T) array([[100, 0, 0, ..., 0, 0, 0], [ 0, 100, 0, ..., 0, 0, 0], [ 0, 0, 100, ..., 0, 0, 0], ..., [ 0, 0, 0, ..., 100, 0, 0], [ 0, 0, 0, ..., 0, 100, 0], [ 0, 0, 0, ..., 0, 0, 100]]) In the above discussion, we considered the case where $   r_i   _\infty\leq1$ and $v\in {-1,+1}^n$, how about the case of $   r_i   _2\leq 1$ and $v\in \mathbb{R}^n$. A similar result can be shown such that $r_i^Tv \geq k^{-1/2}   v   $ with $k=\min(\lfloor 1/\alpha^2 \rfloor, d)$ (See Tramer et al., 2017). Let’s define our setup below, before we show one possible construction. n = 1000 def ei(n, i): &quot;&quot;&quot;return the ith basis vector&quot;&quot;&quot; ei = np.zeros((n, 1)) ei[i] = 1 return ei v = np.random.randn(n,1) k = 6 norm_v = np.linalg.norm(v) OPT = norm_v / np.sqrt(k) The following is one possible construction z = np.sum(np.eye(n)[:, :k], axis=1, keepdims=True) / np.sqrt(k) S = ei(n, 1).dot(v.T) / norm_v T = ei(n, 1).dot(z.T) / np.linalg.norm(z)**2 U = S.T.dot(T) R = U.dot(np.eye(n)[:, :k]) v.T.dot(R), OPT (array([[13.24266379, 13.24266379, 13.24266379, 13.24266379, 13.24266379, 13.24266379]]), 13.242663787049473)">
+  
+
+  <link rel="stylesheet" href="/blog/assets/main.css">
+  <link rel="canonical" href="http://ash-aldujaili.github.io/blog/2019/05/30/adversarial-cone/">
+  
+  
+  <link rel="alternate" type="application/rss+xml" title="Hunting Optima" href="http://ash-aldujaili.github.io/blog/feed.xml">
+
+  
+
+  
+  <meta name="twitter:card" content="summary">
+  
+  <meta name="twitter:title" content="On Maximally Aligned Subspaces">
+  <meta name="twitter:description" content="Given a vector $v\in {-1,+1}^n$, we are interested in the set of $k$ orthogonal vectors $r_1,\ldots, r_k \in {-1,+1}^n$, that solves From Tramer et al., 2018, it was shown that if for all $i$, $v^T...">
+  
+  
+
+  <script type="text/javascript">
+  WebFontConfig = {
+    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
+  };
+  (function() {
+    var wf = document.createElement('script');
+    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+    wf.type = 'text/javascript';
+    wf.async = 'true';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(wf, s);
+  })();
+</script>
+
+  
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-68645681-6', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+
+
+</head>
+
+  <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    TeX: {
+      equationNumbers: {
+        autoNumber: "AMS"
+      }
+    },
+    tex2jax: {
+      inlineMath: [ ['$','$'] ],
+      displayMath: [ ['$$','$$'] ],
+      processEscapes: false,
+    }
+  });
+</script>
+<script type="text/javascript"
+        src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/blog/">Hunting Optima</a>
+
+    <nav class="site-nav">
+      
+        
+        <a class="page-link" href="http://ash-aldujaili.github.io/">Home</a>
+      
+        
+        <a class="page-link" href="/blog/about/">About my blog</a>
+      
+        
+        <a class="page-link" href="/blog/archives/">Archives</a>
+      
+        
+        <a class="page-link" href="https://github.com/ash-aldujaili">GitHub</a>
+      
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    
+      <h1 class="post-title" itemprop="name headline">On Maximally Aligned Subspaces</h1>
+                                       
+
+    <p class="post-meta"><time datetime="2019-05-30T00:00:00-08:00" itemprop="datePublished">May 30, 2019</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>Given a vector $v\in {-1,+1}^n$, we are interested in the set of $k$ orthogonal vectors $r_1,\ldots, r_k \in {-1,+1}^n$, that solves
+<script type="math/tex">\max_{\{r_i\}_k}\min_{i\in [k]}v^Tr_i</script></p>
+
+<p>From Tramer et al., 2018, it was shown that if for all $i$, $v^Tr_i \geq \alpha  n$ for $\alpha \in (0,1)$, then $\alpha \leq 1/\sqrt{k}$. In other words, $OPT=n/\sqrt{k}$. Let’s denote by $R$ the matrix formed by stacking $r_i$ vertically.</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">scipy.linalg</span> <span class="kn">import</span> <span class="n">hadamard</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+</code></pre>
+</div>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="c"># dim</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">108</span> <span class="c"># imagenet dim</span>
+<span class="c"># adv cone size &lt; n</span>
+<span class="n">k</span> <span class="o">=</span> <span class="mi">36</span>
+<span class="c"># target vector</span>
+<span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+<span class="n">OPT</span><span class="o">=</span> <span class="n">n</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<h4>Naive Construction</h4>
+
+<p>The following naive method (Tramer et al, 2018) can be used to achieve ~$n/k$, a factor of $\sqrt{k}$ worse than OPT, assuming $k$ divides $n$.</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">chain_lol</span><span class="p">(</span><span class="n">lol</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="p">(</span><span class="o">*</span><span class="n">lol</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">construct_idx</span><span class="p">(</span><span class="n">chunk_size</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="s">"""a method to get 1d idxs for the R matrix used by the naive construction method
+    """</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">n</span><span class="o">*</span><span class="n">k</span><span class="p">,</span>
+        <span class="n">chain_lol</span><span class="p">(</span>
+        <span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="o">*</span><span class="p">(</span><span class="n">chunk_size</span><span class="p">)</span><span class="o">+</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="o">*</span><span class="p">(</span><span class="n">chunk_size</span> <span class="p">)</span> <span class="o">+</span> <span class="n">chunk_size</span><span class="o">+</span><span class="n">j</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">j</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">n</span><span class="o">*</span><span class="n">k</span><span class="p">,</span><span class="n">n</span><span class="p">))])))</span>
+
+<span class="k">def</span> <span class="nf">naive_R</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+    <span class="n">chunk_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="n">k</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">k</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+    <span class="c">#print(construct_idx(chunk_size, k, n))</span>
+    <span class="n">R</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[</span><span class="n">construct_idx</span><span class="p">(</span><span class="n">chunk_size</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">n</span><span class="p">)]</span> <span class="o">=</span> <span class="n">v</span>
+    <span class="k">return</span> <span class="n">R</span>
+</code></pre>
+</div>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">R</span> <span class="o">=</span> <span class="n">naive_R</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">R</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v</span><span class="p">),</span> <span class="n">OPT</span> 
+</code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>(array([3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3.,
+        3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3., 3.,
+        3., 3.]), 18.0)
+</code></pre>
+</div>
+
+<p>A factor of 10 worse for Imagenet. Let’s consider another construction from Tramer et al., 2018.</p>
+
+<h4>Tight Randomized Construction with Regular Hadamard matrix</h4>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">Hs</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">'4'</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s">'../reg_hadamard_mats/reg_hadamard_mat_order-4.npy'</span><span class="p">),</span>
+    <span class="s">'16'</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s">'../reg_hadamard_mats/reg_hadamard_mat_order-16.npy'</span><span class="p">),</span>
+    <span class="s">'36'</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s">'../reg_hadamard_mats/reg_hadamard_mat_order-36.npy'</span><span class="p">),</span>
+    <span class="s">'64'</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s">'../reg_hadamard_mats/reg_hadamard_mat_order-64.npy'</span><span class="p">),</span>
+    <span class="s">'100'</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s">'../reg_hadamard_mats/reg_hadamard_mat_order-100.npy'</span><span class="p">),</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">H</span> <span class="o">=</span> <span class="n">Hs</span><span class="p">[</span><span class="s">'100'</span><span class="p">]</span>
+</code></pre>
+</div>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">k</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="c"># target vector</span>
+<span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+<span class="n">OPT</span><span class="o">=</span> <span class="n">n</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">k</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+<span class="n">R</span><span class="p">[:,</span> <span class="p">:</span><span class="n">n</span> <span class="o">//</span> <span class="n">k</span> <span class="o">*</span> <span class="n">k</span> <span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">n</span> <span class="o">//</span> <span class="n">k</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">R</span> <span class="o">*=</span> <span class="n">v</span><span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="p">:]</span>
+</code></pre>
+</div>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">R</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v</span><span class="p">),</span> <span class="n">OPT</span> 
+</code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>(array([10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10.,
+        10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10.,
+        10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10.,
+        10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10.,
+        10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10.,
+        10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10.,
+        10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10., 10.,
+        10., 10., 10., 10., 10., 10., 10., 10., 10.]), 10.8)
+</code></pre>
+</div>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="nb">sum</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>array([10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
+       10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
+       10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
+       10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
+       10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
+       10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10])
+</code></pre>
+</div>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">H</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">H</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>array([[100,   0,   0, ...,   0,   0,   0],
+       [  0, 100,   0, ...,   0,   0,   0],
+       [  0,   0, 100, ...,   0,   0,   0],
+       ...,
+       [  0,   0,   0, ..., 100,   0,   0],
+       [  0,   0,   0, ...,   0, 100,   0],
+       [  0,   0,   0, ...,   0,   0, 100]])
+</code></pre>
+</div>
+
+<table>
+  <tbody>
+    <tr>
+      <td>In the above discussion, we considered the case where $</td>
+      <td> </td>
+      <td>r_i</td>
+      <td> </td>
+      <td>_\infty\leq1$ and $v\in {-1,+1}^n$, how about the case of $</td>
+      <td> </td>
+      <td>r_i</td>
+      <td> </td>
+      <td>_2\leq 1$ and $v\in \mathbb{R}^n$.</td>
+    </tr>
+  </tbody>
+</table>
+
+<table>
+  <tbody>
+    <tr>
+      <td>A similar result can be shown such that $r_i^Tv \geq k^{-1/2}</td>
+      <td> </td>
+      <td>v</td>
+      <td> </td>
+      <td>$ with $k=\min(\lfloor 1/\alpha^2 \rfloor, d)$ (See Tramer et al., 2017). Let’s define our setup below, before we show one possible construction.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">n</span> <span class="o">=</span> <span class="mi">1000</span>
+
+<span class="k">def</span> <span class="nf">ei</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+    <span class="s">"""return the ith basis vector"""</span>
+    <span class="n">ei</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">ei</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">ei</span>
+
+<span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">k</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">norm_v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+<span class="n">OPT</span> <span class="o">=</span> <span class="n">norm_v</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>The following is one possible construction</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">n</span><span class="p">)[:,</span> <span class="p">:</span><span class="n">k</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">S</span> <span class="o">=</span> <span class="n">ei</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="n">norm_v</span>
+<span class="n">T</span> <span class="o">=</span> <span class="n">ei</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">z</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+<span class="n">U</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">T</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">R</span> <span class="o">=</span> <span class="n">U</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">n</span><span class="p">)[:,</span> <span class="p">:</span><span class="n">k</span><span class="p">])</span>
+</code></pre>
+</div>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">v</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">R</span><span class="p">),</span> <span class="n">OPT</span>
+</code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>(array([[13.24266379, 13.24266379, 13.24266379, 13.24266379, 13.24266379,
+         13.24266379]]), 13.242663787049473)
+</code></pre>
+</div>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code>
+</code></pre>
+</div>
+
+  </div>
+
+  
+    <div id="disqus_thread"></div>
+    <script>
+    /**
+    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+  
+    var disqus_config = function () {
+    this.page.url = "http://ash-aldujaili.github.io/blog/2019/05/30/adversarial-cone/"; //'http://ash-aldujaili.github.io/blog/2017/06/06/mse-ego-dace/';  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = "/2019/05/30/adversarial-cone"; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://ash-aldujaili.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+   
+
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <p>
+      
+
+&copy; Abdullah Al-Dujaili - Powered by <a href="https://jekyllrb.com">Jekyll</a> &amp; <a href="https://github.com/yous/whiteglass">whiteglass</a> - Subscribe via <a href="http://ash-aldujaili.github.io/blog/feed.xml">RSS</a>
+
+    </p>
+
+  </div>
+
+</footer>
+
+
+    
+  </body>
+
+</html>
